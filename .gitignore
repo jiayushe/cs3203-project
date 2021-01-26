@@ -1,0 +1,7 @@
+# OSX filesystem 
+.DS_Store
+
+# CLion
+.idea
+cmake-build-debug
+
