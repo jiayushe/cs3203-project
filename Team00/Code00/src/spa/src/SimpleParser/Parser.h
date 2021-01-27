@@ -63,10 +63,10 @@ namespace SimpleParser {
         int next_statement_id;
 
         // TODO:
-        Node *choice(const std::vector<std::function<Node *()>> &parse_funcs, const std::string &error_message);
+        Node *choice(const std::vector<std::function<Node *()>> &parse_funcs, std::string error_message);
 
         // TODO:
-        Node *repeat(const std::function<Node *()> &parse_func);
+        Node *repeat(const std::function<Node *(Node *)> &parse_func, Node *initial_node);
 
         // Registers that the next token should be of the expected type.
         // Throws if the expectation is not fulfilled.
