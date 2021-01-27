@@ -299,7 +299,6 @@ Node *Parser::parse_term() {
             term_node->add_child(factor_node);
 
             return term_node;
-
         },
         factor_node
     );
