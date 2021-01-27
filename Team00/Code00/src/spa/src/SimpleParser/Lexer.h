@@ -6,10 +6,10 @@
 
 namespace SimpleParser {
 
-    // TODO:
+    // Lexer for the SIMPLE language (converts string to tokens).
     class Lexer {
     public:
-        // TODO:
+        // Gets a list of tokens representing the supplied SIMPLE source.
         TokenList *tokens();
 
     private:

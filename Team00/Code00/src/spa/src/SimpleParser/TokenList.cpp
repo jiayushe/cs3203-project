@@ -30,5 +30,8 @@ int TokenList::current_pos() {
 }
 
 void TokenList::reset_pos(int new_pos) {
+    if (new_pos < 0 || new_pos >= tokens.size()) {
+        throw "Invalid position supplied";
+    }
     pos = new_pos;
 }

@@ -6,7 +6,8 @@
 
 namespace SimpleParser {
 
-    // TODO:
+    // Lexer for the SIMPLE language (string to tokens) which reads
+    // the SIMPLE source as a std::string.
     class StringLexer : public Lexer {
     public:
         StringLexer(const std::string &value);
