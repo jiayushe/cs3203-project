@@ -58,58 +58,40 @@ Node *Parser::parse_stmt_lst() {
 }
 
 Node *Parser::parse_stmt() {
-    auto saved_pos = tokens->current_pos();
-    auto saved_next_statement_id = next_statement_id;
+    return choice(
+            std::vector<std::function<Node *()>>{
+                    // stmt: read
+                    [this]() {
+                        return parse_read();
+                    },
 
-    // stmt: read
-    try {
-        return parse_read();
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
+                    // stmt: print
+                    [this]() {
+                        return parse_print();
+                    },
 
-    // stmt: print
-    try {
-        return parse_print();
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
+                    // stmt: call
+                    [this]() {
+                        return parse_call();
+                    },
 
-    // stmt: call
-    try {
-        return parse_call();
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
+                    // stmt: while
+                    [this]() {
+                        return parse_while();
+                    },
 
-    // stmt: while
-    try {
-        return parse_while();
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
+                    // stmt: if
+                    [this]() {
+                        return parse_if();
+                    },
 
-    // stmt: if
-    try {
-        return parse_if();
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
-
-    // stmt: assign
-    try {
-        return parse_assign();
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
-
-    throw "Expected stmt, received '" + tokens->front()->get_value() + "'";
+                    // stmt: assign
+                    [this]() {
+                        return parse_assign();
+                    },
+            },
+            "Expected stmt, received '" + tokens->front()->get_value() + "'"
+    );
 }
 
 Node *Parser::parse_read() {
@@ -209,74 +191,49 @@ Node *Parser::parse_assign() {
 }
 
 Node *Parser::parse_cond_expr() {
-    auto saved_pos = tokens->current_pos();
-    auto saved_next_statement_id = next_statement_id;
+    return choice(
+            std::vector<std::function<Node *()>>{
+                    // cond_expr: ‘!’ ‘(’ cond_expr ‘)’
+                    [this]() {
+                        auto op_token = expect_token(TokenType::NOT);
+                        expect_token(TokenType::LPAREN);
+                        auto inner_cond_expr_node = parse_cond_expr();
+                        expect_token(TokenType::RPAREN);
 
-    // cond_expr: ‘!’ ‘(’ cond_expr ‘)’
-    try {
-        auto op_token = expect_token(TokenType::NOT);
-        expect_token(TokenType::LPAREN);
-        auto inner_cond_expr_node = parse_cond_expr();
-        expect_token(TokenType::RPAREN);
+                        auto cond_expr_node = new Node(NodeType::CONDITIONAL, op_token->get_value());
+                        cond_expr_node->add_child(inner_cond_expr_node);
 
-        auto cond_expr_node = new Node(NodeType::CONDITIONAL, op_token->get_value());
-        cond_expr_node->add_child(inner_cond_expr_node);
+                        return cond_expr_node;
+                    },
 
-        return cond_expr_node;
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
+                    // cond_expr: ‘(’ cond_expr ‘)’ ‘&&’ ‘(’ cond_expr ‘)’
+                    // cond_expr: ‘(’ cond_expr ‘)’ ‘||’ ‘(’ cond_expr ‘)’
+                    [this]() {
+                        expect_token(TokenType::LPAREN);
+                        auto left_cond_expr_node = parse_cond_expr();
+                        expect_token(TokenType::RPAREN);
+                        auto op_token = expect_token(std::vector<TokenType>{
+                                TokenType::AND,
+                                TokenType::OR,
+                        });
+                        expect_token(TokenType::LPAREN);
+                        auto right_cond_expr_node = parse_cond_expr();
+                        expect_token(TokenType::RPAREN);
 
-    // cond_expr: ‘(’ cond_expr ‘)’ ‘&&’ ‘(’ cond_expr ‘)’
-    try {
-        expect_token(TokenType::LPAREN);
-        auto left_cond_expr_node = parse_cond_expr();
-        expect_token(TokenType::RPAREN);
-        auto op_token = expect_token(TokenType::AND);
-        expect_token(TokenType::LPAREN);
-        auto right_cond_expr_node = parse_cond_expr();
-        expect_token(TokenType::RPAREN);
+                        auto cond_expr_node = new Node(NodeType::CONDITIONAL, op_token->get_value());
+                        cond_expr_node->add_child(left_cond_expr_node);
+                        cond_expr_node->add_child(right_cond_expr_node);
 
-        auto cond_expr_node = new Node(NodeType::CONDITIONAL, op_token->get_value());
-        cond_expr_node->add_child(left_cond_expr_node);
-        cond_expr_node->add_child(right_cond_expr_node);
+                        return cond_expr_node;
+                    },
 
-        return cond_expr_node;
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
-
-    // cond_expr: ‘(’ cond_expr ‘)’ ‘||’ ‘(’ cond_expr ‘)’
-    try {
-        expect_token(TokenType::LPAREN);
-        auto left_cond_expr_node = parse_cond_expr();
-        expect_token(TokenType::RPAREN);
-        auto op_token = expect_token(TokenType::OR);
-        expect_token(TokenType::LPAREN);
-        auto right_cond_expr_node = parse_cond_expr();
-        expect_token(TokenType::RPAREN);
-
-        auto cond_expr_node = new Node(NodeType::CONDITIONAL, op_token->get_value());
-        cond_expr_node->add_child(left_cond_expr_node);
-        cond_expr_node->add_child(right_cond_expr_node);
-
-        return cond_expr_node;
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
-
-    // cond_expr: rel_expr
-    try {
-        return parse_rel_expr();
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
-
-    throw "Expected cond_expr, received '" + tokens->front()->get_value() + "'";
+                    // cond_expr: rel_expr
+                    [this]() {
+                        return parse_rel_expr();
+                    }
+            },
+            "Expected cond_expr, received '" + tokens->front()->get_value() + "'"
+    );
 }
 
 Node *Parser::parse_rel_expr() {
@@ -299,34 +256,25 @@ Node *Parser::parse_rel_expr() {
 }
 
 Node *Parser::parse_rel_factor() {
-    auto saved_pos = tokens->current_pos();
-    auto saved_next_statement_id = next_statement_id;
+    return choice(
+            std::vector<std::function<Node *()>>{
+                    // rel_factor: expr
+                    [this]() {
+                        return parse_expr();
+                    },
 
-    // rel_factor: expr
-    try {
-        return parse_expr();
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
+                    // rel_factor: var_name
+                    [this]() {
+                        return parse_var_name();
+                    },
 
-    // rel_factor: var_name
-    try {
-        return parse_var_name();
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
-
-    // rel_factor: const_value
-    try {
-        return parse_const_value();
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
-
-    throw "Expected parse_rel_factor, received '" + tokens->front()->get_value() + "'";
+                    // rel_factor: const_value
+                    [this]() {
+                        return parse_const_value();
+                    }
+            },
+            "Expected rel_factor, received '" + tokens->front()->get_value() + "'"
+    );
 }
 
 // expr: term (('+' | '-') term)*
@@ -391,37 +339,42 @@ Node *Parser::parse_term() {
 }
 
 Node *Parser::parse_factor() {
+    return choice(
+            std::vector<std::function<Node *()>>{
+                    // factor: var_name
+                    [this]() {
+                        return parse_var_name();
+                    },
+
+                    // factor: const_value
+                    [this]() {
+                        return parse_const_value();
+                    },
+
+                    // factor: '(' expr ')'
+                    [this]() {
+                        expect_token(TokenType::LPAREN);
+                        auto expr_node = parse_expr();
+                        expect_token(TokenType::RPAREN);
+                        return expr_node;
+                    },
+            },
+            "Expected parse_factor, received '" + tokens->front()->get_value() + "'"
+    );
+}
+
+Node *Parser::choice(const std::vector<std::function<Node *()>> &parse_funcs, const std::string &error_message) {
     auto saved_pos = tokens->current_pos();
     auto saved_next_statement_id = next_statement_id;
-
-    // factor: var_name
-    try {
-        return parse_var_name();
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
+    for (const auto &parse_func : parse_funcs) {
+        try {
+            return parse_func();
+        } catch (...) {
+            tokens->reset_pos(saved_pos);
+            next_statement_id = saved_next_statement_id;
+        }
     }
-
-    // factor: const_value
-    try {
-        return parse_const_value();
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
-
-    // factor: '(' expr ')'
-    try {
-        expect_token(TokenType::LPAREN);
-        auto expr_node = parse_expr();
-        expect_token(TokenType::RPAREN);
-        return expr_node;
-    } catch (...) {
-        tokens->reset_pos(saved_pos);
-        next_statement_id = saved_next_statement_id;
-    }
-
-    throw "Expected parse_factor, received '" + tokens->front()->get_value() + "'";
+    throw error_message;
 }
 
 Node *Parser::parse_var_name() {

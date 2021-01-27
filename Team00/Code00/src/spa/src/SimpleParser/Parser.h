@@ -1,6 +1,7 @@
 #ifndef SIMPLEPARSER_PARSER_H
 #define SIMPLEPARSER_PARSER_H
 
+#include <functional>
 #include "Lexer.h"
 #include "Token.h"
 #include "TokenList.h"
@@ -60,6 +61,12 @@ namespace SimpleParser {
     private:
         TokenList *tokens;
         int next_statement_id;
+
+        // TODO:
+        Node *choice(const std::vector<std::function<Node *()>> &parse_funcs, const std::string &error_message);
+
+        // TODO:
+        Node *repeat(const std::function<Node *()> &parse_func);
 
         // Registers that the next token should be of the expected type.
         // Throws if the expectation is not fulfilled.
