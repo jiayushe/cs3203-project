@@ -58,7 +58,7 @@ std::vector<Node *> Node::get_children() {
 }
 
 Node *Node::get_child(int i) {
-    if (i > children.size()) {
+    if (i < 0 || i >= children.size()) {
         throw "Children with index " + to_string(i) + " doesn't exist";
     }
     return children[i];
