@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cctype>
 #include <string>
 #include "Parser.h"
@@ -397,10 +398,6 @@ Node *Parser::parse_const_value() {
     return new Node(NodeType::CONST_VALUE, const_value_token->get_value());
 }
 
-bool Parser::is_token_type(Token *token, TokenType expected_type) {
-    return token->get_type() == expected_type;
-}
-
 Token *Parser::expect_token(TokenType expected_type) {
     auto token = tokens->pop_front();
     if (!is_token_type(token, expected_type)) {
@@ -420,20 +417,12 @@ Token *Parser::expect_token(const std::vector<TokenType> &expected_types) {
     throw "Expected token type " + to_string(expected_types) + ", received " + std::to_string(token->get_type());
 }
 
-bool Parser::is_word(Token *token, const std::string &expected_value) {
-    return token->get_type() == TokenType::WORD && token->get_value() == expected_value;
-}
-
 Token *Parser::expect_word(const std::string &expected_value) {
     auto token = tokens->pop_front();
     if (!is_word(token, expected_value)) {
         throw "Expected word token with value '" + expected_value + "', received '" + token->get_value() + "'";
     }
     return token;
-}
-
-bool Parser::is_name(Token *token) {
-    return token->get_type() == TokenType::WORD && !token->get_value().empty() && isalpha(token->get_value().front());
 }
 
 Token *Parser::expect_name(const std::string &identifier) {
@@ -444,24 +433,34 @@ Token *Parser::expect_name(const std::string &identifier) {
     return token;
 }
 
-bool Parser::is_integer(Token *token) {
-    if (token->get_type() != TokenType::WORD || token->get_value().empty()) {
-        return false;
-    }
-    for (auto const &character : token->get_value()) {
-        if (!isnumber(character)) {
-            return false;
-        }
-    }
-    return true;
-}
-
 Token *Parser::expect_integer(const std::string &identifier) {
     auto token = tokens->pop_front();
     if (!is_integer(token)) {
         throw "Expected integer token " + identifier + ", received '" + token->get_value() + "'";
     }
     return token;
+}
+
+bool Parser::is_token_type(Token *token, TokenType expected_type) {
+    return token->get_type() == expected_type;
+}
+
+bool Parser::is_word(Token *token, const std::string &expected_value) {
+    return token->get_type() == TokenType::WORD && token->get_value() == expected_value;
+}
+
+bool Parser::is_name(Token *token) {
+    return token->get_type() == TokenType::WORD && !token->get_value().empty() && isalpha(token->get_value().front());
+}
+
+bool Parser::is_integer(Token *token) {
+    auto token_value = token->get_value();
+    if (token->get_type() != TokenType::WORD || token_value.empty()) {
+        return false;
+    }
+    return std::all_of(token_value.begin(), token_value.end(), [](char character) {
+        return isnumber(character);
+    });
 }
 
 std::string Parser::to_string(const std::vector<TokenType> &token_types) {

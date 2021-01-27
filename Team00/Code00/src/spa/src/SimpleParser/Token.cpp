@@ -2,7 +2,7 @@
 
 using namespace SimpleParser;
 
-Token::Token(TokenType type, std::string value) : type(type), value(value) {}
+Token::Token(TokenType type, const std::string &value) : type(type), value(value) {}
 
 TokenType Token::get_type() {
     return type;

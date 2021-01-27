@@ -32,7 +32,7 @@ namespace SimpleParser {
     // AST node for the SIMPLE language.
     class Node {
     public:
-        Node(NodeType type);
+        explicit Node(NodeType type);
 
         Node(NodeType type, std::string value);
 

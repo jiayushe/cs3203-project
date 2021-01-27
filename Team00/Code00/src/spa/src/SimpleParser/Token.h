@@ -42,7 +42,7 @@ namespace SimpleParser {
     // A single token (in parser parlance) for the SIMPLE language.
     class Token {
     public:
-        Token(TokenType type, std::string value);
+        Token(TokenType type, const std::string &value);
 
         // Gets the type of the token.
         TokenType get_type();
