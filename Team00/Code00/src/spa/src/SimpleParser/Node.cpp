@@ -69,7 +69,42 @@ void Node::add_child(Node *node) {
 }
 
 bool Node::is_subtree(Node *node) {
-    throw "To be implemented";
+    if (node == nullptr) {
+        return false;
+    }
+
+    if (is_equal(node)) {
+        return true;
+    }
+
+    for (auto const child : children) {
+        if (child->is_subtree(node)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Node::is_equal(Node *node) {
+    if (node == nullptr) {
+        return false;
+    }
+
+    if (type != node->type
+        || value != node->value
+        || statement_id != node->statement_id
+        || children.size() != node->children.size()) {
+        return false;
+    }
+
+    for (int i = 0; i < children.size(); i++) {
+        if (!children[i]->is_equal(node->children[i])) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 std::string Node::to_string() {
