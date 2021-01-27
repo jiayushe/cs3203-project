@@ -15,6 +15,7 @@ TEST_CASE("SimpleParser::Parser") {
 
         auto read_node = parser.parse_read();
         REQUIRE(read_node->get_type() == NodeType::READ);
+        REQUIRE(read_node->get_statement_id() == 1);
         REQUIRE(read_node->get_children().size() == 1);
 
         auto var_name_node = read_node->get_child(0);
@@ -32,6 +33,7 @@ TEST_CASE("SimpleParser::Parser") {
 
         auto print_node = parser.parse_print();
         REQUIRE(print_node->get_type() == NodeType::PRINT);
+        REQUIRE(print_node->get_statement_id() == 1);
         REQUIRE(print_node->get_children().size() == 1);
 
         auto var_name_node = print_node->get_child(0);
@@ -49,6 +51,7 @@ TEST_CASE("SimpleParser::Parser") {
 
         auto call_node = parser.parse_call();
         REQUIRE(call_node->get_type() == NodeType::CALL);
+        REQUIRE(call_node->get_statement_id() == 1);
         REQUIRE(call_node->get_children().size() == 1);
 
         auto proc_name_node = call_node->get_child(0);
@@ -67,6 +70,7 @@ TEST_CASE("SimpleParser::Parser") {
 
             auto assign_node = parser.parse_assign();
             REQUIRE(assign_node->get_type() == NodeType::ASSIGN);
+            REQUIRE(assign_node->get_statement_id() == 1);
             REQUIRE(assign_node->get_children().size() == 2);
 
             auto left_var_name_node = assign_node->get_child(0);
@@ -89,6 +93,7 @@ TEST_CASE("SimpleParser::Parser") {
 
             auto assign_node = parser.parse_assign();
             REQUIRE(assign_node->get_type() == NodeType::ASSIGN);
+            REQUIRE(assign_node->get_statement_id() == 1);
             REQUIRE(assign_node->get_children().size() == 2);
 
             auto var_name_node = assign_node->get_child(0);
@@ -111,6 +116,7 @@ TEST_CASE("SimpleParser::Parser") {
 
             auto assign_node = parser.parse_assign();
             REQUIRE(assign_node->get_type() == NodeType::ASSIGN);
+            REQUIRE(assign_node->get_statement_id() == 1);
             REQUIRE(assign_node->get_children().size() == 2);
 
             auto var_name_node = assign_node->get_child(0);
@@ -135,9 +141,12 @@ TEST_CASE("SimpleParser::Parser") {
 
         auto while_node = parser.parse_while();
         REQUIRE(while_node->get_type() == NodeType::WHILE);
+        REQUIRE(while_node->get_statement_id() == 1);
         REQUIRE(while_node->get_children().size() == 2);
         REQUIRE(while_node->get_child(0)->get_type() == NodeType::CONDITIONAL);
         REQUIRE(while_node->get_child(1)->get_type() == NodeType::STMT_LST);
+        REQUIRE(while_node->get_child(1)->get_child(0)->get_type() == NodeType::PRINT);
+        REQUIRE(while_node->get_child(1)->get_child(0)->get_statement_id() == 2);
 
         delete while_node;
     }
@@ -154,6 +163,7 @@ TEST_CASE("SimpleParser::Parser") {
 
         auto if_node = parser.parse_if();
         REQUIRE(if_node->get_type() == NodeType::IF);
+        REQUIRE(if_node->get_statement_id() == 1);
         REQUIRE(if_node->get_children().size() == 3);
 
         auto cond_node = if_node->get_child(0);
@@ -163,11 +173,13 @@ TEST_CASE("SimpleParser::Parser") {
         auto then_stmt_lst_node = if_node->get_child(1);
         REQUIRE(then_stmt_lst_node->get_type() == NodeType::STMT_LST);
         REQUIRE(then_stmt_lst_node->get_child(0)->get_type() == NodeType::PRINT);
+        REQUIRE(then_stmt_lst_node->get_child(0)->get_statement_id() == 2);
 
         // Make sure that the first child is a statement list for the 'else' clause
         auto else_stmt_lst_node = if_node->get_child(2);
         REQUIRE(else_stmt_lst_node->get_type() == NodeType::STMT_LST);
         REQUIRE(else_stmt_lst_node->get_child(0)->get_type() == NodeType::READ);
+        REQUIRE(else_stmt_lst_node->get_child(0)->get_statement_id() == 3);
 
         delete if_node;
     }
@@ -439,11 +451,17 @@ TEST_CASE("SimpleParser::Parser") {
         REQUIRE(stmt_lst_node->get_type() == NodeType::STMT_LST);
         REQUIRE(stmt_lst_node->get_children().size() == 6);
         REQUIRE(stmt_lst_node->get_child(0)->get_type() == NodeType::READ);
+        REQUIRE(stmt_lst_node->get_child(0)->get_statement_id() == 1);
         REQUIRE(stmt_lst_node->get_child(1)->get_type() == NodeType::PRINT);
+        REQUIRE(stmt_lst_node->get_child(1)->get_statement_id() == 2);
         REQUIRE(stmt_lst_node->get_child(2)->get_type() == NodeType::CALL);
+        REQUIRE(stmt_lst_node->get_child(2)->get_statement_id() == 3);
         REQUIRE(stmt_lst_node->get_child(3)->get_type() == NodeType::WHILE);
+        REQUIRE(stmt_lst_node->get_child(3)->get_statement_id() == 4);
         REQUIRE(stmt_lst_node->get_child(4)->get_type() == NodeType::IF);
+        REQUIRE(stmt_lst_node->get_child(4)->get_statement_id() == 6);
         REQUIRE(stmt_lst_node->get_child(5)->get_type() == NodeType::ASSIGN);
+        REQUIRE(stmt_lst_node->get_child(5)->get_statement_id() == 9);
 
         delete stmt_lst_node;
     }

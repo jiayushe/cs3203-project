@@ -59,6 +59,7 @@ namespace SimpleParser {
 
     private:
         TokenList *tokens;
+        int next_statement_id;
 
         // Registers that the next token should be of the expected type.
         // Throws if the expectation is not fulfilled.

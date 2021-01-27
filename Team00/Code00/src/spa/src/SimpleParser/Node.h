@@ -40,6 +40,14 @@ namespace SimpleParser {
 
         ~Node();
 
+        // Returns true when node type is either one of the following:
+        // - CONDITIONAL
+        // - ARITHMETIC
+        // - VAR_NAME
+        // - PROC_NAME
+        // - CONST_VALUE
+        bool has_value();
+
         // Gets the value contained within the AST node.
         //
         // Node values only matter for the following node types:
@@ -49,23 +57,20 @@ namespace SimpleParser {
         // - PROC_NAME, value = [a-zA-Z][a-zA-Z0-9]*
         // - CONST_VALUE, value = [0-9]+
         //
-        // Throws unless node type is either one of the following:
-        // - CONDITIONAL
-        // - ARITHMETIC
-        // - VAR_NAME
-        // - PROC_NAME
-        // - CONST_VALUE
+        // Throws unless has_value returns true.
         std::string get_value();
 
-        // Gets the statement id of the current AST node (only valid for statement nodes).
-        //
-        // Throws unless node type is either one of the following:
+        // Returns true when node type is either one of the following:
         // - READ
         // - PRINT
         // - CALL
         // - WHILE
         // - IF
         // - ASSIGN
+        bool has_statement_id();
+
+        // Gets the statement id of the current AST node (only valid for statement nodes).
+        // Throws unless has_statement_id returns true.
         int get_statement_id();
 
         // Gets the current AST node type.

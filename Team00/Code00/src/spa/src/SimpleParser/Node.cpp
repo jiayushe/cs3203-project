@@ -30,24 +30,32 @@ NodeType Node::get_type() {
     return type;
 }
 
+bool Node::has_value() {
+    return type == NodeType::CONDITIONAL
+           || type == NodeType::ARITHMETIC
+           || type == NodeType::VAR_NAME
+           || type == NodeType::PROC_NAME
+           || type == NodeType::CONST_VALUE;
+}
+
 std::string Node::get_value() {
-    if (type != NodeType::CONDITIONAL
-        && type != NodeType::ARITHMETIC
-        && type != NodeType::VAR_NAME
-        && type != NodeType::PROC_NAME
-        && type != NodeType::CONST_VALUE) {
+    if (!has_value()) {
         throw "Cannot get value for node type " + to_string(type);
     }
     return value;
 }
 
+bool Node::has_statement_id() {
+    return type == NodeType::READ
+           || type == NodeType::PRINT
+           || type == NodeType::CALL
+           || type == NodeType::ASSIGN
+           || type == NodeType::IF
+           || type == NodeType::WHILE;
+}
+
 int Node::get_statement_id() {
-    if (type != NodeType::READ
-        && type != NodeType::PRINT
-        && type != NodeType::CALL
-        && type != NodeType::ASSIGN
-        && type != NodeType::IF
-        && type != NodeType::WHILE) {
+    if (!has_statement_id()) {
         throw "Cannot get statement_id for node type " + to_string(type);
     }
     return statement_id;
@@ -117,8 +125,17 @@ std::string Node::to_string(int padding) {
     result += std::string(padding, ' ');
     result += "Node (type=";
     result += std::to_string(type);
-    result += ", value=";
-    result += value;
+
+    if (has_value()) {
+        result += ", value=";
+        result += value;
+    }
+
+    if (has_statement_id()) {
+        result += ", statement_id=";
+        result += std::to_string(statement_id);
+    }
+
     result += ")\n";
 
     for (auto const &child : children) {
