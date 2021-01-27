@@ -3,22 +3,22 @@
 using namespace SimpleParser;
 
 Node::Node(NodeType type) :
-        type(type),
-        value(""),
-        statement_id(-1),
-        children(std::vector<Node *>()) {}
+    type(type),
+    value(""),
+    statement_id(-1),
+    children(std::vector<Node *>()) {}
 
 Node::Node(NodeType type, std::string value) :
-        type(type),
-        value(value),
-        statement_id(-1),
-        children(std::vector<Node *>()) {}
+    type(type),
+    value(value),
+    statement_id(-1),
+    children(std::vector<Node *>()) {}
 
 Node::Node(NodeType type, int statement_id) :
-        type(type),
-        value(""),
-        statement_id(statement_id),
-        children(std::vector<Node *>()) {}
+    type(type),
+    value(""),
+    statement_id(statement_id),
+    children(std::vector<Node *>()) {}
 
 Node::~Node() {
     for (auto const child : children) {
