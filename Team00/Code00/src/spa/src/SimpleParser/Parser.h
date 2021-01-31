@@ -62,10 +62,13 @@ namespace SimpleParser {
         TokenList *tokens;
         int next_statement_id;
 
-        // TODO:
+        // Helper for choosing one valid parser from parse_funcs.
+        // Validity is decided based on whether the chosen parser throws an error.
+        // Useful for building a disjunctive parsing logic (see parse_cond_expr for an example).
         Node *choice(const std::vector<std::function<Node *()>> &parse_funcs, std::string error_message);
 
-        // TODO:
+        // Helper for repeatedly calling parse_func until it throws an error.
+        // Useful for building an iterative parsing logic (see parse_stmt_lst for an example).
         Node *repeat(const std::function<Node *(Node *)> &parse_func, Node *initial_node);
 
         // Registers that the next token should be of the expected type.
