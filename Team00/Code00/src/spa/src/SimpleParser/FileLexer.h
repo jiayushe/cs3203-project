@@ -11,7 +11,7 @@ namespace SimpleParser {
     // the SIMPLE source from the given filename.
     class FileLexer : public Lexer {
     public:
-        FileLexer(const std::string &filename);
+        explicit FileLexer(const std::string &filename);
 
     private:
         std::ifstream file;

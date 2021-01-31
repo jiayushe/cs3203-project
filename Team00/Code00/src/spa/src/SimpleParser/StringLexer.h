@@ -10,7 +10,7 @@ namespace SimpleParser {
     // the SIMPLE source as a std::string.
     class StringLexer : public Lexer {
     public:
-        StringLexer(const std::string &value);
+        explicit StringLexer(const std::string &value);
 
     private:
         int pos;
