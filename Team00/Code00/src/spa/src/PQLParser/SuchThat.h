@@ -23,7 +23,11 @@ namespace PQLParser {
         Ref get_left_ref();
         Ref get_right_ref();
 
-        SuchThat(SuchThatType type);
+        SuchThat();
+
+        SuchThat(SuchThatType type, Ref left_ref, Ref right_ref);
+
+        ~SuchThat();
 
     private:
         SuchThatType type;

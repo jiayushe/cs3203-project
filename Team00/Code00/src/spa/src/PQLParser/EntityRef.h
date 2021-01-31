@@ -18,7 +18,17 @@ namespace PQLParser {
         std::string get_synonym();
         std::string get_name();
 
-        EntityRef(DesignEntityType type);
+        EntityRef();
+
+        // EntityRef(EntityRefType type, std::string text);
+
+        ~EntityRef();
+
+        void set_type(EntityRefType entityRefType);
+
+        void set_synonym(std::string synonym);
+
+        void set_name(std::string name);
 
     private:
         EntityRefType type;

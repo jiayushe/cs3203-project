@@ -2,26 +2,84 @@
 // Created by Victor Varian on 26/1/21.
 //
 
-//#include <string>
-//#include <iostream>
-//#include "QueryObject.h"
-//
-//using namespace PQLParser;
-//
-//QueryObject::QueryObject(std::string selection, bool has_such_that_cl, bool has_pattern_cl) :
-//    selection(selection),
-//    has_such_that_cl(has_such_that_cl),
-//    has_pattern_cl(has_pattern_cl),
-//    such_that_obj(NULL),
-//    pattern_obj(NULL) {}
-//
-//QueryObject::~QueryObject() {
-//
-//}
-//
-//SuchThat *QueryObject::parse_query() {
-//    QueryObject qo("selection", true, false);
-//    std::cout << query;
-//
-//    return qo;
-//}
+#include <string>
+#include <iostream>
+#include "QueryObject.h"
+#include "DesignEntity.h"
+
+using namespace PQLParser;
+
+QueryObject::QueryObject() :
+    has_such_that_cl(false),
+    has_pattern_cl(false) {}
+
+QueryObject::~QueryObject() {
+
+}
+
+std::unordered_map<std::string, DesignEntity> QueryObject::getDeclarations() {
+    return declarations;
+}
+
+void QueryObject::add_declaration(std::string synonym, DesignEntity designEntity) {
+    if (declarations.find(synonym) == declarations.end()) {
+        throw "Synonym has been defined";
+    }
+    declarations[synonym] = designEntity;
+}
+
+
+std::string QueryObject::get_selection() {
+    return selection;
+}
+
+bool QueryObject::has_such_that() {
+    return has_such_that_cl;
+}
+
+bool QueryObject::has_pattern() {
+    return has_pattern_cl;
+}
+
+SuchThat QueryObject::get_such_that() {
+    if (!has_such_that_cl) {
+        throw "Query object doesn't have a such that clause";
+    }
+    return such_that_obj;
+}
+
+Pattern QueryObject::get_pattern() {
+    if (!has_pattern_cl) {
+        throw "Query object doesn't have a pattern clause";
+    }
+    return pattern_obj;
+}
+
+
+void QueryObject::set_selection(std::string selection) {
+    this->selection = selection;
+}
+
+void QueryObject::set_has_such_that(bool has_such_that) {
+    this->has_such_that_cl = has_such_that;
+}
+
+void QueryObject::set_has_pattern(bool has_pattern) {
+    this->has_pattern_cl = has_pattern;
+}
+
+void QueryObject::set_such_that(SuchThat such_that_cl) {
+    this->such_that_obj = such_that_cl;
+}
+
+void QueryObject::set_pattern(Pattern pattern_cl) {
+    this->pattern_obj = pattern_cl;
+}
+
+std::string QueryObject::to_string() {
+    std::cout << "Declaration size:" << declarations.size();
+    std::cout << "Has Such That:" << has_such_that_cl;
+    std::cout << "Has Pattern:" << has_pattern_cl;
+    std::cout << "Selection:" << selection;
+    return "";
+}

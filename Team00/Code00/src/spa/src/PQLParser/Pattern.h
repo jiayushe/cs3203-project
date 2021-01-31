@@ -11,11 +11,15 @@
 namespace PQLParser {
     class Pattern {
     public:
-        std::string assigned_synonym();
+        std::string get_assigned_synonym();
         EntityRef get_entity_ref();
         ExpressionSpec get_expression_spec();
 
-        Pattern(std::string assign_synonym, EntityRef entity_ref, ExpressionSpec expression_spec);
+        Pattern();
+
+        Pattern(std::string assigned_synonym, EntityRef entity_ref, ExpressionSpec expression_spec);
+
+        ~Pattern();
 
     private:
         std::string synonym;

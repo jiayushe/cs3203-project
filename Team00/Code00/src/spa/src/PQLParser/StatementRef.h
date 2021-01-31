@@ -18,12 +18,24 @@ namespace PQLParser {
         std::string get_synonym();
         int get_statement_number();
 
-        StatementRef(StatementRefType type);
+        StatementRef();
+
+        StatementRef(std::string synonym);
+
+        StatementRef(int statement_number);
+
+        ~StatementRef();
+
+        void set_type(StatementRefType statementRefType);
+
+        void set_synonym(std::string synonym);
+
+        void set_statement_number(int statement_number);
 
     private:
         StatementRefType type;
-        std::string synonym();
-        int statement_number();
+        std::string synonym;
+        int statement_number;
 
     };
 

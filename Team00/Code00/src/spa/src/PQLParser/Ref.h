@@ -20,7 +20,13 @@ namespace PQLParser {
         EntityRef get_entity_ref();
         StatementRef get_statement_ref();
 
-        Ref(RefType type);
+        Ref();
+
+        Ref(EntityRef entity_ref);
+
+        Ref(StatementRef statement_ref);
+
+        ~Ref();
 
     private:
         RefType type;

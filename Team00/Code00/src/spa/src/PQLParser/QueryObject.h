@@ -14,7 +14,7 @@ namespace PQLParser {
     // AST node for the SIMPLE language.
     class QueryObject {
     public:
-        QueryObject(std::string selection, bool has_such_that_cl, bool has_pattern_cl);
+        QueryObject();
 
         ~QueryObject();
 
@@ -23,12 +23,19 @@ namespace PQLParser {
         void add_declaration(std::string synonym, DesignEntity designEntity);
         std::string get_selection();
 
-        bool get_has_such_that_cl();
-        bool get_has_pattern_cl();
+        bool has_such_that();
+        bool has_pattern();
 
         SuchThat get_such_that();
 
         Pattern get_pattern();
+
+        void set_selection(std::string selection);
+        void set_has_such_that(bool has_such_that);
+        void set_has_pattern(bool has_pattern);
+
+        void set_such_that(SuchThat such_that_cl);
+        void set_pattern(Pattern pattern_cl);
 
         std::string to_string();
 
@@ -39,8 +46,8 @@ namespace PQLParser {
         bool has_such_that_cl;
         bool has_pattern_cl;
 
-        SuchThat *such_that_obj;
-        Pattern *pattern_obj;
+        SuchThat such_that_obj;
+        Pattern pattern_obj;
     };
 }
 

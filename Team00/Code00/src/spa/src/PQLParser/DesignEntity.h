@@ -23,9 +23,11 @@ namespace PQLParser {
         DesignEntityType get_type();
         std::string get_synonym();
 
-        DesignEntity(DesignEntityType type);
+        DesignEntity();
 
         DesignEntity(DesignEntityType type, std::string synonym);
+
+        ~DesignEntity();
 
     private:
         DesignEntityType type;
