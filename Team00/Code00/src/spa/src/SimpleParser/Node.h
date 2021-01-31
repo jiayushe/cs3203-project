@@ -83,6 +83,9 @@ namespace SimpleParser {
         // Checks if the supplied AST node is a subtree of the current AST node.
         bool is_subtree(Node *node);
 
+        // Checks if the supplied AST node is equal to the current AST node (including all their children).
+        bool is_equal(Node *node);
+
         // Pretty-prints the complete AST starting from the current AST node.
         std::string to_string();
 
