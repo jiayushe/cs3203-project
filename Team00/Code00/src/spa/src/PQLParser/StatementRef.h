@@ -20,10 +20,6 @@ namespace PQLParser {
 
         StatementRef();
 
-        StatementRef(std::string synonym);
-
-        StatementRef(int statement_number);
-
         ~StatementRef();
 
         void set_type(StatementRefType statementRefType);

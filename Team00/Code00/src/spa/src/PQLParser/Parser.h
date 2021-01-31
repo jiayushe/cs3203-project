@@ -19,9 +19,11 @@ namespace PQLParser {
 
         void process_declaration(QueryObject *queryObject, TokenList *tokens, DesignEntityType designEntityType);
 
-        void process_such_that_cl(QueryObject *queryObject, TokenList *tokens);
-
         void *expect_token(TokenType given_type, TokenType expected_type);
+
+        SuchThat process_such_that_cl(TokenList *tokens);
+
+        Pattern process_pattern_cl(TokenList *tokens);
 
         StatementRef process_statement_ref(std::string statement_string);
 

@@ -11,14 +11,23 @@ using namespace PQLParser;
 
 SuchThat::SuchThat() {}
 
-SuchThat::SuchThat(SuchThatType type, Ref left_ref, Ref right_ref) :
-        type(type),
-        left_ref(left_ref),
-        right_ref(right_ref) {}
-
 SuchThat::~SuchThat() {
 
 }
+
+
+void SuchThat::set_type(SuchThatType type) {
+    this->type = type;
+}
+
+void SuchThat::set_left_ref(Ref left_ref) {
+    this->left_ref = left_ref;
+}
+
+void SuchThat::set_right_ref(Ref right_ref) {
+    this->right_ref = right_ref;
+}
+
 
 SuchThatType SuchThat::get_type() {
     return type;

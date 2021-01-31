@@ -25,9 +25,13 @@ namespace PQLParser {
 
         SuchThat();
 
-        SuchThat(SuchThatType type, Ref left_ref, Ref right_ref);
-
         ~SuchThat();
+
+        void set_type(SuchThatType type);
+
+        void set_left_ref(Ref left_ref);
+
+        void set_right_ref(Ref right_ref);
 
     private:
         SuchThatType type;

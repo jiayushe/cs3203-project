@@ -7,19 +7,7 @@
 
 using namespace PQLParser;
 
-StatementRef::StatementRef() {
-    this->type = StatementRefType::ANY;
-}
-
-StatementRef::StatementRef(std::string synonym) {
-    this->type = StatementRefType::SYNONYM;
-    this->synonym = synonym;
-}
-
-StatementRef::StatementRef(int statement_number) {
-    this->type = StatementRefType::STATEMENT_NUMBER;
-    this->statement_number = statement_number;
-}
+StatementRef::StatementRef() {}
 
 StatementRef::~StatementRef() {
 

@@ -35,9 +35,24 @@ void Parser::process_declaration(QueryObject *queryObject, TokenList *tokens, De
 }
 
 
+
+void *Parser::expect_token(TokenType given_type, TokenType expected_type) {
+    if (given_type != expected_type) {
+        throw "Expected token type " + std::to_string(expected_type) + ", received " +
+              std::to_string(given_type);
+    }
+}
+
+
+
 bool is_digits(const std::string &str)
 {
     return std::all_of(str.begin(), str.end(), ::isdigit); // C++11
+}
+
+bool is_enclosed_by_double_quote(std::string statement_string) {
+    std::regex regex_pattern("^(\".+\")$");
+    return std::regex_match(statement_string, regex_pattern);
 }
 
 
@@ -55,12 +70,8 @@ StatementRef Parser::process_statement_ref(std::string statement_string) {
         statementRef.set_synonym(statement_string);
     }
 
+    statementRef.set_type(statementRefType);
     return statementRef;
-}
-
-bool is_enclosed_by_double_quote(std::string statement_string) {
-    std::regex regex_pattern("^(\".+\")$");
-    return std::regex_match(statement_string, regex_pattern);
 }
 
 EntityRef Parser::process_entity_ref(std::string statement_string) {
@@ -81,8 +92,13 @@ EntityRef Parser::process_entity_ref(std::string statement_string) {
     return entityRef;
 }
 
+Pattern Parser::process_pattern_cl(TokenList *tokens) {
+    Pattern pattern_obj;
+}
 
-void Parser::process_such_that_cl(QueryObject *queryObject, TokenList *tokens) {
+
+SuchThat Parser::process_such_that_cl(TokenList *tokens) {
+    SuchThat such_that_obj;
     std::map<std::string, SuchThatType> suchThatMap {
         {"Modifies", SuchThatType::MODIFIES_S},
         {"Uses", SuchThatType::USES_S},
@@ -93,13 +109,22 @@ void Parser::process_such_that_cl(QueryObject *queryObject, TokenList *tokens) {
     };
 
     SuchThatType type;
+    std::string such_that_key;
 
     Token *token = tokens->pop_front();
     if (tokens->front()->get_value() == "*") {
         std::string star_char = tokens->pop_front()->get_value();
-        type = suchThatMap[token->get_value() + star_char];
+        such_that_key = token->get_value() + star_char;
     } else {
-        type = suchThatMap[token->get_value()];
+        such_that_key = token->get_value();
+    }
+
+
+    if (suchThatMap.find(such_that_key) == suchThatMap.end()) {
+        throw "Invalid SuchThatType parsed";
+    } else {
+        type = suchThatMap[such_that_key];
+        such_that_obj.set_type(type);
     }
 
     expect_token(tokens->pop_front()->get_type(), TokenType::LPAREN);  // LPAREN
@@ -118,34 +143,24 @@ void Parser::process_such_that_cl(QueryObject *queryObject, TokenList *tokens) {
         token = tokens->pop_front();
     }
 
-    StatementRef process_statement_ref(left_string);
-
-
-    EntityRef process_entity_ref(right_string);
+    StatementRef left_statement_ref = process_statement_ref(left_string);
+    Ref left_ref(left_statement_ref);
+    such_that_obj.set_left_ref(left_ref);
 
     if (type == SuchThatType::MODIFIES_S || type == SuchThatType::USES_S) {
-
-    }
-    if (left_string == "_") {
-        statementRefType = StatementRefType::ANY;
-    } else if (is_digits(left_string)) {
-        statementRefType = StatementRefType::STATEMENT_NUMBER;
-        statementRef.set_statement_number(std::stoi(left_string));
+        EntityRef right_statement_ref = process_entity_ref(right_string);
+        Ref right_ref(right_statement_ref);
+        such_that_obj.set_right_ref(right_ref);
     } else {
-        statementRefType = StatementRefType::SYNONYM;
-        statementRef.set_synonym(left_string);
+        StatementRef right_statement_ref = process_statement_ref(right_string);
+        Ref right_ref(right_statement_ref);
+        such_that_obj.set_right_ref(right_ref);
     }
 
-
+    return such_that_obj;
 }
 
 
-void *Parser::expect_token(TokenType given_type, TokenType expected_type) {
-    if (given_type != expected_type) {
-        throw "Expected token type " + std::to_string(expected_type) + ", received " +
-              std::to_string(given_type);
-    }
-}
 
 
 QueryObject *Parser::parse_query() {
@@ -190,13 +205,15 @@ QueryObject *Parser::parse_query() {
         } else if (token->get_value() == "such") {
             token = tokens->pop_front();
             if (token->get_value() != "that") {
-                throw "Invalid argument such clause, expected such that clause"
+                throw "Invalid argument such clause, expected such that clause";
             }
 
-            process_such_that_cl(queryObject, tokens)
+            SuchThat such_that_obj = process_such_that_cl(tokens);
+            queryObject->set_such_that(such_that_obj);
+            queryObject->set_has_such_that(true);
         }
 
     } while (token->get_type() != TokenType::END);
 
-    return qo;
+    return queryObject;
 }
