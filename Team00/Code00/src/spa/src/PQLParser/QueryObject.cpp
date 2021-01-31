@@ -13,9 +13,7 @@ QueryObject::QueryObject() :
     has_such_that_cl(false),
     has_pattern_cl(false) {}
 
-QueryObject::~QueryObject() {
-
-}
+QueryObject::~QueryObject() { }
 
 std::unordered_map<std::string, DesignEntity> QueryObject::getDeclarations() {
     return declarations;

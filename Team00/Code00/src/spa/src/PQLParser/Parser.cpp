@@ -29,6 +29,7 @@ void Parser::process_declaration(QueryObject *queryObject, TokenList *tokens, De
         }
 
         DesignEntity designEntity(designEntityType, token->get_value());
+        std::cout << token->get_value();
         queryObject->add_declaration(token->get_value(), designEntity);
         token = tokens->pop_front();
     } ;
@@ -94,6 +95,39 @@ EntityRef Parser::process_entity_ref(std::string statement_string) {
 
 Pattern Parser::process_pattern_cl(TokenList *tokens) {
     Pattern pattern_obj;
+    Token *token = tokens->pop_front();
+
+    pattern_obj.set_assigned_synonym(token->get_value());
+
+    expect_token(tokens->pop_front()->get_type(), TokenType::LPAREN);  // LPAREN
+    std::string left_string = "";
+    std::string right_string = "";
+
+    token = tokens->pop_front();
+    while (token->get_type() != TokenType::SEMICOLON) {
+        left_string += token->get_value();
+        token = tokens->pop_front();
+    }
+
+    token = tokens->pop_front();
+    while (token->get_type() != TokenType::RPAREN) {
+        right_string += token->get_value();
+        token = tokens->pop_front();
+    }
+
+    EntityRef left_statement_ref = process_entity_ref(left_string);
+    pattern_obj.set_entity_ref(left_statement_ref);
+
+    if (right_string == "_") {
+        ExpressionSpec expression_spec;
+        pattern_obj.set_expression_spec(expression_spec);
+    } else {
+        // TODO
+        ExpressionSpec expression_spec;
+        pattern_obj.set_expression_spec(expression_spec);
+    }
+
+    return pattern_obj;
 }
 
 
@@ -166,7 +200,6 @@ SuchThat Parser::process_such_that_cl(TokenList *tokens) {
 QueryObject *Parser::parse_query() {
     auto queryObject = new QueryObject();
     std::cout << query;
-    std::cout << static_cast<int>(DesignEntityType::ASSIGN);
 
     StringLexer lexer(query);
     TokenList *tokens = lexer.tokens();
@@ -184,12 +217,14 @@ QueryObject *Parser::parse_query() {
         {"procedure", DesignEntityType::PROCEDURE}
     };
 
-    while (token->get_value() != "Select" && token->get_value() != TokenType::END) {
+    while (token->get_value() != "Select" && token->get_type() != TokenType::END) {
         if (designEntityMap.find(token->get_value()) != designEntityMap.end()) {
             process_declaration(queryObject, tokens, designEntityMap[token->get_value()]);
         } else {
             throw "Invalid design entity type parsed";
         }
+
+        token = tokens->pop_front();
     }
 
 
@@ -201,7 +236,9 @@ QueryObject *Parser::parse_query() {
             token = tokens->pop_front();
             queryObject->set_selection(token->get_value());
         } else if (token->get_value() == "pattern") {
-
+            Pattern pattern_obj = process_pattern_cl(tokens);
+            queryObject->set_pattern(pattern_obj);
+            queryObject->set_has_pattern(true);
         } else if (token->get_value() == "such") {
             token = tokens->pop_front();
             if (token->get_value() != "that") {

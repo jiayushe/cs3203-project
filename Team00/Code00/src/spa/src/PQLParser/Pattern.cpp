@@ -10,14 +10,22 @@ using namespace PQLParser;
 
 Pattern::Pattern() {}
 
-Pattern::Pattern(std::string assigned_synonym, EntityRef entity_ref, ExpressionSpec expression_spec) :
-        synonym(assigned_synonym),
-        entity_ref(entity_ref),
-        expression_spec(expression_spec) {}
-
 Pattern::~Pattern() {
 
 }
+
+void Pattern::set_assigned_synonym(std::string assigned_synonym) {
+    this->synonym = assigned_synonym;
+}
+
+void Pattern::set_entity_ref(EntityRef entity_ref) {
+    this->entity_ref = entity_ref;
+}
+
+void Pattern::set_expression_spec(ExpressionSpec expression_spec) {
+    this->expression_spec = expression_spec;
+}
+
 
 std::string Pattern::get_assigned_synonym() {
     return synonym;
