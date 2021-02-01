@@ -437,7 +437,7 @@ bool Parser::is_integer(Token *token) {
         return false;
     }
     return std::all_of(token_value.begin(), token_value.end(), [](char character) {
-        return isnumber(character);
+        return isdigit(character);
     });
 }
 
