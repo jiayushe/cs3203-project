@@ -18,18 +18,12 @@ namespace PQLParser {
         LPAREN,         // (
         RPAREN,         // )
 
-        GT,             // >
-        GTE,            // >=
-        LT,             // <
-        LTE,            // <=
-        DEQUAL,         // ==
-        NEQUAL,         // !=
-
         COMMA,          // ,
-        EQUAL,          // =
         PLUS,           // +
         MINUS,          // -
         ASTERISK,       // *
+        SLASH,          // /
+        PERCENT,        // %
         UNDERSCORE,     // _
         SEMICOLON,      // ;
         DOUBLE_QUOTE,   // "

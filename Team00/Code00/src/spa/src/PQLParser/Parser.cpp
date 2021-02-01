@@ -25,11 +25,11 @@ void Parser::process_declaration(QueryObject *queryObject, TokenList *tokens, De
 
     while (token->get_type() != TokenType::SEMICOLON) {
         if (token->get_type() == TokenType::COMMA) {
+            token = tokens->pop_front();
             continue;
         }
 
         DesignEntity designEntity(designEntityType, token->get_value());
-        std::cout << token->get_value();
         queryObject->add_declaration(token->get_value(), designEntity);
         token = tokens->pop_front();
     } ;
@@ -37,7 +37,7 @@ void Parser::process_declaration(QueryObject *queryObject, TokenList *tokens, De
 
 
 
-void *Parser::expect_token(TokenType given_type, TokenType expected_type) {
+void Parser::expect_token(TokenType given_type, TokenType expected_type) {
     if (given_type != expected_type) {
         throw "Expected token type " + std::to_string(expected_type) + ", received " +
               std::to_string(given_type);
@@ -104,7 +104,7 @@ Pattern Parser::process_pattern_cl(TokenList *tokens) {
     std::string right_string = "";
 
     token = tokens->pop_front();
-    while (token->get_type() != TokenType::SEMICOLON) {
+    while (token->get_type() != TokenType::COMMA) {
         left_string += token->get_value();
         token = tokens->pop_front();
     }
@@ -122,9 +122,17 @@ Pattern Parser::process_pattern_cl(TokenList *tokens) {
         ExpressionSpec expression_spec;
         pattern_obj.set_expression_spec(expression_spec);
     } else {
-        // TODO
-        ExpressionSpec expression_spec;
-        pattern_obj.set_expression_spec(expression_spec);
+        std::regex regex_pattern("_\"(.*)\"_");
+        std::smatch matches;
+
+        if (std::regex_search(right_string, matches, regex_pattern)) {
+            // TODO Integrate with Simple Parser
+            std::string target_string = matches[matches.size() - 1];
+            ExpressionSpec expression_spec;
+            pattern_obj.set_expression_spec(expression_spec);
+        } else {
+            throw "Invalid expression spec parsed";
+        }
     }
 
     return pattern_obj;
@@ -161,12 +169,14 @@ SuchThat Parser::process_such_that_cl(TokenList *tokens) {
         such_that_obj.set_type(type);
     }
 
+
     expect_token(tokens->pop_front()->get_type(), TokenType::LPAREN);  // LPAREN
     std::string left_string = "";
     std::string right_string = "";
 
+
     token = tokens->pop_front();
-    while (token->get_type() != TokenType::SEMICOLON) {
+    while (token->get_type() != TokenType::COMMA) {
         left_string += token->get_value();
         token = tokens->pop_front();
     }
@@ -176,6 +186,7 @@ SuchThat Parser::process_such_that_cl(TokenList *tokens) {
         right_string += token->get_value();
         token = tokens->pop_front();
     }
+
 
     StatementRef left_statement_ref = process_statement_ref(left_string);
     Ref left_ref(left_statement_ref);
@@ -199,7 +210,7 @@ SuchThat Parser::process_such_that_cl(TokenList *tokens) {
 
 QueryObject *Parser::parse_query() {
     auto queryObject = new QueryObject();
-    std::cout << query;
+    std::cout << "Query String: " << query << std::endl;
 
     StringLexer lexer(query);
     TokenList *tokens = lexer.tokens();
@@ -217,6 +228,7 @@ QueryObject *Parser::parse_query() {
         {"procedure", DesignEntityType::PROCEDURE}
     };
 
+
     while (token->get_value() != "Select" && token->get_type() != TokenType::END) {
         if (designEntityMap.find(token->get_value()) != designEntityMap.end()) {
             process_declaration(queryObject, tokens, designEntityMap[token->get_value()]);
@@ -226,9 +238,6 @@ QueryObject *Parser::parse_query() {
 
         token = tokens->pop_front();
     }
-
-
-    token = tokens->pop_front();
 
     do {
         if (token->get_value() == "Select") {
@@ -250,7 +259,9 @@ QueryObject *Parser::parse_query() {
             queryObject->set_has_such_that(true);
         }
 
+        token = tokens->pop_front();
     } while (token->get_type() != TokenType::END);
 
+    queryObject->to_string();
     return queryObject;
 }

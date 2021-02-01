@@ -20,7 +20,7 @@ std::unordered_map<std::string, DesignEntity> QueryObject::getDeclarations() {
 }
 
 void QueryObject::add_declaration(std::string synonym, DesignEntity designEntity) {
-    if (declarations.find(synonym) == declarations.end()) {
+    if (declarations.find(synonym) != declarations.end()) {
         throw "Synonym has been defined";
     }
     declarations[synonym] = designEntity;
@@ -74,10 +74,9 @@ void QueryObject::set_pattern(Pattern pattern_cl) {
     this->pattern_obj = pattern_cl;
 }
 
-std::string QueryObject::to_string() {
-    std::cout << "Declaration size:" << declarations.size();
-    std::cout << "Has Such That:" << has_such_that_cl;
-    std::cout << "Has Pattern:" << has_pattern_cl;
-    std::cout << "Selection:" << selection;
-    return "";
+void QueryObject::to_string() {
+    std::cout << "Declaration size:" << declarations.size() << std::endl;
+    std::cout << "Has Such That:" << has_such_that_cl << std::endl;
+    std::cout << "Has Pattern:" << has_pattern_cl << std::endl;
+    std::cout << "Selection:" << selection << std::endl;
 }

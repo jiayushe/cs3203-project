@@ -4,6 +4,7 @@
 
 #include <string>
 #include <cctype>
+#include <iostream>
 #include "Lexer.h"
 
 using namespace PQLParser;
@@ -28,13 +29,12 @@ Token *Lexer::next_token() {
         return next_token();
     }
 
+    // TODO add token from SimpleLexer
     switch (next) {
         case '(':
             return new Token(TokenType::LPAREN, "(");
         case ')':
             return new Token(TokenType::RPAREN, ")");
-        case '*':
-            return new Token(TokenType::ASTERISK, "*");
         case ',':
             return new Token(TokenType::COMMA, ",");
         case '_':
@@ -43,6 +43,16 @@ Token *Lexer::next_token() {
             return new Token(TokenType::SEMICOLON, ";");
         case '\"':
             return new Token(TokenType::DOUBLE_QUOTE, "\"");
+        case '+':
+            return new Token(TokenType::PLUS, "+");
+        case '-':
+            return new Token(TokenType::MINUS, "-");
+        case '*':
+            return new Token(TokenType::ASTERISK, "*");
+        case '/':
+            return new Token(TokenType::SLASH, "/");
+        case '%':
+            return new Token(TokenType::PERCENT, "%");
         default:
             // Fall through - other cases are checked below
             break;
@@ -55,6 +65,7 @@ Token *Lexer::next_token() {
         while (has_more() && isalnum(peek_char())) {
             value.push_back(pop_char());
         }
+
         return new Token(TokenType::WORD, value);
     }
 

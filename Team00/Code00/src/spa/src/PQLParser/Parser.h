@@ -19,7 +19,7 @@ namespace PQLParser {
 
         void process_declaration(QueryObject *queryObject, TokenList *tokens, DesignEntityType designEntityType);
 
-        void *expect_token(TokenType given_type, TokenType expected_type);
+        void expect_token(TokenType given_type, TokenType expected_type);
 
         SuchThat process_such_that_cl(TokenList *tokens);
 

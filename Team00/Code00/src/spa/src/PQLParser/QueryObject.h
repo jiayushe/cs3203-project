@@ -37,7 +37,7 @@ namespace PQLParser {
         void set_such_that(SuchThat such_that_cl);
         void set_pattern(Pattern pattern_cl);
 
-        std::string to_string();
+        void to_string();
 
     private:
         std::unordered_map<std::string, DesignEntity> declarations;
