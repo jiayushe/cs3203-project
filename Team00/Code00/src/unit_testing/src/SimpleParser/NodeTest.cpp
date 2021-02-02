@@ -5,7 +5,7 @@
 using namespace SimpleParser;
 
 // Helper function to build an AST representing "x + y * 5"
-Node *build_test_node() {
+Node* build_test_node() {
     auto node = new Node(NodeType::ARITHMETIC, "+");
     node->add_child(new Node(NodeType::VAR_NAME, "x"));
     node->add_child(new Node(NodeType::ARITHMETIC, "*"));

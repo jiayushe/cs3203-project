@@ -2,7 +2,4 @@
 
 using namespace std;
 
-TEST_CASE("1st Test") {
-    REQUIRE(1 == 1);
-}
-
+TEST_CASE("1st Test") { REQUIRE(1 == 1); }

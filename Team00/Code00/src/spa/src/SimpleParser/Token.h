@@ -5,56 +5,56 @@
 
 namespace SimpleParser {
 
-    // All possible token types for the SIMPLE language.
-    enum TokenType {
-        INVALID_TOKEN,
+// All possible token types for the SIMPLE language.
+enum TokenType {
+    INVALID_TOKEN,
 
-        WORD,           // Consecutive alphanumeric characters
+    WORD, // Consecutive alphanumeric characters
 
-        LCURL,          // {
-        RCURL,          // }
-        LPAREN,         // (
-        RPAREN,         // )
+    LCURL,  // {
+    RCURL,  // }
+    LPAREN, // (
+    RPAREN, // )
 
-        GT,             // >
-        GTE,            // >=
-        LT,             // <
-        LTE,            // <=
-        DEQUAL,         // ==
-        NEQUAL,         // !=
+    GT,     // >
+    GTE,    // >=
+    LT,     // <
+    LTE,    // <=
+    DEQUAL, // ==
+    NEQUAL, // !=
 
-        NOT,           // !
-        AND,            // &&
-        OR,             // ||
+    NOT, // !
+    AND, // &&
+    OR,  // ||
 
-        EQUAL,          // =
-        PLUS,           // +
-        MINUS,          // -
-        ASTERISK,       // *
-        SLASH,          // /
-        PERCENT,        // %
+    EQUAL,    // =
+    PLUS,     // +
+    MINUS,    // -
+    ASTERISK, // *
+    SLASH,    // /
+    PERCENT,  // %
 
-        SEMICOLON,      // ;
+    SEMICOLON, // ;
 
-        END,            // EOF
-    };
+    END, // EOF
+};
 
-    // A single token (in parser parlance) for the SIMPLE language.
-    class Token {
-    public:
-        Token(TokenType type, const std::string &value);
+// A single token (in parser parlance) for the SIMPLE language.
+class Token {
+public:
+    Token(TokenType type, const std::string& value);
 
-        // Gets the type of the token.
-        TokenType get_type();
+    // Gets the type of the token.
+    TokenType get_type();
 
-        // Gets the value which the token stands for.
-        std::string get_value();
+    // Gets the value which the token stands for.
+    std::string get_value();
 
-    private:
-        TokenType type;
-        std::string value;
-    };
+private:
+    TokenType type;
+    std::string value;
+};
 
-}
+} // namespace SimpleParser
 
-#endif //SIMPLEPARSER_TOKEN_H
+#endif // SIMPLEPARSER_TOKEN_H

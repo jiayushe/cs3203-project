@@ -1,10 +1,11 @@
 #include "TestWrapper.h"
 
 // implementation code of WrapperFactory - do NOT modify the next 5 lines
-AbstractWrapper *WrapperFactory::wrapper = 0;
+AbstractWrapper* WrapperFactory::wrapper = 0;
 
-AbstractWrapper *WrapperFactory::createWrapper() {
-    if (wrapper == 0) wrapper = new TestWrapper;
+AbstractWrapper* WrapperFactory::createWrapper() {
+    if (wrapper == 0)
+        wrapper = new TestWrapper;
     return wrapper;
 }
 
@@ -29,17 +30,17 @@ void TestWrapper::parse(std::string filename) {
         std::cout << root_node->to_string();
 
         delete root_node;
-    } catch (char const *message) {
+    } catch (char const* message) {
         std::cout << "Error: " << message << std::endl;
         throw message;
-    } catch (const std::string &message) {
+    } catch (const std::string& message) {
         std::cout << "Error: " << message << std::endl;
         throw message;
     }
 }
 
 // method to evaluating a query
-void TestWrapper::evaluate(std::string query, std::list<std::string> &results) {
+void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
     // call your evaluator to evaluate the query here
     // ...code to evaluate query...
 

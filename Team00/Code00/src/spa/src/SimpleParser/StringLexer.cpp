@@ -2,11 +2,9 @@
 
 using namespace SimpleParser;
 
-StringLexer::StringLexer(const std::string &value) : pos(0), value(value) {}
+StringLexer::StringLexer(const std::string& value) : pos(0), value(value) {}
 
-bool StringLexer::has_more() {
-    return pos < value.size();
-}
+bool StringLexer::has_more() { return pos < value.size(); }
 
 int StringLexer::pop_char() {
     int result = peek_char();
