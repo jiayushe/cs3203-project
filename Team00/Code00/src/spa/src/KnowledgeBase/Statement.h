@@ -18,7 +18,8 @@ enum class StatementType {
 
 class Statement {
 public:
-    Statement(StatementType type, int id, std::string procedure_name, Parser::SimpleNode* pattern);
+    Statement(StatementType type, int id, std::string procedure_name,
+              std::shared_ptr<Parser::SimpleNode> pattern);
 
     Statement();
 
@@ -35,7 +36,7 @@ public:
 
     // Gets the AST node of this statement.
     // Throws unless its type is ASSIGN.
-    Parser::SimpleNode* get_pattern();
+    std::shared_ptr<Parser::SimpleNode> get_pattern();
 
     // Gets the id of the parent statement.
     // Returns -1 if it has no parent statement.
@@ -89,14 +90,14 @@ private:
     StatementType type;
     int id;
     std::string procedure_name;
-    Parser::SimpleNode* pattern;
+    std::shared_ptr<Parser::SimpleNode> pattern;
     int parent;
-    std::unordered_set<int> children;
+    std::unordered_set<int>* children;
     int following;
     int follower;
     std::string procedure_called;
-    std::unordered_set<std::string> modifies;
-    std::unordered_set<std::string> uses;
+    std::unordered_set<std::string>* modifies;
+    std::unordered_set<std::string>* uses;
 };
 
 } // namespace KnowledgeBase

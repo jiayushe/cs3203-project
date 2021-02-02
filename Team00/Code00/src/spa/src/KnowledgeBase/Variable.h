@@ -31,8 +31,8 @@ public:
 
 private:
     std::string name;
-    std::unordered_set<int> modified_by;
-    std::unordered_set<int> used_by;
+    std::unordered_set<int>* modified_by;
+    std::unordered_set<int>* used_by;
 };
 
 } // namespace KnowledgeBase
