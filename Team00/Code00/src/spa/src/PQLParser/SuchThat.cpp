@@ -1,8 +1,3 @@
-//
-// Created by Victor Varian on 27/1/21.
-//
-
-
 #include <string>
 #include <iostream>
 #include "SuchThat.h"

@@ -1,7 +1,3 @@
-//
-// Created by Victor Varian on 27/1/21.
-//
-
 #ifndef PQLPARSER_REF_H
 #define PQLPARSER_REF_H
 

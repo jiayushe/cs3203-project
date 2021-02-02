@@ -1,7 +1,3 @@
-//
-// Created by Victor Varian on 27/1/21.
-//
-
 #include <string>
 #include "DesignEntity.h"
 
@@ -13,9 +9,7 @@ DesignEntity::DesignEntity(DesignEntityType type, std::string synonym) :
     type(type),
     synonym(synonym) {}
 
-DesignEntity::~DesignEntity() {
-
-}
+DesignEntity::~DesignEntity() {}
 
 DesignEntityType DesignEntity::get_type() {
     return type;

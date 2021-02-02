@@ -1,7 +1,3 @@
-//
-// Created by Victor Varian on 30/1/21.
-//
-
 #include <string>
 #include <cctype>
 #include <iostream>

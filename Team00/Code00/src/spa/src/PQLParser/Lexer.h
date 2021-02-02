@@ -1,9 +1,5 @@
-//
-// Created by Victor Varian on 30/1/21.
-//
-
-#ifndef AUTOTESTER_LEXER_H
-#define AUTOTESTER_LEXER_H
+#ifndef PQLPARSER_LEXER_H
+#define PQLPARSER_LEXER_H
 
 #include "Token.h"
 #include "TokenList.h"

@@ -1,9 +1,5 @@
-//
-// Created by Victor Varian on 30/1/21.
-//
-
-#ifndef AUTOTESTER_STRINGLEXER_H
-#define AUTOTESTER_STRINGLEXER_H
+#ifndef PQLPARSER_STRINGLEXER_H
+#define PQLPARSER_STRINGLEXER_H
 
 #include <string>
 #include "Lexer.h"

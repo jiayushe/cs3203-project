@@ -1,7 +1,3 @@
-//
-// Created by Victor Varian on 26/1/21.
-//
-
 #ifndef PQLPARSER_QUERYOBJECT_H
 #define PQLPARSER_QUERYOBJECT_H
 
@@ -19,17 +15,18 @@ namespace PQLParser {
         ~QueryObject();
 
         // Function
-        std::unordered_map<std::string, DesignEntity> getDeclarations();
-        void add_declaration(std::string synonym, DesignEntity designEntity);
-        std::string get_selection();
+        void add_declaration(std::string synonym, DesignEntity design_entity);
 
+        // getters
+        std::unordered_map<std::string, DesignEntity> getDeclarations();
         bool has_such_that();
         bool has_pattern();
 
+        std::string get_selection();
         SuchThat get_such_that();
-
         Pattern get_pattern();
 
+        // setters
         void set_selection(std::string selection);
         void set_has_such_that(bool has_such_that);
         void set_has_pattern(bool has_pattern);
@@ -37,6 +34,7 @@ namespace PQLParser {
         void set_such_that(SuchThat such_that_cl);
         void set_pattern(Pattern pattern_cl);
 
+        // this is just for view purpose
         void to_string();
 
     private:

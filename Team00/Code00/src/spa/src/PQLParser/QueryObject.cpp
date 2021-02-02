@@ -1,7 +1,3 @@
-//
-// Created by Victor Varian on 26/1/21.
-//
-
 #include <string>
 #include <iostream>
 #include "QueryObject.h"
@@ -19,11 +15,11 @@ std::unordered_map<std::string, DesignEntity> QueryObject::getDeclarations() {
     return declarations;
 }
 
-void QueryObject::add_declaration(std::string synonym, DesignEntity designEntity) {
+void QueryObject::add_declaration(std::string synonym, DesignEntity design_entity) {
     if (declarations.find(synonym) != declarations.end()) {
         throw "Synonym has been defined";
     }
-    declarations[synonym] = designEntity;
+    declarations[synonym] = design_entity;
 }
 
 

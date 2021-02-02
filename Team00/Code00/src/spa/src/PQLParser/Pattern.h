@@ -1,7 +1,3 @@
-//
-// Created by Victor Varian on 27/1/21.
-//
-
 #ifndef PQLPARSER_PATTERN_H
 #define PQLPARSER_PATTERN_H
 
@@ -20,9 +16,7 @@ namespace PQLParser {
         ~Pattern();
 
         void set_assigned_synonym(std::string assigned_synonym);
-
         void set_entity_ref(EntityRef entity_ref);
-
         void set_expression_spec(ExpressionSpec expression_spec);
 
     private:

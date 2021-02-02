@@ -1,7 +1,3 @@
-//
-// Created by Victor Varian on 27/1/21.
-//
-
 #ifndef PQLPARSER_ENTITYREF_H
 #define PQLPARSER_ENTITYREF_H
 
@@ -19,8 +15,6 @@ namespace PQLParser {
         std::string get_name();
 
         EntityRef();
-
-        // EntityRef(EntityRefType type, std::string text);
 
         ~EntityRef();
 

@@ -1,7 +1,3 @@
-//
-// Created by Victor Varian on 27/1/21.
-//
-
 #ifndef PQLPARSER_EXPRESSIONSPEC_H
 #define PQLPARSER_EXPRESSIONSPEC_H
 

@@ -1,8 +1,3 @@
-//
-// Created by Victor Varian on 27/1/21.
-//
-
-#include <string>
 #include "ExpressionSpec.h"
 
 using namespace PQLParser;
@@ -26,7 +21,7 @@ ExpressionSpecType ExpressionSpec::get_type() {
 
 SimpleParser::Node *ExpressionSpec::get_pattern() {
     if (type != ExpressionSpecType::PATTERN) {
-        throw 'ExpressionSpecType is not PATTERN type';
+        throw "ExpressionSpecType is not PATTERN type";
     }
 
     return pattern;

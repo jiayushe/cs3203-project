@@ -1,7 +1,3 @@
-//
-// Created by Victor Varian on 30/1/21.
-//
-
 #include "TokenList.h"
 
 using namespace PQLParser;

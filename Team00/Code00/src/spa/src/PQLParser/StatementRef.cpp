@@ -1,7 +1,3 @@
-//
-// Created by Victor Varian on 27/1/21.
-//
-
 #include <string>
 #include "StatementRef.h"
 
@@ -14,8 +10,8 @@ StatementRef::~StatementRef() {
 }
 
 
-void StatementRef::set_type(StatementRefType statementRefType) {
-    this->type = statementRefType;
+void StatementRef::set_type(StatementRefType statement_ref_type) {
+    this->type = statement_ref_type;
 }
 
 void StatementRef::set_synonym(std::string synonym) {
@@ -32,7 +28,7 @@ StatementRefType StatementRef::get_type() {
 
 std::string StatementRef::get_synonym() {
     if (type != StatementRefType::SYNONYM) {
-        throw 'StatementRefType is not SYNONYM type';
+        throw "StatementRefType is not SYNONYM type";
     }
 
     return synonym;
@@ -40,7 +36,7 @@ std::string StatementRef::get_synonym() {
 
 int StatementRef::get_statement_number() {
     if (type != StatementRefType::STATEMENT_NUMBER) {
-        throw 'StatementRefType is not STATEMENT_NUMBER type';
+        throw "StatementRefType is not STATEMENT_NUMBER type";
     }
 
     return statement_number;

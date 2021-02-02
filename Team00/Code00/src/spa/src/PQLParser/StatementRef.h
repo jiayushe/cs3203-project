@@ -1,7 +1,3 @@
-//
-// Created by Victor Varian on 27/1/21.
-//
-
 #ifndef PQLPARSER_STATEMENTREF_H
 #define PQLPARSER_STATEMENTREF_H
 
@@ -22,7 +18,7 @@ namespace PQLParser {
 
         ~StatementRef();
 
-        void set_type(StatementRefType statementRefType);
+        void set_type(StatementRefType statement_ref_type);
 
         void set_synonym(std::string synonym);
 

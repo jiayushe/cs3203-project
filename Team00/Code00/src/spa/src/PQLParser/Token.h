@@ -1,9 +1,5 @@
-//
-// Created by Victor Varian on 30/1/21.
-//
-
-#ifndef AUTOTESTER_TOKEN_H
-#define AUTOTESTER_TOKEN_H
+#ifndef PQLPARSER_TOKEN_H
+#define PQLPARSER_TOKEN_H
 
 #include <string>
 

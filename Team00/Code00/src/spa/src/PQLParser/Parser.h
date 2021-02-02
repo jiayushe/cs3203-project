@@ -1,7 +1,3 @@
-//
-// Created by Victor Varian on 27/1/21.
-//
-
 #ifndef PQLPARSER_PARSER_H
 #define PQLPARSER_PARSER_H
 
@@ -17,7 +13,7 @@ namespace PQLParser {
 
         QueryObject *parse_query();
 
-        void process_declaration(QueryObject *queryObject, TokenList *tokens, DesignEntityType designEntityType);
+        void process_declaration(QueryObject *query_object, TokenList *tokens, DesignEntityType design_entity_type);
 
         void expect_token(TokenType given_type, TokenType expected_type);
 

@@ -1,9 +1,5 @@
-//
-// Created by Victor Varian on 30/1/21.
-//
-
-#ifndef AUTOTESTER_TOKENLIST_H
-#define AUTOTESTER_TOKENLIST_H
+#ifndef PQLPARSER_TOKENLIST_H
+#define PQLPARSER_TOKENLIST_H
 
 #include <vector>
 #include "Token.h"
