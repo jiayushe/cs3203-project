@@ -6,6 +6,8 @@
 #include "TokenList.h"
 #include "StringLexer.h"
 #include "DesignEntity.h"
+#include <SimpleParser/Parser.h>
+#include "SimpleParser/StringLexer.h"
 
 using namespace PQLParser;
 
@@ -135,9 +137,12 @@ Pattern Parser::process_pattern_cl(TokenList *tokens) {
         // return matches if it is enclosed by _" and "_
         // example: _"x+i"_ will return matches but "x+i"_ won't etc.
         if (std::regex_search(right_string, matches, regex_pattern)) {
-            // TODO Integrate with Simple Parser
             std::string target_string = matches[matches.size() - 1];
-            ExpressionSpec expression_spec;
+            SimpleParser::StringLexer lexer(target_string);
+            SimpleParser::Parser parser(lexer);
+
+            SimpleParser::Node *node_parser = parser.parse_expr();
+            ExpressionSpec expression_spec(node_parser);
             pattern_obj.set_expression_spec(expression_spec);
         } else {
             throw "Invalid expression spec parsed";
