@@ -323,4 +323,58 @@ TEST_CASE("PQLParser::Parser") {
             REQUIRE(expression_spec.get_type() == ExpressionSpecType::ANY);
         }
     }
+
+    SECTION("One Such That clause, One Pattern clause") {
+        std::string query = "variable v; assign a; while w; Select w such that Uses(a, v) pattern a(v, _\"z\"_)";
+        Parser parser(query);
+        QueryObject *query_object = parser.parse_query();
+
+        SimpleParser::StringLexer lexer("z");
+        SimpleParser::Parser pattern_parser(lexer);
+        SimpleParser::Node *pattern_node = pattern_parser.parse_expr();
+
+        std::unordered_map<std::string, DesignEntity> declarations = query_object->get_declarations();
+        REQUIRE(declarations.size() == 3);
+        REQUIRE(declarations.find("v") != declarations.end());
+        REQUIRE(declarations.find("a") != declarations.end());
+        REQUIRE(declarations.find("w") != declarations.end());
+        REQUIRE(declarations["v"].get_type() == DesignEntityType::VARIABLE);
+        REQUIRE(declarations["a"].get_type() == DesignEntityType::ASSIGN);
+        REQUIRE(declarations["w"].get_type() == DesignEntityType::WHILE);
+
+        std::string selection = query_object->get_selection();
+        REQUIRE(selection == "w");
+
+        bool has_such_that_cl = query_object->has_such_that();
+        bool has_pattern_cl = query_object->has_pattern();
+        REQUIRE(has_such_that_cl);
+        REQUIRE(has_pattern_cl);
+
+        SuchThat such_that_obj = query_object->get_such_that();
+        REQUIRE(such_that_obj.get_type() == SuchThatType::USES_S);
+
+        Ref left_ref = such_that_obj.get_left_ref();
+        Ref right_ref = such_that_obj.get_right_ref();
+        REQUIRE(left_ref.get_type() == RefType::STATEMENT);
+        REQUIRE(right_ref.get_type() == RefType::ENTITY);
+        REQUIRE_THROWS(left_ref.get_entity_ref());
+        REQUIRE_THROWS(right_ref.get_statement_ref());
+
+        StatementRef left_statement_ref = left_ref.get_statement_ref();
+        EntityRef right_entity_ref = right_ref.get_entity_ref();
+        REQUIRE(left_statement_ref.get_type() == StatementRefType::SYNONYM);
+        REQUIRE(left_statement_ref.get_synonym() == "a");
+        REQUIRE(right_entity_ref.get_type() == EntityRefType::SYNONYM);
+        REQUIRE(right_entity_ref.get_synonym() == "v");
+
+        Pattern pattern_obj = query_object->get_pattern();
+        std::string assigned_synonym = pattern_obj.get_assigned_synonym();
+        REQUIRE(assigned_synonym == "a");
+
+        EntityRef entity_ref = pattern_obj.get_entity_ref();
+        ExpressionSpec expression_spec = pattern_obj.get_expression_spec();
+        REQUIRE(entity_ref.get_type() == EntityRefType::SYNONYM);
+        REQUIRE(expression_spec.get_type() == ExpressionSpecType::PATTERN);
+        REQUIRE(expression_spec.get_pattern()->is_equal(pattern_node));
+    }
 }
