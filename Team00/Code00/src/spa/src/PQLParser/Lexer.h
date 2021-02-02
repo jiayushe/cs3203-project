@@ -24,4 +24,4 @@ namespace PQLParser {
 
 }
 
-#endif //AUTOTESTER_LEXER_H
+#endif //PQLPARSER_LEXER_H

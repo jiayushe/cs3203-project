@@ -25,4 +25,4 @@ namespace PQLParser {
 
 }
 
-#endif //AUTOTESTER_STRINGLEXER_H
+#endif //PQLPARSER_STRINGLEXER_H

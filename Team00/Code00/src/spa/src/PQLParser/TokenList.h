@@ -39,4 +39,4 @@ namespace PQLParser {
 
 }
 
-#endif //AUTOTESTER_TOKENLIST_H
+#endif //PQLPARSER_TOKENLIST_H
