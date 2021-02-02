@@ -5,3 +5,6 @@
 .idea
 cmake-build-debug
 
+# VS
+.vs
+build_win
