@@ -232,7 +232,7 @@ QueryObject *Parser::parse_query() {
     TokenList *tokens = lexer.tokens();
     Token *token = tokens->pop_front();
 
-    std::map<std::string, DesignEntityType> designEntityMap {
+    std::map<std::string, DesignEntityType> design_entity_map {
         {"stmt", DesignEntityType::STMT},
         {"read", DesignEntityType::READ},
         {"print", DesignEntityType::PRINT},
@@ -247,13 +247,17 @@ QueryObject *Parser::parse_query() {
 
     // process_declaration
     while (token->get_value() != "Select" && token->get_type() != TokenType::END) {
-        if (designEntityMap.find(token->get_value()) != designEntityMap.end()) {
-            process_declaration(queryObject, tokens, designEntityMap[token->get_value()]);
+        if (design_entity_map.find(token->get_value()) != design_entity_map.end()) {
+            process_declaration(queryObject, tokens, design_entity_map[token->get_value()]);
         } else {
             throw "Invalid design entity type parsed";
         }
 
         token = tokens->pop_front();
+    }
+
+    if (token->get_type() == TokenType::END) {
+        throw "No Select query string parsed";
     }
 
     do {

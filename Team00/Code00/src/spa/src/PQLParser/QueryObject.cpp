@@ -11,7 +11,7 @@ QueryObject::QueryObject() :
 
 QueryObject::~QueryObject() { }
 
-std::unordered_map<std::string, DesignEntity> QueryObject::getDeclarations() {
+std::unordered_map<std::string, DesignEntity> QueryObject::get_declarations() {
     return declarations;
 }
 

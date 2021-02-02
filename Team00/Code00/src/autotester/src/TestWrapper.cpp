@@ -49,4 +49,6 @@ void TestWrapper::evaluate(std::string query, std::list<std::string> &results) {
     PQLParser::QueryObject *query_object = parser.parse_query();
 
     // TODO: QE code...
+
+    delete query_object;
 }
