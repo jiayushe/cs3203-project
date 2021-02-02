@@ -17,6 +17,8 @@ namespace PQLParser {
 
         void expect_token(TokenType given_type, TokenType expected_type);
 
+        void expect_token(std::string given_string, std::string expected_string);
+
         SuchThat process_such_that_cl(TokenList *tokens);
 
         Pattern process_pattern_cl(TokenList *tokens);

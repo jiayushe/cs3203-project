@@ -12,7 +12,7 @@
 using namespace PQLParser;
 
 Parser::Parser(std::string tmp_query) :
-    query(tmp_query) {}
+        query(tmp_query) {}
 
 Parser::~Parser() {}
 
@@ -21,7 +21,7 @@ Parser::~Parser() {}
 void Parser::process_declaration(QueryObject *query_object, TokenList *tokens, DesignEntityType design_entity_type) {
     Token *token = tokens->pop_front();
 
-    while (token->get_type() != TokenType::SEMICOLON) {
+    while (token->get_type() != TokenType::SEMICOLON && token->get_type() != TokenType::END) {
         if (token->get_type() == TokenType::COMMA) {
             token = tokens->pop_front();
             continue;
@@ -31,6 +31,8 @@ void Parser::process_declaration(QueryObject *query_object, TokenList *tokens, D
         query_object->add_declaration(token->get_value(), design_entity);
         token = tokens->pop_front();
     }
+
+    expect_token(token->get_type(), TokenType::SEMICOLON);
 }
 
 
@@ -39,6 +41,13 @@ void Parser::expect_token(TokenType given_type, TokenType expected_type) {
     if (given_type != expected_type) {
         throw "Expected token type " + std::to_string(expected_type) + ", received " +
               std::to_string(given_type);
+    }
+}
+
+// compare two TokenType and throw error if it is different
+void Parser::expect_token(std::string given_string, std::string expected_string) {
+    if (given_string != expected_string) {
+        throw "Expected token type " + expected_string + ", received " + given_string;
     }
 }
 
@@ -101,7 +110,7 @@ EntityRef Parser::process_entity_ref(std::string statement_string) {
 Pattern Parser::process_pattern_cl(TokenList *tokens) {
     Pattern pattern_obj;
     Token *token = tokens->pop_front();
-
+    expect_token(token->get_type(), TokenType::WORD);
     pattern_obj.set_assigned_synonym(token->get_value());
 
     expect_token(tokens->pop_front()->get_type(), TokenType::LPAREN);  // LPAREN
@@ -110,17 +119,19 @@ Pattern Parser::process_pattern_cl(TokenList *tokens) {
 
     // append token string to left_string until it reached COMMA
     token = tokens->pop_front();
-    while (token->get_type() != TokenType::COMMA) {
+    while (token->get_type() != TokenType::COMMA && token->get_type() != TokenType::END) {
         left_string += token->get_value();
         token = tokens->pop_front();
     }
+    expect_token(token->get_type(), TokenType::COMMA);
 
     // append token string to right_string until it reached RPAREN
     token = tokens->pop_front();
-    while (token->get_type() != TokenType::RPAREN) {
+    while (token->get_type() != TokenType::RPAREN && token->get_type() != TokenType::END) {
         right_string += token->get_value();
         token = tokens->pop_front();
     }
+    expect_token(token->get_type(), TokenType::RPAREN);
 
     // LHS is always an entity ref
     EntityRef left_statement_ref = process_entity_ref(left_string);
@@ -157,12 +168,12 @@ Pattern Parser::process_pattern_cl(TokenList *tokens) {
 SuchThat Parser::process_such_that_cl(TokenList *tokens) {
     SuchThat such_that_obj;
     std::map<std::string, SuchThatType> such_that_map {
-        {"Modifies", SuchThatType::MODIFIES_S},
-        {"Uses", SuchThatType::USES_S},
-        {"Parent", SuchThatType::PARENT},
-        {"Parent*", SuchThatType::PARENT_T},
-        {"Follows", SuchThatType::FOLLOWS},
-        {"Follows*", SuchThatType::FOLLOWS_T},
+            {"Modifies", SuchThatType::MODIFIES_S},
+            {"Uses", SuchThatType::USES_S},
+            {"Parent", SuchThatType::PARENT},
+            {"Parent*", SuchThatType::PARENT_T},
+            {"Follows", SuchThatType::FOLLOWS},
+            {"Follows*", SuchThatType::FOLLOWS_T},
     };
 
     SuchThatType type;
@@ -170,6 +181,7 @@ SuchThat Parser::process_such_that_cl(TokenList *tokens) {
 
     // check and parse what SuchThatType is used
     Token *token = tokens->pop_front();
+    expect_token(token->get_type(), TokenType::WORD);
     if (tokens->front()->get_value() == "*") {
         std::string star_char = tokens->pop_front()->get_value();
         such_that_key = token->get_value() + star_char;
@@ -191,17 +203,20 @@ SuchThat Parser::process_such_that_cl(TokenList *tokens) {
 
     // append token string to left_string until it reached COMMA
     token = tokens->pop_front();
-    while (token->get_type() != TokenType::COMMA) {
+    while (token->get_type() != TokenType::COMMA && token->get_type() != TokenType::END) {
         left_string += token->get_value();
         token = tokens->pop_front();
     }
+    expect_token(token->get_type(), TokenType::COMMA);
 
     // append token string to right_string until it reached RPAREN
     token = tokens->pop_front();
-    while (token->get_type() != TokenType::RPAREN) {
+    while (token->get_type() != TokenType::RPAREN && token->get_type() != TokenType::END) {
         right_string += token->get_value();
         token = tokens->pop_front();
     }
+    expect_token(token->get_type(), TokenType::RPAREN);
+
 
     // LHS is always a StatementRef
     StatementRef left_statement_ref = process_statement_ref(left_string);
@@ -231,24 +246,29 @@ QueryObject *Parser::parse_query() {
     StringLexer lexer(query);
     TokenList *tokens = lexer.tokens();
     Token *token = tokens->pop_front();
+    if (token->get_type() == TokenType::END) {
+        throw "Unexpected end of query";
+    }
 
-    std::map<std::string, DesignEntityType> design_entity_map {
-        {"stmt", DesignEntityType::STMT},
-        {"read", DesignEntityType::READ},
-        {"print", DesignEntityType::PRINT},
-        {"while", DesignEntityType::WHILE},
-        {"if", DesignEntityType::IF},
-        {"assign", DesignEntityType::ASSIGN},
-        {"variable", DesignEntityType::VARIABLE},
-        {"constant", DesignEntityType::CONSTANT},
-        {"procedure", DesignEntityType::PROCEDURE}
+    std::map<std::string, DesignEntityType> designEntityMap {
+            {"stmt", DesignEntityType::STMT},
+            {"read", DesignEntityType::READ},
+            {"print", DesignEntityType::PRINT},
+            {"while", DesignEntityType::WHILE},
+            {"if", DesignEntityType::IF},
+            {"assign", DesignEntityType::ASSIGN},
+            {"variable", DesignEntityType::VARIABLE},
+            {"constant", DesignEntityType::CONSTANT},
+            {"procedure", DesignEntityType::PROCEDURE}
     };
 
 
     // process_declaration
+    bool has_declaration_query = false;
     while (token->get_value() != "Select" && token->get_type() != TokenType::END) {
-        if (design_entity_map.find(token->get_value()) != design_entity_map.end()) {
-            process_declaration(queryObject, tokens, design_entity_map[token->get_value()]);
+        if (designEntityMap.find(token->get_value()) != designEntityMap.end()) {
+            process_declaration(queryObject, tokens, designEntityMap[token->get_value()]);
+            has_declaration_query = true;
         } else {
             throw "Invalid design entity type parsed";
         }
@@ -256,14 +276,17 @@ QueryObject *Parser::parse_query() {
         token = tokens->pop_front();
     }
 
-    if (token->get_type() == TokenType::END) {
-        throw "No Select query string parsed";
+    if (!has_declaration_query) {
+        throw "No declaration is made in the query";
+    } else if (token->get_type() == TokenType::END) {
+        throw "Unexpected end of query, expected Select clause";
     }
 
     do {
         if (token->get_value() == "Select") {
             // expect synonym (for now it is only one variable)
             token = tokens->pop_front();
+            expect_token(token->get_type(), TokenType::WORD);
             queryObject->set_selection(token->get_value());
         } else if (token->get_value() == "pattern") {
             Pattern pattern_obj = process_pattern_cl(tokens);
@@ -285,5 +308,6 @@ QueryObject *Parser::parse_query() {
 
     // print for checking purposes
     queryObject->to_string();
+
     return queryObject;
 }
