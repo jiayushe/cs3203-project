@@ -312,6 +312,9 @@ TEST_CASE("PQLParser::Parser") {
             REQUIRE(entity_ref.get_type() == EntityRefType::ANY);
             REQUIRE(expression_spec.get_type() == ExpressionSpecType::PATTERN);
             REQUIRE(expression_spec.get_pattern()->is_equal(pattern_node));
+
+            delete query_object;
+            delete pattern_node;
         }
 
         SECTION("ExpressionSpecType of type ANY") {
@@ -321,6 +324,8 @@ TEST_CASE("PQLParser::Parser") {
             Pattern pattern_obj = query_object->get_pattern();
             ExpressionSpec expression_spec = pattern_obj.get_expression_spec();
             REQUIRE(expression_spec.get_type() == ExpressionSpecType::ANY);
+
+            delete query_object;
         }
     }
 
@@ -376,5 +381,8 @@ TEST_CASE("PQLParser::Parser") {
         REQUIRE(entity_ref.get_type() == EntityRefType::SYNONYM);
         REQUIRE(expression_spec.get_type() == ExpressionSpecType::PATTERN);
         REQUIRE(expression_spec.get_pattern()->is_equal(pattern_node));
+
+        delete query_object;
+        delete pattern_node;
     }
 }
