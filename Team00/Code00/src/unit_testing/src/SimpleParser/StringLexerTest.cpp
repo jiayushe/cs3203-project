@@ -1,13 +1,13 @@
 #include "catch.hpp"
 
-#include <string>
-#include "SimpleParser/Token.h"
 #include "SimpleParser/StringLexer.h"
+#include "SimpleParser/Token.h"
+#include <string>
 
 using namespace SimpleParser;
 
 TEST_CASE("SimpleParser::StringLexer") {
-    TokenList *tokens;
+    TokenList* tokens;
 
     SECTION("words") {
         std::string source = "alphabetical alphanumeric123 12345";

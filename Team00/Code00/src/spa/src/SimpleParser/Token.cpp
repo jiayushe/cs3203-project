@@ -2,12 +2,8 @@
 
 using namespace SimpleParser;
 
-Token::Token(TokenType type, const std::string &value) : type(type), value(value) {}
+Token::Token(TokenType type, const std::string& value) : type(type), value(value) {}
 
-TokenType Token::get_type() {
-    return type;
-}
+TokenType Token::get_type() { return type; }
 
-std::string Token::get_value() {
-    return value;
-}
+std::string Token::get_value() { return value; }

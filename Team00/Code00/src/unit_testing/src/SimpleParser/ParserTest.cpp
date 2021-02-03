@@ -1,9 +1,9 @@
 #include "catch.hpp"
 
-#include <string>
-#include <iterator>
-#include "SimpleParser/StringLexer.h"
 #include "SimpleParser/Parser.h"
+#include "SimpleParser/StringLexer.h"
+#include <iterator>
+#include <string>
 
 using namespace SimpleParser;
 
