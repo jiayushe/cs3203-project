@@ -1,14 +1,14 @@
 #ifndef TESTWRAPPER_H
 #define TESTWRAPPER_H
 
-#include <string>
 #include <iostream>
 #include <list>
+#include <string>
 
 // include your other headers here
 #include "AbstractWrapper.h"
-#include "SimpleParser/FileLexer.h"
-#include "SimpleParser/Parser.h"
+#include "Parser/SimpleParser/SimpleParser.h"
+#include "Parser/shared/FileLexer.h"
 
 #include "PQLParser/QueryObject.h"
 #include "PQLParser/Parser.h"
@@ -25,7 +25,7 @@ public:
     virtual void parse(std::string filename);
 
     // method for evaluating a query
-    virtual void evaluate(std::string query, std::list<std::string> &results);
+    virtual void evaluate(std::string query, std::list<std::string>& results);
 };
 
 #endif

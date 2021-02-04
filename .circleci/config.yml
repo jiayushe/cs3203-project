@@ -1,0 +1,61 @@
+version: 2.1
+
+orbs:
+  win: circleci/windows@2.4.0
+
+jobs:
+  build:
+    executor:
+      name: win/default
+      shell: bash
+
+    steps:
+      - checkout
+      - run:
+          name: Install CMake
+          command: choco install cmake
+      - run: 
+          name: Build
+          command: |
+            export PATH="C:\Program Files\CMake\bin:$PATH"
+            cd Team00/Code00
+            mkdir build
+            cd build
+            cmake -A Win32 ..
+            cmake --build . --target unit_testing --config Release
+            cmake --build . --target integration_testing --config Release
+            cmake --build . --target autotester --config Release
+            cd ..
+      - persist_to_workspace:
+          root: Team00/Code00
+          paths:
+            - build
+
+  test:
+    executor:
+      name: win/default
+      shell: bash
+
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Unit tests
+          command: build/src/unit_testing/Release/unit_testing.exe -d yes --order lex
+      - run:
+          name: Integration tests
+          command: build/src/integration_testing/Release/integration_testing.exe -d yes --order lex
+
+workflows:
+  build-and-test:
+    jobs:
+      - build:
+          filters: &master-only
+            branches:
+              only: master
+      - test:
+          requires:
+            - build
+          filters:
+            <<: *master-only
+
