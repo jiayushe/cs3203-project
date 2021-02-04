@@ -21,8 +21,8 @@ TestWrapper::TestWrapper() {
 // method for parsing the SIMPLE source
 void TestWrapper::parse(std::string filename) {
     try {
-        SimpleParser::FileLexer lexer(filename);
-        SimpleParser::Parser parser(lexer);
+        Parser::FileLexer lexer(filename);
+        Parser::SimpleParser parser(lexer);
         auto root_node = parser.parse_program();
 
         // TODO: PKB logic here...
