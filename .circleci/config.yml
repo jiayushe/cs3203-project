@@ -31,8 +31,26 @@ jobs:
           paths:
             - build
 
+  test:
+    executor:
+      name: win/default
+      shell: bash
+
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Unit tests
+          command: build/src/unit_testing/Release/unit_testing.exe -d yes --order lex
+      - run:
+          name: Integration tests
+          command: build/src/integration_testing/Release/integration_testing.exe -d yes --order lex
+
 workflows:
   build-and-test:
     jobs:
       - build
+      - test:
+          requires:
+            - build
 
