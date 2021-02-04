@@ -17,7 +17,7 @@ namespace Parser {
         void add_declaration(std::string synonym, DesignEntity design_entity);
 
         // getters
-        std::unordered_map<std::string, DesignEntity> getDeclarations();
+        std::unordered_map<std::string, DesignEntity> get_declarations();
         bool has_such_that();
         bool has_pattern();
 

@@ -1,32 +1,40 @@
 #pragma once
 
+#include <map>
+#include "Parser/shared/BaseLexer.h"
+#include "Parser/shared/BaseParser.h"
+#include "Parser/shared/Token.h"
 #include "Parser/shared/TokenList.h"
 #include "QueryObject.h"
 
 namespace Parser {
-    class PQLParser {
+    class PQLParser : public BaseParser {
     public:
-        PQLParser(std::string tmp_query);
+        PQLParser(QueryObject* queryObject, TokenList* tokens);
 
         ~PQLParser();
 
         QueryObject* parse_query();
 
-        void process_declaration(QueryObject* query_object, TokenList* tokens,
-                                 DesignEntityType design_entity_type);
+        void process_declaration(std::map<std::string, DesignEntityType> design_entity_map);
 
-        void expect_token(TokenType given_type, TokenType expected_type);
+        void process_selection();
 
-        SuchThat process_such_that_cl(TokenList* tokens);
+        void process_such_that_cl();
 
-        Pattern process_pattern_cl(TokenList* tokens);
+        void process_pattern_cl();
 
-        StatementRef process_statement_ref(std::string statement_string);
+        ExpressionSpec process_expression_spec();
 
-        EntityRef process_entity_ref(std::string statement_string);
+        StatementRef process_statement_ref();
+
+        EntityRef process_entity_ref();
 
     private:
-        std::string query;
+        QueryObject* query_object;
+
+        void choice(const std::vector<std::function<void()>>& parse_funcs,
+                           std::string error_message);
     };
 
 } // namespace Parser

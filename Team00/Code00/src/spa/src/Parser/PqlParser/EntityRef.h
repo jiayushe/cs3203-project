@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Parser {
-    enum EntityRefType {
+    enum class EntityRefType {
         ANY,
         SYNONYM,
         NAME,

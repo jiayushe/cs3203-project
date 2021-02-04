@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Parser {
-    enum DesignEntityType {
+    enum class DesignEntityType {
         STMT,
         READ,
         PRINT,

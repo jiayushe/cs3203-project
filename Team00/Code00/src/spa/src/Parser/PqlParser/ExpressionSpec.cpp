@@ -6,13 +6,17 @@ ExpressionSpec::ExpressionSpec() {
     this->type = ExpressionSpecType::ANY;
 }
 
-ExpressionSpec::ExpressionSpec(Parser::SimpleNode* pattern) {
-    this->type = ExpressionSpecType::PATTERN;
-    this->pattern = pattern;
-}
-
 ExpressionSpec::~ExpressionSpec() {
 
+}
+
+void ExpressionSpec::set_type(ExpressionSpecType expression_spec_type) {
+    this->type = expression_spec_type;
+}
+
+
+void ExpressionSpec::set_pattern(Parser::SimpleNode* pattern) {
+    this->pattern = pattern;
 }
 
 ExpressionSpecType ExpressionSpec::get_type() {

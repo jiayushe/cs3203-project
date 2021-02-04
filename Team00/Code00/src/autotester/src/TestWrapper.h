@@ -9,9 +9,9 @@
 #include "AbstractWrapper.h"
 #include "Parser/SimpleParser/SimpleParser.h"
 #include "Parser/shared/FileLexer.h"
-
-#include "PQLParser/QueryObject.h"
-#include "PQLParser/Parser.h"
+#include "Parser/shared/StringLexer.h"
+#include "Parser/PQLParser/QueryObject.h"
+#include "Parser/PQLParser/PQLParser.h"
 
 class TestWrapper : public AbstractWrapper {
 public:

@@ -1,7 +1,7 @@
 #pragma once
 
 namespace Parser {
-    enum StatementRefType {
+    enum class StatementRefType {
         ANY,
         SYNONYM,
         STATEMENT_NUMBER,
