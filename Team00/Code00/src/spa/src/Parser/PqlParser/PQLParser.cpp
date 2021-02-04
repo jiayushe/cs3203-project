@@ -2,23 +2,23 @@
 #include <iostream>
 #include <map>
 #include <regex>
-#include "Parser.h"
+#include "PQLParser.h"
 #include "TokenList.h"
 #include "StringLexer.h"
 #include "DesignEntity.h"
 #include <SimpleParser/Parser.h>
 #include "SimpleParser/StringLexer.h"
 
-using namespace PQLParser;
+using namespace Parser;
 
-Parser::Parser(std::string tmp_query) :
+PQLParser::PQLParser(std::string tmp_query) :
         query(tmp_query) {}
 
-Parser::~Parser() {}
+PQLParser::~PQLParser() {}
 
 
 // Accepts query string in the form of declaration and save those declarations to query_object (add_declaration)
-void Parser::process_declaration(QueryObject *query_object, TokenList *tokens, DesignEntityType design_entity_type) {
+void PQLParser::process_declaration(QueryObject *query_object, TokenList *tokens, DesignEntityType design_entity_type) {
     Token *token = tokens->pop_front();
 
     while (token->get_type() != TokenType::SEMICOLON && token->get_type() != TokenType::END) {
@@ -37,7 +37,7 @@ void Parser::process_declaration(QueryObject *query_object, TokenList *tokens, D
 
 
 // compare two TokenType and throw error if it is different
-void Parser::expect_token(TokenType given_type, TokenType expected_type) {
+void PQLParser::expect_token(TokenType given_type, TokenType expected_type) {
     if (given_type != expected_type) {
         throw "Expected token type " + std::to_string(expected_type) + ", received " +
               std::to_string(given_type);
@@ -45,7 +45,7 @@ void Parser::expect_token(TokenType given_type, TokenType expected_type) {
 }
 
 // compare two TokenType and throw error if it is different
-void Parser::expect_token(std::string given_string, std::string expected_string) {
+void PQLParser::expect_token(std::string given_string, std::string expected_string) {
     if (given_string != expected_string) {
         throw "Expected token type " + expected_string + ", received " + given_string;
     }
@@ -67,7 +67,7 @@ bool is_enclosed_by_double_quote(std::string statement_string) {
 
 
 // Convert string of expected type StatementRef to a StatementRef class object
-StatementRef Parser::process_statement_ref(std::string statement_string) {
+StatementRef PQLParser::process_statement_ref(std::string statement_string) {
     StatementRef statement_ref;
     StatementRefType statement_ref_type;
 
@@ -87,7 +87,7 @@ StatementRef Parser::process_statement_ref(std::string statement_string) {
 
 
 // Convert string of expected type EntityRef to a EntityRef class object
-EntityRef Parser::process_entity_ref(std::string statement_string) {
+EntityRef PQLParser::process_entity_ref(std::string statement_string) {
     EntityRef entity_ref;
     EntityRefType entity_ref_type;
 
@@ -107,7 +107,7 @@ EntityRef Parser::process_entity_ref(std::string statement_string) {
 
 
 // Parse string with pattern: "pattern a(..., ...)" and return a Pattern class object
-Pattern Parser::process_pattern_cl(TokenList *tokens) {
+Pattern PQLParser::process_pattern_cl(TokenList *tokens) {
     Pattern pattern_obj;
     Token *token = tokens->pop_front();
     expect_token(token->get_type(), TokenType::WORD);
@@ -165,7 +165,7 @@ Pattern Parser::process_pattern_cl(TokenList *tokens) {
 
 
 // Parse string with pattern: "such that Modifies(..., ...)" and return a SuchThat class object
-SuchThat Parser::process_such_that_cl(TokenList *tokens) {
+SuchThat PQLParser::process_such_that_cl(TokenList *tokens) {
     SuchThat such_that_obj;
     std::map<std::string, SuchThatType> such_that_map {
             {"Modifies", SuchThatType::MODIFIES_S},
@@ -239,7 +239,7 @@ SuchThat Parser::process_such_that_cl(TokenList *tokens) {
 
 
 // Parse token string and store it as a QueryObject
-QueryObject *Parser::parse_query() {
+QueryObject *PQLParser::parse_query() {
     auto queryObject = new QueryObject();
     std::cout << "Query String: " << query << std::endl;
 

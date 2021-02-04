@@ -1,7 +1,7 @@
 #include <string>
 #include "StatementRef.h"
 
-using namespace PQLParser;
+using namespace Parser;
 
 StatementRef::StatementRef() {}
 

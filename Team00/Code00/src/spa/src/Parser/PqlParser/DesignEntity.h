@@ -1,32 +1,32 @@
 #pragma once
 
 namespace Parser {
-enum DesignEntityType {
-    STMT,
-    READ,
-    PRINT,
-    WHILE,
-    IF,
-    ASSIGN,
-    VARIABLE,
-    CONSTANT,
-    PROCEDURE,
-};
+    enum DesignEntityType {
+        STMT,
+        READ,
+        PRINT,
+        WHILE,
+        IF,
+        ASSIGN,
+        VARIABLE,
+        CONSTANT,
+        PROCEDURE,
+    };
 
-class DesignEntity {
-public:
-    DesignEntityType get_type();
-    std::string get_synonym();
+    class DesignEntity {
+    public:
+        DesignEntityType get_type();
+        std::string get_synonym();
 
-    DesignEntity();
+        DesignEntity();
 
-    DesignEntity(DesignEntityType type, std::string synonym);
+        DesignEntity(DesignEntityType type, std::string synonym);
 
-    ~DesignEntity();
+        ~DesignEntity();
 
-private:
-    DesignEntityType type;
-    std::string synonym;
-};
+    private:
+        DesignEntityType type;
+        std::string synonym;
+    };
 
 } // namespace Parser

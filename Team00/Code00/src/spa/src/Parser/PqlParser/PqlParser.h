@@ -4,29 +4,29 @@
 #include "QueryObject.h"
 
 namespace Parser {
-class PqlParser {
-public:
-    PqlParser(std::string tmp_query);
+    class PQLParser {
+    public:
+        PQLParser(std::string tmp_query);
 
-    ~PqlParser();
+        ~PQLParser();
 
-    QueryObject* parse_query();
+        QueryObject* parse_query();
 
-    void process_declaration(QueryObject* query_object, TokenList* tokens,
-                             DesignEntityType design_entity_type);
+        void process_declaration(QueryObject* query_object, TokenList* tokens,
+                                 DesignEntityType design_entity_type);
 
-    void expect_token(TokenType given_type, TokenType expected_type);
+        void expect_token(TokenType given_type, TokenType expected_type);
 
-    SuchThat process_such_that_cl(TokenList* tokens);
+        SuchThat process_such_that_cl(TokenList* tokens);
 
-    Pattern process_pattern_cl(TokenList* tokens);
+        Pattern process_pattern_cl(TokenList* tokens);
 
-    StatementRef process_statement_ref(std::string statement_string);
+        StatementRef process_statement_ref(std::string statement_string);
 
-    EntityRef process_entity_ref(std::string statement_string);
+        EntityRef process_entity_ref(std::string statement_string);
 
-private:
-    std::string query;
-};
+    private:
+        std::string query;
+    };
 
 } // namespace Parser

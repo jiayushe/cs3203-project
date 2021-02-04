@@ -1,7 +1,7 @@
 #include <string>
 #include "Ref.h"
 
-using namespace PQLParser;
+using namespace Parser;
 
 Ref::Ref() {}
 

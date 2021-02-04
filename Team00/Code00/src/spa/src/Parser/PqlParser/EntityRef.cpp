@@ -1,7 +1,7 @@
 #include <string>
 #include "EntityRef.h"
 
-using namespace PQLParser;
+using namespace Parser;
 
 EntityRef::EntityRef() {}
 

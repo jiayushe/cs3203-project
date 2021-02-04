@@ -1,8 +1,7 @@
 #include <string>
-#include <iostream>
 #include "Pattern.h"
 
-using namespace PQLParser;
+using namespace Parser;
 
 Pattern::Pattern() {}
 

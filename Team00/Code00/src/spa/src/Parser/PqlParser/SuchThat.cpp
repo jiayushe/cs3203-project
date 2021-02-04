@@ -1,8 +1,7 @@
 #include <string>
-#include <iostream>
 #include "SuchThat.h"
 
-using namespace PQLParser;
+using namespace Parser;
 
 SuchThat::SuchThat() {}
 

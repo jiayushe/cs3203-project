@@ -4,29 +4,29 @@
 #include "StatementRef.h"
 
 namespace Parser {
-enum RefType {
-    ENTITY,
-    STATEMENT,
-};
+    enum RefType {
+        ENTITY,
+        STATEMENT,
+    };
 
-class Ref {
-public:
-    RefType get_type();
-    EntityRef get_entity_ref();
-    StatementRef get_statement_ref();
+    class Ref {
+    public:
+        RefType get_type();
+        EntityRef get_entity_ref();
+        StatementRef get_statement_ref();
 
-    Ref();
+        Ref();
 
-    Ref(EntityRef entity_ref);
+        Ref(EntityRef entity_ref);
 
-    Ref(StatementRef statement_ref);
+        Ref(StatementRef statement_ref);
 
-    ~Ref();
+        ~Ref();
 
-private:
-    RefType type;
-    EntityRef entity_ref;
-    StatementRef statement_ref;
-};
+    private:
+        RefType type;
+        EntityRef entity_ref;
+        StatementRef statement_ref;
+    };
 
 } // namespace Parser

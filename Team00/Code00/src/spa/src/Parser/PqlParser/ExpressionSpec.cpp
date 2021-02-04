@@ -1,12 +1,12 @@
 #include "ExpressionSpec.h"
 
-using namespace PQLParser;
+using namespace Parser;
 
 ExpressionSpec::ExpressionSpec() {
     this->type = ExpressionSpecType::ANY;
 }
 
-ExpressionSpec::ExpressionSpec(SimpleParser::Node *pattern) {
+ExpressionSpec::ExpressionSpec(Parser::SimpleNode* pattern) {
     this->type = ExpressionSpecType::PATTERN;
     this->pattern = pattern;
 }
@@ -19,7 +19,7 @@ ExpressionSpecType ExpressionSpec::get_type() {
     return type;
 }
 
-SimpleParser::Node *ExpressionSpec::get_pattern() {
+Parser::SimpleNode* ExpressionSpec::get_pattern() {
     if (type != ExpressionSpecType::PATTERN) {
         throw "ExpressionSpecType is not PATTERN type";
     }

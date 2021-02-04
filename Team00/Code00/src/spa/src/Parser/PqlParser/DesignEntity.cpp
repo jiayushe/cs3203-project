@@ -1,7 +1,7 @@
 #include <string>
-#include "DesignEntity.h"
+#include "Parser/PQLParser/DesignEntity.h"
 
-using namespace PQLParser;
+using namespace Parser;
 
 DesignEntity::DesignEntity() {}
 

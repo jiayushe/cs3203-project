@@ -3,7 +3,7 @@
 #include "QueryObject.h"
 #include "DesignEntity.h"
 
-using namespace PQLParser;
+using namespace Parser;
 
 QueryObject::QueryObject() :
     has_such_that_cl(false),
