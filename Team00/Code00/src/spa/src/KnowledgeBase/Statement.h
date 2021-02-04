@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SimpleParser/Node.h"
+#include "Parser/SimpleParser/SimpleNode.h"
 #include <string>
 #include <unordered_set>
 #include <vector>

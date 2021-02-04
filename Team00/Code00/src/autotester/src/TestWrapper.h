@@ -7,8 +7,8 @@
 
 // include your other headers here
 #include "AbstractWrapper.h"
-#include "SimpleParser/FileLexer.h"
-#include "SimpleParser/Parser.h"
+#include "Parser/FileLexer.h"
+#include "Parser/SimpleParser/SimpleParser.h"
 
 class TestWrapper : public AbstractWrapper {
 public:
