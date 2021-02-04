@@ -1,14 +1,13 @@
 #pragma once
 
-#include "Lexer.h"
+#include "BaseLexer.h"
 #include <fstream>
 #include <string>
 
 namespace Parser {
 
-// Lexer for the SIMPLE language (string to tokens) which reads
-// the SIMPLE source from the given filename.
-class FileLexer : public Lexer {
+// Lexer for PQL + SIMPLE (string to tokens) which reads the source from the given filename.
+class FileLexer : public BaseLexer {
 public:
     explicit FileLexer(const std::string& filename);
 

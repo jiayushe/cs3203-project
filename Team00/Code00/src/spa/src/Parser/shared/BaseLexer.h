@@ -5,10 +5,10 @@
 
 namespace Parser {
 
-// Lexer for the SIMPLE language (converts string to tokens).
-class AbstractLexer {
+// Lexer for PQL + SIMPLE (converts string to tokens).
+class BaseLexer {
 public:
-    // Gets a list of tokens representing the supplied SIMPLE source.
+    // Gets a list of tokens representing the supplied source.
     TokenList* tokens();
 
 private:

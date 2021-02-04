@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
 #include "Parser/SimpleParser/SimpleParser.h"
-#include "Parser/StringLexer.h"
+#include "Parser/shared/StringLexer.h"
 #include <iterator>
 #include <string>
 
@@ -416,15 +416,19 @@ TEST_CASE("Parser::SimpleParser") {
             REQUIRE(left_inner_left_cond_node->get_type() == SimpleNodeType::ARITHMETIC);
             REQUIRE(left_inner_left_cond_node->get_value() == "+");
             REQUIRE(left_inner_left_cond_node->get_children().size() == 2);
-            REQUIRE(left_inner_left_cond_node->get_child(0)->get_type() == SimpleNodeType::VAR_NAME);
-            REQUIRE(left_inner_left_cond_node->get_child(1)->get_type() == SimpleNodeType::CONST_VALUE);
+            REQUIRE(left_inner_left_cond_node->get_child(0)->get_type() ==
+                    SimpleNodeType::VAR_NAME);
+            REQUIRE(left_inner_left_cond_node->get_child(1)->get_type() ==
+                    SimpleNodeType::CONST_VALUE);
 
             auto left_inner_right_cond_node = left_inner_cond_node->get_child(1);
             REQUIRE(left_inner_right_cond_node->get_type() == SimpleNodeType::ARITHMETIC);
             REQUIRE(left_inner_right_cond_node->get_value() == "*");
             REQUIRE(left_inner_right_cond_node->get_children().size() == 2);
-            REQUIRE(left_inner_right_cond_node->get_child(0)->get_type() == SimpleNodeType::VAR_NAME);
-            REQUIRE(left_inner_right_cond_node->get_child(1)->get_type() == SimpleNodeType::CONST_VALUE);
+            REQUIRE(left_inner_right_cond_node->get_child(0)->get_type() ==
+                    SimpleNodeType::VAR_NAME);
+            REQUIRE(left_inner_right_cond_node->get_child(1)->get_type() ==
+                    SimpleNodeType::CONST_VALUE);
 
             delete cond_node;
         }

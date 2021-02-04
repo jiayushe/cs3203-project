@@ -1,18 +1,24 @@
 #pragma once
 
-#include "Parser/Lexer.h"
+#include "Parser/shared/BaseLexer.h"
+#include "Parser/shared/BaseParser.h"
+#include "Parser/shared/Token.h"
+#include "Parser/shared/TokenList.h"
 #include "SimpleNode.h"
-#include "Parser/Token.h"
-#include "Parser/TokenList.h"
 #include <functional>
 
 namespace Parser {
 
 // SimpleParser for the SIMPLE language (converts tokens to AST).
-class SimpleParser {
+class SimpleParser : public BaseParser {
 public:
-    explicit SimpleParser(Lexer& lexer);
+    // TODO:
+    explicit SimpleParser(BaseLexer& lexer);
 
+    // TODO:
+    explicit SimpleParser(TokenList* tokens);
+
+    // TODO:
     ~SimpleParser();
 
     // The methods below correspond 1-to-1 to the grammar rule for the SIMPLE language.
@@ -59,55 +65,19 @@ public:
     SimpleNode* parse_const_value();
 
 private:
-    TokenList* tokens;
     int next_statement_id;
+    bool should_delete_token_list;
 
     // Helper for choosing one valid parser from parse_funcs.
     // Validity is decided based on whether the chosen parser throws an error.
     // Useful for building a disjunctive parsing logic (see parse_cond_expr for an example).
-    SimpleNode* choice(const std::vector<std::function<SimpleNode*()>>& parse_funcs, std::string error_message);
+    SimpleNode* choice(const std::vector<std::function<SimpleNode*()>>& parse_funcs,
+                       std::string error_message);
 
     // Helper for repeatedly calling parse_func until it throws an error.
     // Useful for building an iterative parsing logic (see parse_stmt_lst for an example).
-    SimpleNode* repeat(const std::function<SimpleNode*(SimpleNode*)>& parse_func, SimpleNode* initial_node);
-
-    // Registers that the next token should be of the expected type.
-    // Throws if the expectation is not fulfilled.
-    Token* expect_token(TokenType expected_type);
-
-    // Registers that the next token should be any of the expected types.
-    // Throws if the expectation is not fulfilled.
-    Token* expect_token(const std::vector<TokenType>& expected_types);
-
-    // Registers that the next token should be a WORD token with the expected value.
-    // Throws if the expectation is not fulfilled.
-    Token* expect_word(const std::string& expected_value);
-
-    // Registers that the next token should be a WORD token whose value is a name
-    // (an alphanumeric string which starts with an alphabet).
-    // Throws if the expectation is not fulfilled.
-    Token* expect_name(const std::string& identifier);
-
-    // Registers that the next token should be a WORD token whose value is an integer
-    // (a numeric string).
-    // Throws if the expectation is not fulfilled.
-    Token* expect_integer(const std::string& identifier);
-
-    // Checks if the given token type matches with the expected type.
-    static bool is_token_type(Token* token, TokenType expected_type);
-
-    // Checks if the given token type matches with any of the expected types.
-    static bool is_word(Token* token, const std::string& expected_value);
-
-    // Checks if the given token is a WORD token whose value is a name
-    // (an alphanumeric string which starts with an alphabet).
-    static bool is_name(Token* token);
-
-    // Checks if the given token is a WORD token whose value is an integer
-    // (a numeric string).
-    static bool is_integer(Token* token);
-
-    static std::string to_string(const std::vector<TokenType>& token_types);
+    SimpleNode* repeat(const std::function<SimpleNode*(SimpleNode*)>& parse_func,
+                       SimpleNode* initial_node);
 };
 
-}
+} // namespace Parser

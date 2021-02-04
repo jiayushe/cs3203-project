@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Procedure.h"
 #include "Parser/SimpleParser/SimpleNode.h"
+#include "Procedure.h"
 #include "Statement.h"
 #include "Variable.h"
 #include <string>

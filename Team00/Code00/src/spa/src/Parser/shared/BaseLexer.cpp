@@ -1,10 +1,10 @@
-#include "AbstractLexer.h"
+#include "BaseLexer.h"
 #include <cctype>
 #include <string>
 
 using namespace Parser;
 
-TokenList* AbstractLexer::tokens() {
+TokenList* BaseLexer::tokens() {
     auto tokens = new TokenList();
     Token* token;
     do {
@@ -14,7 +14,7 @@ TokenList* AbstractLexer::tokens() {
     return tokens;
 }
 
-Token* AbstractLexer::next_token() {
+Token* BaseLexer::next_token() {
     if (!has_more()) {
         return new Token(TokenType::END, "END");
     }

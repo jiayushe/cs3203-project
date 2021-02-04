@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Parser/TokenList.h"
+#include "Parser/shared/TokenList.h"
 #include "QueryObject.h"
 
 namespace Parser {
 class PqlParser {
 public:
-    Parser(std::string tmp_query);
+    PqlParser(std::string tmp_query);
 
-    ~Parser();
+    ~PqlParser();
 
     QueryObject* parse_query();
 

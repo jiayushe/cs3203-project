@@ -33,8 +33,9 @@ std::string SimpleNode::get_value() {
 }
 
 bool SimpleNode::has_statement_id() {
-    return type == SimpleNodeType::READ || type == SimpleNodeType::PRINT || type == SimpleNodeType::CALL ||
-           type == SimpleNodeType::ASSIGN || type == SimpleNodeType::IF || type == SimpleNodeType::WHILE;
+    return type == SimpleNodeType::READ || type == SimpleNodeType::PRINT ||
+           type == SimpleNodeType::CALL || type == SimpleNodeType::ASSIGN ||
+           type == SimpleNodeType::IF || type == SimpleNodeType::WHILE;
 }
 
 int SimpleNode::get_statement_id() {

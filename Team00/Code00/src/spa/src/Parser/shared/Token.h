@@ -4,7 +4,7 @@
 
 namespace Parser {
 
-// All possible token types for the SIMPLE language.
+// All possible token types for PQL + SIMPLE.
 enum TokenType {
     INVALID_TOKEN,
 
@@ -38,7 +38,7 @@ enum TokenType {
     END, // EOF
 };
 
-// A single token (in parser parlance) for the SIMPLE language.
+// A single token (in parser parlance) for PQL + SIMPLE.
 class Token {
 public:
     Token(TokenType type, const std::string& value);

@@ -3,26 +3,25 @@
 #include "Parser/SimpleParser/SimpleNode.h"
 
 namespace Parser {
-    enum ExpressionSpecType {
-        ANY,
-        PATTERN,
-    };
+enum ExpressionSpecType {
+    ANY,
+    PATTERN,
+};
 
-    class ExpressionSpec {
-    public:
-        ExpressionSpecType get_type();
-        SimpleParser::Node *get_pattern();
+class ExpressionSpec {
+public:
+    ExpressionSpecType get_type();
+    SimpleParser::Node* get_pattern();
 
-        ExpressionSpec();
+    ExpressionSpec();
 
-        ExpressionSpec(SimpleParser::Node *pattern);
+    ExpressionSpec(SimpleParser::Node* pattern);
 
-        ~ExpressionSpec();
+    ~ExpressionSpec();
 
-    private:
-        ExpressionSpecType type;
-        SimpleParser::Node *pattern;
+private:
+    ExpressionSpecType type;
+    SimpleParser::Node* pattern;
+};
 
-    };
-
-}
+} // namespace Parser

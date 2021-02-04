@@ -6,8 +6,7 @@
 namespace Parser {
 
 // List of tokens (see Token.h) which supports quick O(1) rewind operation.
-// See SimpleParser.cpp to understand better how this list of tokens is used to enable efficient
-// parsing.
+// Useful for supporting parser combinator logic. See BaseParser.cpp for more info.
 class TokenList {
 public:
     ~TokenList();
