@@ -49,8 +49,13 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      - build
+      - build:
+          filters: &master-only
+            branches:
+              only: master
       - test:
           requires:
             - build
+          filters:
+            <<: *master-only
 
