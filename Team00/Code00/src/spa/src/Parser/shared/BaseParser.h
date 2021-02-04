@@ -6,12 +6,14 @@
 
 namespace Parser {
 
-// TODO:
+// Parser for PQL + SIMPLE. This is a base class containing helper methods
+// which parsers for both PQL and SIMPLE should find useful.
 class BaseParser {
 protected:
     TokenList* tokens;
 
-    // TODO:
+    // Construct a BaseParser instance.
+    // Caller is responsible for cleaning up the memory for the supplied token list.
     BaseParser(TokenList* tokens);
 
     // Registers that the next token should be of the expected type.

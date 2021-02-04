@@ -12,13 +12,13 @@ namespace Parser {
 // SimpleParser for the SIMPLE language (converts tokens to AST).
 class SimpleParser : public BaseParser {
 public:
-    // TODO:
+    // Create a SimpleParser instance from the given lexer instance.
     explicit SimpleParser(BaseLexer& lexer);
 
-    // TODO:
+    // Create a SimpleParser instance from the given token list.
+    // Caller is responsible for cleaning up the memory for the supplied token list.
     explicit SimpleParser(TokenList* tokens);
 
-    // TODO:
     ~SimpleParser();
 
     // The methods below correspond 1-to-1 to the grammar rule for the SIMPLE language.
