@@ -1,7 +1,9 @@
 #pragma once
 
+#include <string>
+
 namespace Parser {
-enum DesignEntityType {
+enum class DesignEntityType {
     STMT,
     READ,
     PRINT,
@@ -15,14 +17,14 @@ enum DesignEntityType {
 
 class DesignEntity {
 public:
-    DesignEntityType get_type();
-    std::string get_synonym();
-
     DesignEntity();
 
     DesignEntity(DesignEntityType type, std::string synonym);
 
     ~DesignEntity();
+
+    DesignEntityType get_type();
+    std::string get_synonym();
 
 private:
     DesignEntityType type;

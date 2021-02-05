@@ -1,17 +1,19 @@
 #pragma once
 
+#include <string>
+
 namespace Parser {
-enum StatementRefType {
+enum class StatementRefType {
     ANY,
     SYNONYM,
-    STATEMENT_NUMBER,
+    STATEMENT_ID,
 };
 
 class StatementRef {
 public:
     StatementRefType get_type();
     std::string get_synonym();
-    int get_statement_number();
+    int get_statement_id();
 
     StatementRef();
 
@@ -21,12 +23,12 @@ public:
 
     void set_synonym(std::string synonym);
 
-    void set_statement_number(int statement_number);
+    void set_statement_id(int statement_id);
 
 private:
     StatementRefType type;
     std::string synonym;
-    int statement_number;
+    int statement_id;
 };
 
 } // namespace Parser

@@ -7,8 +7,11 @@
 
 // include your other headers here
 #include "AbstractWrapper.h"
+#include "Parser/PQLParser/PQLParser.h"
+#include "Parser/PQLParser/QueryObject.h"
 #include "Parser/SimpleParser/SimpleParser.h"
 #include "Parser/shared/FileLexer.h"
+#include "Parser/shared/StringLexer.h"
 
 class TestWrapper : public AbstractWrapper {
 public:

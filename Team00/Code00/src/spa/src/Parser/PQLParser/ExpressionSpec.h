@@ -3,7 +3,7 @@
 #include "Parser/SimpleParser/SimpleNode.h"
 
 namespace Parser {
-enum ExpressionSpecType {
+enum class ExpressionSpecType {
     ANY,
     PATTERN,
 };
@@ -11,17 +11,19 @@ enum ExpressionSpecType {
 class ExpressionSpec {
 public:
     ExpressionSpecType get_type();
-    SimpleParser::Node* get_pattern();
+    Parser::SimpleNode* get_pattern();
 
     ExpressionSpec();
 
-    ExpressionSpec(SimpleParser::Node* pattern);
-
     ~ExpressionSpec();
+
+    void set_pattern(Parser::SimpleNode* pattern);
+
+    void set_type(ExpressionSpecType expression_spec_type);
 
 private:
     ExpressionSpecType type;
-    SimpleParser::Node* pattern;
+    Parser::SimpleNode* pattern;
 };
 
 } // namespace Parser

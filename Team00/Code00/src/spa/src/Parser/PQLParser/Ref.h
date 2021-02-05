@@ -4,7 +4,7 @@
 #include "StatementRef.h"
 
 namespace Parser {
-enum RefType {
+enum class RefType {
     ENTITY,
     STATEMENT,
 };

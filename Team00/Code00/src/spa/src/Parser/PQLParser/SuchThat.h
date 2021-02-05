@@ -3,7 +3,7 @@
 #include "Ref.h"
 
 namespace Parser {
-enum SuchThatType {
+enum class SuchThatType {
     MODIFIES_S,
     USES_S,
     PARENT,

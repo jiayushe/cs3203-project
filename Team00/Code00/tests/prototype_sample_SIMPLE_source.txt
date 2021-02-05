@@ -15,10 +15,10 @@ if (a <  beta) then{	\\4
             print Romeo;	\\13
             b = 0;	\\14
             c = delta    + l  * width + Romeo; }}	\\15
-        else {	
+        else {
             while (c>1) {	\\16
               c = c -1;} 	\\17
             x = x+ 1; }}}	\\18
-else{	
+else{
 	a= 2;}	\\19
 }

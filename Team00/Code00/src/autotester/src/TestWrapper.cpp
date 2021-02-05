@@ -46,4 +46,18 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
 
     // store the answers to the query in the results list (it is initially empty)
     // each result must be a string.
+    try {
+        std::cout << "Query string: " << query << std::endl;
+        Parser::StringLexer lexer(query);
+        Parser::PQLParser parser(lexer.tokens());
+        Parser::QueryObject* query_object = parser.parse_query();
+
+        // TODO: QE code...
+
+        delete query_object;
+
+    } catch (const std::string& message) {
+        std::cout << "Error: " << message << std::endl;
+        throw message;
+    }
 }

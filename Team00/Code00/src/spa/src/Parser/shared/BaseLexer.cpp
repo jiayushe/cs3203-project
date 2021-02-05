@@ -69,6 +69,12 @@ Token* BaseLexer::next_token() {
         return new Token(TokenType::PERCENT, "%");
     case ';':
         return new Token(TokenType::SEMICOLON, ";");
+    case ',':
+        return new Token(TokenType::COMMA, ",");
+    case '_':
+        return new Token(TokenType::UNDERSCORE, "_");
+    case '\"':
+        return new Token(TokenType::DOUBLE_QUOTE, "\"");
     default:
         // Fall through - other cases are checked below
         break;
