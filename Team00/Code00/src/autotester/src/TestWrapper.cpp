@@ -50,7 +50,7 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
         std::cout << "Query string: " << query << std::endl;
         Parser::StringLexer lexer(query);
         Parser::PQLParser parser(lexer.tokens());
-        Parser::QueryObject *query_object = parser.parse_query();
+        Parser::QueryObject* query_object = parser.parse_query();
 
         // TODO: QE code...
 

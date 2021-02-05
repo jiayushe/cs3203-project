@@ -33,10 +33,10 @@ enum TokenType {
     SLASH,    // /
     PERCENT,  // %
 
-    SEMICOLON,     // ;
-    COMMA,         // ,
-    DOUBLE_QUOTE,  // "
-    UNDERSCORE,    // _
+    SEMICOLON,    // ;
+    COMMA,        // ,
+    DOUBLE_QUOTE, // "
+    UNDERSCORE,   // _
 
     END, // EOF
 };
