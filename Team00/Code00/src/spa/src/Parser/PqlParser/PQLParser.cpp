@@ -1,7 +1,6 @@
 #include <string>
 #include <iostream>
 
-#include <regex>
 #include "PQLParser.h"
 #include "DesignEntity.h"
 #include "Parser/SimpleParser/SimpleParser.h"
@@ -19,84 +18,127 @@ PQLParser::~PQLParser() {
 }
 
 
-// Accepts query string in the form of declaration and save those declarations to query_object (add_declaration)
-void PQLParser::process_declaration(std::map<std::string, DesignEntityType> design_entity_map) {
-    Token *token = expect_token(TokenType::WORD);
-    if (design_entity_map.find(token->get_value()) == design_entity_map.end()) {
-        throw "No declaration/Invalid declaration name provided";
-    }
-
-    DesignEntityType design_entity_type = design_entity_map[token->get_value()];
-    do {
-         choice({
-            [&]() { // expect synonym
-                Token *token = expect_token(TokenType::WORD);
-                DesignEntity design_entity(design_entity_type, token->get_value());
-                query_object->add_declaration(token->get_value(), design_entity);
-
-            },
-            [&]() { // expect comma
-                expect_token(TokenType::COMMA);
-            }
-         }, "Error in process_declaration func");
-    } while (tokens->front()->get_type() != TokenType::SEMICOLON &&
-              tokens->front()->get_type() != TokenType::END);
-
-    if (tokens->front()->get_type() == TokenType::SEMICOLON)
-        tokens->pop_front();
+void PQLParser::process_declaration() {
+    choice({
+        [&]() {
+            expect_word("stmt");
+            process_declaration_synonym(DesignEntityType::STMT);
+        },
+        [&]() {
+           expect_word("read");
+           process_declaration_synonym(DesignEntityType::READ);
+        },
+        [&]() {
+           expect_word("print");
+           process_declaration_synonym(DesignEntityType::PRINT);
+        },
+        [&]() {
+           expect_word("while");
+           process_declaration_synonym(DesignEntityType::WHILE);
+        },
+        [&]() {
+           expect_word("if");
+           process_declaration_synonym(DesignEntityType::IF);
+        },
+        [&]() {
+           expect_word("assign");
+           process_declaration_synonym(DesignEntityType::ASSIGN);
+        },
+        [&]() {
+           expect_word("variable");
+           process_declaration_synonym(DesignEntityType::VARIABLE);
+        },
+        [&]() {
+           expect_word("constant");
+           process_declaration_synonym(DesignEntityType::CONSTANT);
+        },
+        [&]() {
+           expect_word("procedure");
+           process_declaration_synonym(DesignEntityType::PROCEDURE);
+        }
+    }, "Invalid Design Entity Type parsed");
 }
 
-void PQLParser::process_selection() {
-    Token *token;
-    token = expect_token(TokenType::WORD);
-    expect_equal(token->get_value(), "Select");
 
-    token = expect_token(TokenType::WORD);
+void PQLParser::process_declaration_synonym(DesignEntityType design_entity_type) {
+    Token *token = expect_name("");
+    DesignEntity design_entity(design_entity_type, token->get_value());
+    query_object->add_declaration(token->get_value(), design_entity);
+
+    repeat([&]() {
+        expect_token(TokenType::COMMA);
+        token = expect_name("");
+        DesignEntity design_entity(design_entity_type, token->get_value());
+        query_object->add_declaration(token->get_value(), design_entity);
+    });
+    expect_token(TokenType::SEMICOLON);
+}
+
+
+void PQLParser::process_selection() {
+    expect_word("Select");
+    Token *token = expect_name("");
     query_object->set_selection(token->get_value());
 
-    do {
-        choice({
-           [&]() {
-               process_pattern_cl();
-           },
-           [&]() {
-               process_such_that_cl();
-           }
-        }, "");
-    } while (tokens->front()->get_type() != TokenType::END);
+    choice({
+        [&]() {
+            process_such_that_cl();
+            process_pattern_cl();
+        },
+        [&]() {
+            process_such_that_cl();
+        },
+        [&]() {
+            process_pattern_cl();
+        },
+        [&]() { }
+    }, "Should not throw anything in process_selection");
 }
 
 
 void PQLParser::process_such_that_cl() {
-    std::map<std::string, SuchThatType> such_that_map {
-            {"Modifies", SuchThatType::MODIFIES_S},
-            {"Uses", SuchThatType::USES_S},
-            {"Parent", SuchThatType::PARENT},
-            {"Parent*", SuchThatType::PARENT_T},
-            {"Follows", SuchThatType::FOLLOWS},
-            {"Follows*", SuchThatType::FOLLOWS_T},
-    };
-
-    Token *token;
-    SuchThat such_that_obj;
-
     expect_word("such");
     expect_word("that");
 
-    SuchThatType such_that_type;
-    token = expect_token(TokenType::WORD);
-    if (tokens->front()->get_type() == TokenType::ASTERISK) {
-        expect_token(TokenType::ASTERISK);
-        such_that_type = such_that_map[token->get_value() + "*"];
-    } else {
-        such_that_type = such_that_map[token->get_value()];
-    }
+    choice({
+        [&]() {
+            expect_word("Modifies");
+            process_such_that_body(SuchThatType::MODIFIES_S);
+        },
+        [&]() {
+            expect_word("Uses");
+            process_such_that_body(SuchThatType::USES_S);
+        },
+        [&]() {
+            expect_word("Parent");
+            process_such_that_body(SuchThatType::PARENT);
+        },
+        [&]() {
+            expect_word("Parent*");
+            process_such_that_body(SuchThatType::PARENT_T);
+        },
+        [&]() {
+            expect_word("Follows");
+            process_such_that_body(SuchThatType::FOLLOWS);
+        },
+        [&]() {
+            expect_word("Follows*");
+            process_such_that_body(SuchThatType::FOLLOWS_T);
+        }
+    }, "Invalid such that type parsed");
+}
+
+
+// Parse content of the such_that type
+void PQLParser::process_such_that_body(SuchThatType such_that_type) {
+    SuchThat such_that_obj;
 
     such_that_obj.set_type(such_that_type);
     expect_token(TokenType::LPAREN);
     StatementRef left_statement_ref = process_statement_ref();
     such_that_obj.set_left_ref(left_statement_ref);
     expect_token(TokenType::COMMA);
+
     if (such_that_type == SuchThatType::MODIFIES_S || such_that_type == SuchThatType::USES_S) {
         EntityRef entity_ref = process_entity_ref();
         such_that_obj.set_right_ref(entity_ref);
@@ -106,17 +148,16 @@ void PQLParser::process_such_that_cl() {
     }
 
     expect_token(TokenType::RPAREN);
+    query_object->set_such_that(such_that_obj);
     query_object->set_has_such_that(true);
 }
 
 
 void PQLParser::process_pattern_cl() {
-    Token *token;
     Pattern pattern_obj;
-
     expect_word("pattern");
 
-    token = expect_token(TokenType::WORD);
+    Token *token = expect_name("");
     pattern_obj.set_assigned_synonym(token->get_value());
 
     expect_token(TokenType::LPAREN);
@@ -127,8 +168,10 @@ void PQLParser::process_pattern_cl() {
     pattern_obj.set_entity_ref(entity_ref);
     pattern_obj.set_expression_spec(expression_spec);
 
+    query_object->set_pattern(pattern_obj);
     query_object->set_has_pattern(true);
 }
+
 
 StatementRef PQLParser::process_statement_ref() {
     StatementRef statement_ref;
@@ -136,19 +179,20 @@ StatementRef PQLParser::process_statement_ref() {
     choice({
        // stmtRef: synonym
        [&]() {
-           statement_ref.set_synonym(expect_token(TokenType::WORD)->get_value());
+           statement_ref.set_synonym(expect_name("")->get_value());
            statement_ref.set_type(StatementRefType::SYNONYM);
        },
 
        // stmtRef: '_'
        [&]() {
-           expect_token(TokenType::UNDERSCORE)->get_value();
+           expect_token(TokenType::UNDERSCORE);
            statement_ref.set_type(StatementRefType::ANY);
        },
 
        // stmtRef: INTEGER
        [&]() {
-           expect_integer(expect_token(TokenType::WORD)->get_value());
+           std::string statement_number = expect_integer("")->get_value();
+           statement_ref.set_statement_number(std::stoi(statement_number));
            statement_ref.set_type(StatementRefType::STATEMENT_NUMBER);
        }
    }, "Invalid statement ref format");
@@ -162,22 +206,21 @@ EntityRef PQLParser::process_entity_ref() {
     choice({
        // entRef: synonym
        [&]() {
-           entity_ref.set_synonym(expect_token(TokenType::WORD)->get_value());
+           entity_ref.set_synonym(expect_name("")->get_value());
            entity_ref.set_type(EntityRefType::SYNONYM);
        },
 
        // entRef: '_'
        [&]() {
-           expect_token(TokenType::UNDERSCORE)->get_value();
+           expect_token(TokenType::UNDERSCORE);
            entity_ref.set_type(EntityRefType::ANY);
        },
 
        // entRef: '"' IDENT '"'
        [&]() {
-           std::string identifier;
-           identifier += expect_token(TokenType::DOUBLE_QUOTE)->get_value();
-           identifier += expect_token(TokenType::WORD)->get_value();
-           identifier += expect_token(TokenType::DOUBLE_QUOTE)->get_value();
+           expect_token(TokenType::DOUBLE_QUOTE)->get_value();
+           std::string identifier = expect_name("")->get_value();
+           expect_token(TokenType::DOUBLE_QUOTE)->get_value();
            entity_ref.set_synonym(identifier);
            entity_ref.set_type(EntityRefType::NAME);
        }
@@ -186,6 +229,7 @@ EntityRef PQLParser::process_entity_ref() {
 }
 
 
+// Parse pattern type second parameter: ExpressionSpec
 ExpressionSpec PQLParser::process_expression_spec() {
     ExpressionSpec expression_spec;
     choice({
@@ -207,9 +251,8 @@ ExpressionSpec PQLParser::process_expression_spec() {
 }
 
 
-void PQLParser::choice(const std::vector<std::function<void()>>& parse_funcs,
-            std::string error_message) {
-
+// Matched one of the vector function of parse_funcs then terminate, otherwise throw error if none match
+void PQLParser::choice(const std::vector<std::function<void()>>& parse_funcs, std::string error_message) {
     auto saved_pos = tokens->current_pos();
     for (const auto& parse_func : parse_funcs) {
         try {
@@ -224,41 +267,30 @@ void PQLParser::choice(const std::vector<std::function<void()>>& parse_funcs,
 }
 
 
+// atomic, repeatedly running the parse_func until it fails
+void PQLParser::repeat(const std::function<void()>& parse_func) {
+    auto saved_pos = tokens->current_pos();
+    try {
+        // Given a valid SIMPLE source, this loop should eventually terminate.
+        while (true) {
+            parse_func();
+            saved_pos = tokens->current_pos();
+        }
+    } catch (...) {
+        tokens->reset_pos(saved_pos);
+    }
+}
+
+
 // Parse token string and store it as a QueryObject
 QueryObject *PQLParser::parse_query() {
-    Token *token = tokens->front();
-    std::map<std::string, DesignEntityType> design_entity_map {
-            {"stmt", DesignEntityType::STMT},
-            {"read", DesignEntityType::READ},
-            {"print", DesignEntityType::PRINT},
-            {"while", DesignEntityType::WHILE},
-            {"if", DesignEntityType::IF},
-            {"assign", DesignEntityType::ASSIGN},
-            {"variable", DesignEntityType::VARIABLE},
-            {"constant", DesignEntityType::CONSTANT},
-            {"procedure", DesignEntityType::PROCEDURE}
-    };
-
-    if (design_entity_map.find(token->get_value()) == design_entity_map.end()) {
-        throw "No declaration/Invalid declaration name provided";
-    }
-
-
-
-    while (tokens->front()->get_type() != TokenType::END) {
-        try {
-            choice({
-               [&]() {
-                   process_declaration(design_entity_map);
-               },
-               [&]() {
-                   process_selection();
-               }
-           }, "Expected declaration or Select keyword, received: '" + tokens->front()->get_value() + "'");
-        } catch (const std::string& message) {
-            std::cout << "Error: " << message << std::endl;
+    repeat({
+     [&]() {
+           process_declaration();
         }
-    }
+    });
+    process_selection();
+    expect_token(TokenType::END);
 
     // print for checking purposes
     query_object->to_string();

@@ -16,11 +16,15 @@ namespace Parser {
 
         QueryObject* parse_query();
 
-        void process_declaration(std::map<std::string, DesignEntityType> design_entity_map);
+        void process_declaration_synonym(DesignEntityType design_entity_type);
+
+        void process_declaration();
 
         void process_selection();
 
         void process_such_that_cl();
+
+        void process_such_that_body(SuchThatType such_that_type);
 
         void process_pattern_cl();
 
@@ -35,6 +39,8 @@ namespace Parser {
 
         void choice(const std::vector<std::function<void()>>& parse_funcs,
                            std::string error_message);
+
+        void repeat(const std::function<void()>& parse_func);
     };
 
 } // namespace Parser
