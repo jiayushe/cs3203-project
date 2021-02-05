@@ -1,4 +1,5 @@
 #include "BaseParser.h"
+#include <algorithm>
 
 using namespace Parser;
 
