@@ -271,7 +271,6 @@ void PQLParser::choice(const std::vector<std::function<void()>>& parse_funcs, st
 void PQLParser::repeat(const std::function<void()>& parse_func) {
     auto saved_pos = tokens->current_pos();
     try {
-        // Given a valid SIMPLE source, this loop should eventually terminate.
         while (true) {
             parse_func();
             saved_pos = tokens->current_pos();
