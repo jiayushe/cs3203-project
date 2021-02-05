@@ -97,7 +97,8 @@ void PQLParser::process_such_that_cl() {
                 process_such_that_body(SuchThatType::PARENT);
             },
             [&]() {
-                expect_word("Parent*");
+                expect_word("Parent");
+                expect_token(TokenType::ASTERISK);
                 process_such_that_body(SuchThatType::PARENT_T);
             },
             [&]() {
@@ -105,7 +106,8 @@ void PQLParser::process_such_that_cl() {
                 process_such_that_body(SuchThatType::FOLLOWS);
             },
             [&]() {
-                expect_word("Follows*");
+                expect_word("Follows");
+                expect_token(TokenType::ASTERISK);
                 process_such_that_body(SuchThatType::FOLLOWS_T);
             }},
            "Invalid such that type parsed");
