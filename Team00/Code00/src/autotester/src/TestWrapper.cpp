@@ -1,10 +1,11 @@
 #include "TestWrapper.h"
 
 // implementation code of WrapperFactory - do NOT modify the next 5 lines
-AbstractWrapper *WrapperFactory::wrapper = 0;
+AbstractWrapper* WrapperFactory::wrapper = 0;
 
-AbstractWrapper *WrapperFactory::createWrapper() {
-    if (wrapper == 0) wrapper = new TestWrapper;
+AbstractWrapper* WrapperFactory::createWrapper() {
+    if (wrapper == 0)
+        wrapper = new TestWrapper;
     return wrapper;
 }
 
@@ -20,8 +21,8 @@ TestWrapper::TestWrapper() {
 // method for parsing the SIMPLE source
 void TestWrapper::parse(std::string filename) {
     try {
-        SimpleParser::FileLexer lexer(filename);
-        SimpleParser::Parser parser(lexer);
+        Parser::FileLexer lexer(filename);
+        Parser::SimpleParser parser(lexer);
         auto root_node = parser.parse_program();
 
         // TODO: PKB logic here...
@@ -29,24 +30,34 @@ void TestWrapper::parse(std::string filename) {
         std::cout << root_node->to_string();
 
         delete root_node;
-    } catch (char const *message) {
+    } catch (char const* message) {
         std::cout << "Error: " << message << std::endl;
         throw message;
-    } catch (const std::string &message) {
+    } catch (const std::string& message) {
         std::cout << "Error: " << message << std::endl;
         throw message;
     }
 }
 
 // method to evaluating a query
-void TestWrapper::evaluate(std::string query, std::list<std::string> &results) {
+void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
     // call your evaluator to evaluate the query here
     // ...code to evaluate query...
 
     // store the answers to the query in the results list (it is initially empty)
     // each result must be a string.
-    PQLParser::Parser parser(query);
-    PQLParser::QueryObject *query_object = parser.parse_query();
+    try {
+        std::cout << "Query string: " << query << std::endl;
+        Parser::StringLexer lexer(query);
+        Parser::PQLParser parser(lexer.tokens());
+        Parser::QueryObject* query_object = parser.parse_query();
 
-    // TODO: QE code...
+        // TODO: QE code...
+
+        delete query_object;
+
+    } catch (const std::string& message) {
+        std::cout << "Error: " << message << std::endl;
+        throw message;
+    }
 }
