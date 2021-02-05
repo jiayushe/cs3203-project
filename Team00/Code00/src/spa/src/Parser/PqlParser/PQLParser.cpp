@@ -191,9 +191,9 @@ StatementRef PQLParser::process_statement_ref() {
 
        // stmtRef: INTEGER
        [&]() {
-           std::string statement_number = expect_integer("statement_number")->get_value();
-           statement_ref.set_statement_number(std::stoi(statement_number));
-           statement_ref.set_type(StatementRefType::STATEMENT_NUMBER);
+           std::string statement_id = expect_integer("statement_id")->get_value();
+           statement_ref.set_statement_id(std::stoi(statement_id));
+           statement_ref.set_type(StatementRefType::STATEMENT_ID);
        }
    }, "Invalid statement ref format");
     return statement_ref;
