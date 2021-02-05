@@ -16,9 +16,6 @@ protected:
     // Caller is responsible for cleaning up the memory for the supplied token list.
     BaseParser(TokenList* tokens);
 
-    // Throws if both string are not equal;
-    void expect_equal(std::string given_string, std::string expected_string);
-
     // Registers that the next token should be of the expected type.
     // Throws if the expectation is not fulfilled.
     Token* expect_token(TokenType expected_type);

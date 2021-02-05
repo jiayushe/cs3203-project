@@ -4,12 +4,6 @@ using namespace Parser;
 
 BaseParser::BaseParser(TokenList* tokens) : tokens(tokens) {}
 
-void BaseParser::expect_equal(std::string given_string, std::string expected_string) {
-    if (given_string != expected_string) {
-        throw "Expected token type " + expected_string + ", received " + given_string;
-    }
-}
-
 Token* BaseParser::expect_token(TokenType expected_type) {
     auto token = tokens->pop_front();
     if (!is_token_type(token, expected_type)) {

@@ -218,10 +218,10 @@ EntityRef PQLParser::process_entity_ref() {
 
        // entRef: '"' IDENT '"'
        [&]() {
-           expect_token(TokenType::DOUBLE_QUOTE)->get_value();
+           expect_token(TokenType::DOUBLE_QUOTE);
            std::string identifier = expect_name("identifier")->get_value();
-           expect_token(TokenType::DOUBLE_QUOTE)->get_value();
-           entity_ref.set_synonym(identifier);
+           expect_token(TokenType::DOUBLE_QUOTE);
+           entity_ref.set_name(identifier);
            entity_ref.set_type(EntityRefType::NAME);
        }
     }, "Invalid entity ref format");
