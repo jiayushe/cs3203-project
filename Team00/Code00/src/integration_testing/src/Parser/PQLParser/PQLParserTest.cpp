@@ -3,14 +3,14 @@
 #include <string>
 #include <iterator>
 #include <map>
-#include "SimpleParser/Parser.h"
-#include "SimpleParser/StringLexer.h"
-#include "PQLParser/StringLexer.h"
-#include "PQLParser/Parser.h"
+#include "Parser/shared/StringLexer.h"
+#include "Parser/SimpleParser/SimpleNode.h"
+#include "Parser/SimpleParser/SimpleParser.h"
+#include "Parser/PQLParser/PQLParser.h"
 
-using namespace PQLParser;
+using namespace Parser;
 
-TEST_CASE("PQLParser::Parser") {
+TEST_CASE("Parser::PQLParser") {
     SECTION("Without clause") {
         SECTION("One design entity, one variable") {
             std::map<std::string, DesignEntityType> design_entity_map{
@@ -29,7 +29,8 @@ TEST_CASE("PQLParser::Parser") {
                                       "assign", "variable", "constant", "procedure");
 
             std::string query = op + " s; Select s";
-            Parser parser(query);
+            Parser::StringLexer lexer(query);
+            Parser::PQLParser parser(lexer.tokens());
             QueryObject *query_object = parser.parse_query();
 
             std::unordered_map<std::string, DesignEntity> declarations = query_object->get_declarations();
@@ -51,7 +52,8 @@ TEST_CASE("PQLParser::Parser") {
 
         SECTION("One design entity, multiple variable") {
             std::string query = "stmt s,u,v; Select s";
-            Parser parser(query);
+            Parser::StringLexer lexer(query);
+            Parser::PQLParser parser(lexer.tokens());
             QueryObject *query_object = parser.parse_query();
 
             std::unordered_map<std::string, DesignEntity> declarations = query_object->get_declarations();
@@ -79,7 +81,8 @@ TEST_CASE("PQLParser::Parser") {
 
         SECTION("Multiple design entity, one variable") {
             std::string query = "stmt s; if ifs; while w; Select w";
-            Parser parser(query);
+            Parser::StringLexer lexer(query);
+            Parser::PQLParser parser(lexer.tokens());
             QueryObject *query_object = parser.parse_query();
 
             std::unordered_map<std::string, DesignEntity> declarations = query_object->get_declarations();
@@ -107,7 +110,8 @@ TEST_CASE("PQLParser::Parser") {
 
         SECTION("Multiple design entity, multiple variable") {
             std::string query = "stmt s,u,v; if ifs; variable var1, var2; Select var1";
-            Parser parser(query);
+            Parser::StringLexer lexer(query);
+            Parser::PQLParser parser(lexer.tokens());
             QueryObject *query_object = parser.parse_query();
 
             std::unordered_map<std::string, DesignEntity> declarations = query_object->get_declarations();
@@ -153,7 +157,8 @@ TEST_CASE("PQLParser::Parser") {
             std::string op = GENERATE("Parent", "Parent*", "Follows", "Follows*");
 
             std::string query = "while w; Select w such that " + op + "(w, 7)";
-            Parser parser(query);
+            Parser::StringLexer lexer(query);
+            Parser::PQLParser parser(lexer.tokens());
             QueryObject *query_object = parser.parse_query();
 
             std::unordered_map<std::string, DesignEntity> declarations = query_object->get_declarations();
@@ -182,8 +187,8 @@ TEST_CASE("PQLParser::Parser") {
             StatementRef right_statement_ref = right_ref.get_statement_ref();
             REQUIRE(left_statement_ref.get_type() == StatementRefType::SYNONYM);
             REQUIRE(left_statement_ref.get_synonym() == "w");
-            REQUIRE(right_statement_ref.get_type() == StatementRefType::STATEMENT_NUMBER);
-            REQUIRE(right_statement_ref.get_statement_number() == 7);
+            REQUIRE(right_statement_ref.get_type() == StatementRefType::STATEMENT_ID);
+            REQUIRE(right_statement_ref.get_statement_id() == 7);
 
             delete query_object;
         }
@@ -192,7 +197,8 @@ TEST_CASE("PQLParser::Parser") {
             std::string op = GENERATE("Modifies", "Uses");
 
             std::string query = "stmt s; Select s such that " + op + "(s, \"i\")";
-            Parser parser(query);
+            Parser::StringLexer lexer(query);
+            Parser::PQLParser parser(lexer.tokens());
             QueryObject *query_object = parser.parse_query();
 
             std::unordered_map<std::string, DesignEntity> declarations = query_object->get_declarations();
@@ -222,7 +228,7 @@ TEST_CASE("PQLParser::Parser") {
             REQUIRE(left_statement_ref.get_type() == StatementRefType::SYNONYM);
             REQUIRE(left_statement_ref.get_synonym() == "s");
             REQUIRE(right_entity_ref.get_type() == EntityRefType::NAME);
-            REQUIRE(right_entity_ref.get_name() == "\"i\"");
+            REQUIRE(right_entity_ref.get_name() == "i");
 
             delete query_object;
         }
@@ -231,9 +237,12 @@ TEST_CASE("PQLParser::Parser") {
             std::string query_1 = "stmt s; Select s such that Modifies(_, _)";
             std::string query_2 = "stmt s; Select s such that Modifies(s, s)";
             std::string query_3 = "stmt s; Select s such that Modifies(7, \"x\")";
-            Parser parser_1(query_1);
-            Parser parser_2(query_2);
-            Parser parser_3(query_3);
+            Parser::StringLexer lexer_1(query_1);
+            Parser::PQLParser parser_1(lexer_1.tokens());
+            Parser::StringLexer lexer_2(query_2);
+            Parser::PQLParser parser_2(lexer_2.tokens());
+            Parser::StringLexer lexer_3(query_3);
+            Parser::PQLParser parser_3(lexer_3.tokens());
             QueryObject *query_object_1 = parser_1.parse_query();
             QueryObject *query_object_2 = parser_2.parse_query();
             QueryObject *query_object_3 = parser_3.parse_query();
@@ -252,7 +261,7 @@ TEST_CASE("PQLParser::Parser") {
             EntityRef right_entity_ref_1 = right_ref_1.get_entity_ref();
             REQUIRE(left_statement_ref_1.get_type() == StatementRefType::ANY);
             REQUIRE_THROWS(left_statement_ref_1.get_synonym());
-            REQUIRE_THROWS(left_statement_ref_1.get_statement_number());
+            REQUIRE_THROWS(left_statement_ref_1.get_statement_id());
             REQUIRE(right_entity_ref_1.get_type() == EntityRefType::ANY);
             REQUIRE_THROWS(right_entity_ref_1.get_synonym());
             REQUIRE_THROWS(right_entity_ref_1.get_name());
@@ -261,18 +270,18 @@ TEST_CASE("PQLParser::Parser") {
             EntityRef right_entity_ref_2 = right_ref_2.get_entity_ref();
             REQUIRE(left_statement_ref_2.get_type() == StatementRefType::SYNONYM);
             REQUIRE(left_statement_ref_2.get_synonym() == "s");
-            REQUIRE_THROWS(left_statement_ref_2.get_statement_number());
+            REQUIRE_THROWS(left_statement_ref_2.get_statement_id());
             REQUIRE(right_entity_ref_2.get_type() == EntityRefType::SYNONYM);
             REQUIRE(right_entity_ref_2.get_synonym() == "s");
             REQUIRE_THROWS(right_entity_ref_2.get_name());
 
             StatementRef left_statement_ref_3 = left_ref_3.get_statement_ref();
             EntityRef right_entity_ref_3 = right_ref_3.get_entity_ref();
-            REQUIRE(left_statement_ref_3.get_type() == StatementRefType::STATEMENT_NUMBER);
-            REQUIRE(left_statement_ref_3.get_statement_number() == 7);
+            REQUIRE(left_statement_ref_3.get_type() == StatementRefType::STATEMENT_ID);
+            REQUIRE(left_statement_ref_3.get_statement_id() == 7);
             REQUIRE_THROWS(left_statement_ref_3.get_synonym());
             REQUIRE(right_entity_ref_3.get_type() == EntityRefType::NAME);
-            REQUIRE(right_entity_ref_3.get_name() == "\"x\"");
+            REQUIRE(right_entity_ref_3.get_name() == "x");
             REQUIRE_THROWS(right_entity_ref_3.get_synonym());
 
             delete query_object_1;
@@ -284,12 +293,12 @@ TEST_CASE("PQLParser::Parser") {
     SECTION("One Pattern clause") {
         SECTION("General pattern test") {
             std::string query = "assign a; Select a pattern a(_, _\"x + 1\"_)";
-            Parser parser(query);
+            Parser::StringLexer lexer(query);
+            Parser::PQLParser parser(lexer.tokens());
             QueryObject *query_object = parser.parse_query();
 
-            SimpleParser::StringLexer lexer("x+1");
-            SimpleParser::Parser pattern_parser(lexer);
-            SimpleParser::Node *pattern_node = pattern_parser.parse_expr();
+            Parser::StringLexer factor_lexer("x+1");
+            Parser::SimpleNode *pattern_node = SimpleParser(factor_lexer.tokens()).parse_expr();
 
             std::unordered_map<std::string, DesignEntity> declarations = query_object->get_declarations();
             REQUIRE(declarations.size() == 1);
@@ -319,7 +328,8 @@ TEST_CASE("PQLParser::Parser") {
 
         SECTION("ExpressionSpecType of type ANY") {
             std::string query = "assign a; Select a pattern a(_, _)";
-            Parser parser(query);
+            Parser::StringLexer lexer(query);
+            Parser::PQLParser parser(lexer.tokens());
             QueryObject *query_object = parser.parse_query();
             Pattern pattern_obj = query_object->get_pattern();
             ExpressionSpec expression_spec = pattern_obj.get_expression_spec();
@@ -331,12 +341,12 @@ TEST_CASE("PQLParser::Parser") {
 
     SECTION("One Such That clause, One Pattern clause") {
         std::string query = "variable v; assign a; while w; Select w such that Uses(a, v) pattern a(v, _\"z\"_)";
-        Parser parser(query);
+        Parser::StringLexer lexer(query);
+        Parser::PQLParser parser(lexer.tokens());
         QueryObject *query_object = parser.parse_query();
 
-        SimpleParser::StringLexer lexer("z");
-        SimpleParser::Parser pattern_parser(lexer);
-        SimpleParser::Node *pattern_node = pattern_parser.parse_expr();
+        Parser::StringLexer factor_lexer("z");
+        Parser::SimpleNode *pattern_node = SimpleParser(factor_lexer.tokens()).parse_expr();
 
         std::unordered_map<std::string, DesignEntity> declarations = query_object->get_declarations();
         REQUIRE(declarations.size() == 3);
