@@ -1,6 +1,9 @@
 # OSX filesystem 
 .DS_Store
 
+# Test folder
+tests/
+
 # CLion
 .idea
 cmake-build-debug

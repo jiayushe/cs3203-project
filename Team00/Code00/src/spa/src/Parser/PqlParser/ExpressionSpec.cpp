@@ -7,7 +7,9 @@ ExpressionSpec::ExpressionSpec() {
 }
 
 ExpressionSpec::~ExpressionSpec() {
-    delete pattern;
+    // if (type == ExpressionSpecType::PATTERN) {
+    //    delete pattern;
+    //}
 }
 
 void ExpressionSpec::set_type(ExpressionSpecType expression_spec_type) {

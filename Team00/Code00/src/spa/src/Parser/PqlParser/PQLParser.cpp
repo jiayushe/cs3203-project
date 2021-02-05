@@ -9,9 +9,10 @@
 using namespace Parser;
 
 
-PQLParser::PQLParser(QueryObject* query_object, TokenList* tokens) :
-    query_object(query_object),
-    BaseParser(tokens) {}
+PQLParser::PQLParser(TokenList* tokens) :
+    BaseParser(tokens) {
+    this->query_object = new QueryObject();
+}
 
 PQLParser::~PQLParser() {
     delete tokens;
