@@ -61,13 +61,13 @@ void PQLParser::process_declaration() {
 
 
 void PQLParser::process_declaration_synonym(DesignEntityType design_entity_type) {
-    Token *token = expect_name("");
+    Token *token = expect_name("synonym");
     DesignEntity design_entity(design_entity_type, token->get_value());
     query_object->add_declaration(token->get_value(), design_entity);
 
     repeat([&]() {
         expect_token(TokenType::COMMA);
-        token = expect_name("");
+        token = expect_name("synonym");
         DesignEntity design_entity(design_entity_type, token->get_value());
         query_object->add_declaration(token->get_value(), design_entity);
     });
@@ -77,7 +77,7 @@ void PQLParser::process_declaration_synonym(DesignEntityType design_entity_type)
 
 void PQLParser::process_selection() {
     expect_word("Select");
-    Token *token = expect_name("");
+    Token *token = expect_name("select_synonym");
     query_object->set_selection(token->get_value());
 
     choice({
@@ -157,7 +157,7 @@ void PQLParser::process_pattern_cl() {
     Pattern pattern_obj;
     expect_word("pattern");
 
-    Token *token = expect_name("");
+    Token *token = expect_name("pattern_synonym");
     pattern_obj.set_assigned_synonym(token->get_value());
 
     expect_token(TokenType::LPAREN);
@@ -179,7 +179,7 @@ StatementRef PQLParser::process_statement_ref() {
     choice({
        // stmtRef: synonym
        [&]() {
-           statement_ref.set_synonym(expect_name("")->get_value());
+           statement_ref.set_synonym(expect_name("stmt_synonym")->get_value());
            statement_ref.set_type(StatementRefType::SYNONYM);
        },
 
@@ -191,7 +191,7 @@ StatementRef PQLParser::process_statement_ref() {
 
        // stmtRef: INTEGER
        [&]() {
-           std::string statement_number = expect_integer("")->get_value();
+           std::string statement_number = expect_integer("statement_number")->get_value();
            statement_ref.set_statement_number(std::stoi(statement_number));
            statement_ref.set_type(StatementRefType::STATEMENT_NUMBER);
        }
@@ -206,7 +206,7 @@ EntityRef PQLParser::process_entity_ref() {
     choice({
        // entRef: synonym
        [&]() {
-           entity_ref.set_synonym(expect_name("")->get_value());
+           entity_ref.set_synonym(expect_name("ent_synonym")->get_value());
            entity_ref.set_type(EntityRefType::SYNONYM);
        },
 
@@ -219,7 +219,7 @@ EntityRef PQLParser::process_entity_ref() {
        // entRef: '"' IDENT '"'
        [&]() {
            expect_token(TokenType::DOUBLE_QUOTE)->get_value();
-           std::string identifier = expect_name("")->get_value();
+           std::string identifier = expect_name("identifier")->get_value();
            expect_token(TokenType::DOUBLE_QUOTE)->get_value();
            entity_ref.set_synonym(identifier);
            entity_ref.set_type(EntityRefType::NAME);
