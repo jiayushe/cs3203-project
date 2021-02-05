@@ -1,6 +1,5 @@
 #include "SimpleParser.h"
 #include <algorithm>
-#include <cctype>
 #include <string>
 
 using namespace Parser;
