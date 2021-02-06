@@ -21,7 +21,7 @@ TEST_CASE("PQLParser::QueryObject") {
 
     SECTION("duplicated synonym") {
         QueryObject query_object;
-        DesignEntity designEntity;  // assume this is wont throw error
+        DesignEntity designEntity; // assume this is wont throw error
 
         REQUIRE_NOTHROW(query_object.add_declaration("a", designEntity));
         REQUIRE_NOTHROW(query_object.add_declaration("b", designEntity));
