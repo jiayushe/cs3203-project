@@ -2,8 +2,8 @@
 
 #include "Parser/shared/StringLexer.h"
 #include "Parser/shared/Token.h"
-#include <string>
 #include <memory>
+#include <string>
 
 using namespace Parser;
 

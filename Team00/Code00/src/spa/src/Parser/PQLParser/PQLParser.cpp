@@ -6,13 +6,14 @@
 
 using namespace Parser;
 
-PQLParser::PQLParser(BaseLexer &lexer) : BaseParser(lexer.tokens()), query_object(std::make_shared<QueryObject>()) {}
+PQLParser::PQLParser(BaseLexer& lexer)
+    : BaseParser(lexer.tokens()), query_object(std::make_shared<QueryObject>()) {}
 
 void PQLParser::process_declaration() {
     choice({[&]() {
-               expect_word("stmt");
-               process_declaration_synonym(DesignEntityType::STMT);
-           },
+                expect_word("stmt");
+                process_declaration_synonym(DesignEntityType::STMT);
+            },
             [&]() {
                 expect_word("read");
                 process_declaration_synonym(DesignEntityType::READ);
@@ -68,9 +69,9 @@ void PQLParser::process_selection() {
     query_object->set_selection(token->get_value());
 
     choice({[&]() {
-               process_such_that_cl();
-               process_pattern_cl();
-           },
+                process_such_that_cl();
+                process_pattern_cl();
+            },
             [&]() { process_such_that_cl(); }, [&]() { process_pattern_cl(); }, [&]() {}},
            "Should not throw anything in process_selection");
 }
@@ -80,9 +81,9 @@ void PQLParser::process_such_that_cl() {
     expect_word("that");
 
     choice({[&]() {
-               expect_word("Modifies");
-               process_such_that_body(SuchThatType::MODIFIES_S);
-           },
+                expect_word("Modifies");
+                process_such_that_body(SuchThatType::MODIFIES_S);
+            },
             [&]() {
                 expect_word("Uses");
                 process_such_that_body(SuchThatType::USES_S);
@@ -154,23 +155,23 @@ StatementRef PQLParser::process_statement_ref() {
     StatementRef statement_ref;
 
     choice({// stmtRef: synonym
-               [&]() {
-                   statement_ref.set_synonym(expect_name("stmt_synonym")->get_value());
-                   statement_ref.set_type(StatementRefType::SYNONYM);
-               },
+            [&]() {
+                statement_ref.set_synonym(expect_name("stmt_synonym")->get_value());
+                statement_ref.set_type(StatementRefType::SYNONYM);
+            },
 
-               // stmtRef: '_'
-               [&]() {
-                   expect_token(TokenType::UNDERSCORE);
-                   statement_ref.set_type(StatementRefType::ANY);
-               },
+            // stmtRef: '_'
+            [&]() {
+                expect_token(TokenType::UNDERSCORE);
+                statement_ref.set_type(StatementRefType::ANY);
+            },
 
-               // stmtRef: INTEGER
-               [&]() {
-                   std::string statement_id = expect_integer("statement_id")->get_value();
-                   statement_ref.set_statement_id(std::stoi(statement_id));
-                   statement_ref.set_type(StatementRefType::STATEMENT_ID);
-               }},
+            // stmtRef: INTEGER
+            [&]() {
+                std::string statement_id = expect_integer("statement_id")->get_value();
+                statement_ref.set_statement_id(std::stoi(statement_id));
+                statement_ref.set_type(StatementRefType::STATEMENT_ID);
+            }},
            "Invalid statement ref format");
     return statement_ref;
 }
@@ -179,25 +180,25 @@ EntityRef PQLParser::process_entity_ref() {
     EntityRef entity_ref;
 
     choice({// entRef: synonym
-               [&]() {
-                   entity_ref.set_synonym(expect_name("ent_synonym")->get_value());
-                   entity_ref.set_type(EntityRefType::SYNONYM);
-               },
+            [&]() {
+                entity_ref.set_synonym(expect_name("ent_synonym")->get_value());
+                entity_ref.set_type(EntityRefType::SYNONYM);
+            },
 
-               // entRef: '_'
-               [&]() {
-                   expect_token(TokenType::UNDERSCORE);
-                   entity_ref.set_type(EntityRefType::ANY);
-               },
+            // entRef: '_'
+            [&]() {
+                expect_token(TokenType::UNDERSCORE);
+                entity_ref.set_type(EntityRefType::ANY);
+            },
 
-               // entRef: '"' IDENT '"'
-               [&]() {
-                   expect_token(TokenType::DOUBLE_QUOTE);
-                   std::string identifier = expect_name("identifier")->get_value();
-                   expect_token(TokenType::DOUBLE_QUOTE);
-                   entity_ref.set_name(identifier);
-                   entity_ref.set_type(EntityRefType::NAME);
-               }},
+            // entRef: '"' IDENT '"'
+            [&]() {
+                expect_token(TokenType::DOUBLE_QUOTE);
+                std::string identifier = expect_name("identifier")->get_value();
+                expect_token(TokenType::DOUBLE_QUOTE);
+                entity_ref.set_name(identifier);
+                entity_ref.set_type(EntityRefType::NAME);
+            }},
            "Invalid entity ref format");
     return entity_ref;
 }
@@ -206,15 +207,15 @@ EntityRef PQLParser::process_entity_ref() {
 ExpressionSpec PQLParser::process_expression_spec() {
     ExpressionSpec expression_spec;
     choice({// expSpec: _" factor "_
-        [&]() {
-               expect_token(TokenType::UNDERSCORE);
-               expect_token(TokenType::DOUBLE_QUOTE);
-               auto simple_node = SimpleParser(tokens).parse_expr();
-               expect_token(TokenType::DOUBLE_QUOTE);
-               expect_token(TokenType::UNDERSCORE);
-               expression_spec.set_pattern(simple_node);
-               expression_spec.set_type(ExpressionSpecType::PATTERN);
-           },
+            [&]() {
+                expect_token(TokenType::UNDERSCORE);
+                expect_token(TokenType::DOUBLE_QUOTE);
+                auto simple_node = SimpleParser(tokens).parse_expr();
+                expect_token(TokenType::DOUBLE_QUOTE);
+                expect_token(TokenType::UNDERSCORE);
+                expression_spec.set_pattern(simple_node);
+                expression_spec.set_type(ExpressionSpecType::PATTERN);
+            },
             [&]() {
                 expect_token(TokenType::UNDERSCORE);
                 expression_spec.set_type(ExpressionSpecType::ANY);
@@ -225,10 +226,10 @@ ExpressionSpec PQLParser::process_expression_spec() {
 
 // Matched one of the vector function of parse_funcs then terminate, otherwise throw error if none
 // match
-void PQLParser::choice(const std::vector<std::function<void()>> &parse_funcs,
+void PQLParser::choice(const std::vector<std::function<void()>>& parse_funcs,
                        std::string error_message) {
     auto saved_pos = tokens->current_pos();
-    for (const auto &parse_func : parse_funcs) {
+    for (const auto& parse_func : parse_funcs) {
         try {
             parse_func();
             return;
@@ -241,7 +242,7 @@ void PQLParser::choice(const std::vector<std::function<void()>> &parse_funcs,
 }
 
 // atomic, repeatedly running the parse_func until it fails
-void PQLParser::repeat(const std::function<void()> &parse_func) {
+void PQLParser::repeat(const std::function<void()>& parse_func) {
     auto saved_pos = tokens->current_pos();
     try {
         while (true) {

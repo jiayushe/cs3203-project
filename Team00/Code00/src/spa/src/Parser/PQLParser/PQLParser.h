@@ -11,7 +11,7 @@
 namespace Parser {
 class PQLParser : public BaseParser {
 public:
-    explicit PQLParser(BaseLexer &lexer);
+    explicit PQLParser(BaseLexer& lexer);
 
     std::shared_ptr<QueryObject> parse_query();
 

@@ -5,13 +5,13 @@ using namespace Parser;
 
 Pattern::Pattern() = default;
 
-void Pattern::set_assigned_synonym(const std::string &new_assigned_synonym) {
+void Pattern::set_assigned_synonym(const std::string& new_assigned_synonym) {
     assigned_synonym = new_assigned_synonym;
 }
 
-void Pattern::set_entity_ref(const EntityRef &new_entity_ref) { entity_ref = new_entity_ref; }
+void Pattern::set_entity_ref(const EntityRef& new_entity_ref) { entity_ref = new_entity_ref; }
 
-void Pattern::set_expression_spec(const ExpressionSpec &new_expression_spec) {
+void Pattern::set_expression_spec(const ExpressionSpec& new_expression_spec) {
     expression_spec = new_expression_spec;
 }
 

@@ -4,9 +4,10 @@ using namespace Parser;
 
 Ref::Ref() : type(RefType::INVALID) {}
 
-Ref::Ref(const EntityRef &entity_ref) : type(RefType::ENTITY), entity_ref(entity_ref) {}
+Ref::Ref(const EntityRef& entity_ref) : type(RefType::ENTITY), entity_ref(entity_ref) {}
 
-Ref::Ref(const StatementRef &statement_ref) : type(RefType::STATEMENT), statement_ref(statement_ref) {}
+Ref::Ref(const StatementRef& statement_ref)
+    : type(RefType::STATEMENT), statement_ref(statement_ref) {}
 
 RefType Ref::get_type() { return type; }
 

@@ -2,8 +2,8 @@
 
 #include "Parser/shared/Token.h"
 #include "Parser/shared/TokenList.h"
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace Parser {
 

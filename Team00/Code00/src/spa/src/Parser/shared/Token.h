@@ -6,59 +6,59 @@
 namespace Parser {
 
 // All possible token types for PQL + SIMPLE.
-    enum class TokenType {
-        INVALID,
+enum class TokenType {
+    INVALID,
 
-        WORD, // Consecutive alphanumeric characters
+    WORD, // Consecutive alphanumeric characters
 
-        LCURL,  // {
-        RCURL,  // }
-        LPAREN, // (
-        RPAREN, // )
+    LCURL,  // {
+    RCURL,  // }
+    LPAREN, // (
+    RPAREN, // )
 
-        GT,     // >
-        GTE,    // >=
-        LT,     // <
-        LTE,    // <=
-        DEQUAL, // ==
-        NEQUAL, // !=
+    GT,     // >
+    GTE,    // >=
+    LT,     // <
+    LTE,    // <=
+    DEQUAL, // ==
+    NEQUAL, // !=
 
-        NOT, // !
-        AND, // &&
-        OR,  // ||
+    NOT, // !
+    AND, // &&
+    OR,  // ||
 
-        EQUAL,    // =
-        PLUS,     // +
-        MINUS,    // -
-        ASTERISK, // *
-        SLASH,    // /
-        PERCENT,  // %
+    EQUAL,    // =
+    PLUS,     // +
+    MINUS,    // -
+    ASTERISK, // *
+    SLASH,    // /
+    PERCENT,  // %
 
-        SEMICOLON,    // ;
-        COMMA,        // ,
-        DOUBLE_QUOTE, // "
-        UNDERSCORE,   // _
+    SEMICOLON,    // ;
+    COMMA,        // ,
+    DOUBLE_QUOTE, // "
+    UNDERSCORE,   // _
 
-        END, // EOF
-    };
+    END, // EOF
+};
 
-    // Gets friendly string representing the different token types.
-    std::string to_string(TokenType token_type);
+// Gets friendly string representing the different token types.
+std::string to_string(TokenType token_type);
 
 // A single token (in parser parlance) for PQL + SIMPLE.
-    class Token {
-    public:
-        Token(TokenType type, const std::string &value);
+class Token {
+public:
+    Token(TokenType type, const std::string& value);
 
-        // Gets the type of the token.
-        TokenType get_type();
+    // Gets the type of the token.
+    TokenType get_type();
 
-        // Gets the value which the token stands for.
-        std::string get_value();
+    // Gets the value which the token stands for.
+    std::string get_value();
 
-    private:
-        TokenType type;
-        std::string value;
-    };
+private:
+    TokenType type;
+    std::string value;
+};
 
 } // namespace Parser

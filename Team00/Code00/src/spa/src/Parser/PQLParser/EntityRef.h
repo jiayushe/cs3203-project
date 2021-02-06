@@ -20,9 +20,9 @@ public:
 
     void set_type(EntityRefType entityRefType);
 
-    void set_synonym(const std::string &synonym);
+    void set_synonym(const std::string& synonym);
 
-    void set_name(const std::string &name);
+    void set_name(const std::string& name);
 
 private:
     EntityRefType type;

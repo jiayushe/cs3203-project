@@ -46,8 +46,10 @@ TEST_CASE("Parser::SimpleNode") {
         SECTION("return false if the supplied node is not a subtree") {
             // Build an AST representing "x + y"
             auto non_subtree_node = std::make_shared<SimpleNode>(SimpleNodeType::ARITHMETIC, "+");
-            non_subtree_node->add_child(std::make_shared<SimpleNode>(SimpleNodeType::VAR_NAME, "x"));
-            non_subtree_node->add_child(std::make_shared<SimpleNode>(SimpleNodeType::VAR_NAME, "y"));
+            non_subtree_node->add_child(
+                std::make_shared<SimpleNode>(SimpleNodeType::VAR_NAME, "x"));
+            non_subtree_node->add_child(
+                std::make_shared<SimpleNode>(SimpleNodeType::VAR_NAME, "y"));
 
             // "x + y" is not a subtree of "x + y * 5"
             REQUIRE_FALSE(node->is_subtree(non_subtree_node));

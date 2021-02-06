@@ -1,8 +1,8 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace Parser {
 
@@ -30,14 +30,14 @@ enum class SimpleNodeType {
 };
 
 // Gets friendly string representing the different node types.
-    std::string to_string(SimpleNodeType simple_node_type);
+std::string to_string(SimpleNodeType simple_node_type);
 
 // AST node for the SIMPLE language.
 class SimpleNode {
 public:
     explicit SimpleNode(SimpleNodeType type);
 
-    SimpleNode(SimpleNodeType type, const std::string &value);
+    SimpleNode(SimpleNodeType type, const std::string& value);
 
     SimpleNode(SimpleNodeType type, int statement_id);
 

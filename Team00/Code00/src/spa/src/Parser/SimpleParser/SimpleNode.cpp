@@ -1,17 +1,19 @@
 #include "SimpleNode.h"
-#include <string>
 #include <algorithm>
+#include <string>
 
 using namespace Parser;
 
 SimpleNode::SimpleNode(SimpleNodeType type)
     : type(type), statement_id(-1), children(std::vector<std::shared_ptr<SimpleNode>>()) {}
 
-SimpleNode::SimpleNode(SimpleNodeType type, const std::string &value)
-    : type(type), value(value), statement_id(-1), children(std::vector<std::shared_ptr<SimpleNode>>()) {}
+SimpleNode::SimpleNode(SimpleNodeType type, const std::string& value)
+    : type(type), value(value), statement_id(-1),
+      children(std::vector<std::shared_ptr<SimpleNode>>()) {}
 
 SimpleNode::SimpleNode(SimpleNodeType type, int statement_id)
-    : type(type), statement_id(statement_id), children(std::vector<std::shared_ptr<SimpleNode>>()) {}
+    : type(type), statement_id(statement_id), children(std::vector<std::shared_ptr<SimpleNode>>()) {
+}
 
 SimpleNodeType SimpleNode::get_type() { return type; }
 
@@ -105,7 +107,7 @@ std::string SimpleNode::to_string(int padding) {
 
     result += ")\n";
 
-    for (auto const &child : children) {
+    for (auto const& child : children) {
         result += child->to_string(padding + 4);
     }
 
@@ -114,37 +116,37 @@ std::string SimpleNode::to_string(int padding) {
 
 std::string Parser::to_string(SimpleNodeType simple_node_type) {
     switch (simple_node_type) {
-        case SimpleNodeType::INVALID:
-            return "INVALID";
-        case SimpleNodeType::PROGRAM:
-            return "PROGRAM";
-        case SimpleNodeType::PROCEDURE:
-            return "PROCEDURE";
-        case SimpleNodeType::STMT_LST:
-            return "STMT_LST";
-        case SimpleNodeType::READ:
-            return "READ";
-        case SimpleNodeType::PRINT:
-            return "PRINT";
-        case SimpleNodeType::CALL:
-            return "CALL";
-        case SimpleNodeType::WHILE:
-            return "WHILE";
-        case SimpleNodeType::IF:
-            return "IF";
-        case SimpleNodeType::ASSIGN:
-            return "ASSIGN";
-        case SimpleNodeType::CONDITIONAL:
-            return "CONDITIONAL";
-        case SimpleNodeType::ARITHMETIC:
-            return "ARITHMETIC";
-        case SimpleNodeType::VAR_NAME:
-            return "VAR_NAME";
-        case SimpleNodeType::PROC_NAME:
-            return "PROC_NAME";
-        case SimpleNodeType::CONST_VALUE:
-            return "CONST_VALUE";
-        default:
-            throw "Unknown simple node type";
+    case SimpleNodeType::INVALID:
+        return "INVALID";
+    case SimpleNodeType::PROGRAM:
+        return "PROGRAM";
+    case SimpleNodeType::PROCEDURE:
+        return "PROCEDURE";
+    case SimpleNodeType::STMT_LST:
+        return "STMT_LST";
+    case SimpleNodeType::READ:
+        return "READ";
+    case SimpleNodeType::PRINT:
+        return "PRINT";
+    case SimpleNodeType::CALL:
+        return "CALL";
+    case SimpleNodeType::WHILE:
+        return "WHILE";
+    case SimpleNodeType::IF:
+        return "IF";
+    case SimpleNodeType::ASSIGN:
+        return "ASSIGN";
+    case SimpleNodeType::CONDITIONAL:
+        return "CONDITIONAL";
+    case SimpleNodeType::ARITHMETIC:
+        return "ARITHMETIC";
+    case SimpleNodeType::VAR_NAME:
+        return "VAR_NAME";
+    case SimpleNodeType::PROC_NAME:
+        return "PROC_NAME";
+    case SimpleNodeType::CONST_VALUE:
+        return "CONST_VALUE";
+    default:
+        throw "Unknown simple node type";
     }
 }

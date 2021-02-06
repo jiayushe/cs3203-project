@@ -4,8 +4,8 @@
 #include "Parser/SimpleParser/SimpleParser.h"
 #include "Parser/shared/StringLexer.h"
 #include <iterator>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 using namespace Parser;
 
@@ -107,7 +107,7 @@ TEST_CASE("Parser::PQLParser") {
             std::string query = "stmt s,u,v; if ifs; variable var1, var2; Select var1";
             Parser::StringLexer lexer(query);
             Parser::PQLParser parser(lexer);
-            auto  query_object = parser.parse_query();
+            auto query_object = parser.parse_query();
 
             std::unordered_map<std::string, DesignEntity> declarations =
                 query_object->get_declarations();

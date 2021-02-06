@@ -20,7 +20,7 @@ class DesignEntity {
 public:
     DesignEntity();
 
-    DesignEntity(DesignEntityType type, const std::string &synonym);
+    DesignEntity(DesignEntityType type, const std::string& synonym);
 
     DesignEntityType get_type();
     std::string get_synonym();

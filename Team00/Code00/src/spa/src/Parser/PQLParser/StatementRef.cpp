@@ -7,7 +7,7 @@ StatementRef::StatementRef() : type(StatementRefType::INVALID), statement_id(-1)
 
 void StatementRef::set_type(StatementRefType new_type) { type = new_type; }
 
-void StatementRef::set_synonym(const std::string &new_synonym) { synonym = new_synonym; }
+void StatementRef::set_synonym(const std::string& new_synonym) { synonym = new_synonym; }
 
 void StatementRef::set_statement_id(int new_statement_id) { statement_id = new_statement_id; }
 

@@ -9,14 +9,14 @@ std::shared_ptr<Token> BaseParser::expect_token(TokenType expected_type) {
     auto token = tokens->pop_front();
     if (!is_token_type(token, expected_type)) {
         throw "Expected token type " + Parser::to_string(expected_type) + ", received " +
-              Parser::to_string(token->get_type());
+            Parser::to_string(token->get_type());
     }
     return token;
 }
 
-std::shared_ptr<Token> BaseParser::expect_token(const std::vector<TokenType> &expected_types) {
+std::shared_ptr<Token> BaseParser::expect_token(const std::vector<TokenType>& expected_types) {
     auto token = tokens->pop_front();
-    for (auto const &expected_type : expected_types) {
+    for (auto const& expected_type : expected_types) {
         if (is_token_type(token, expected_type)) {
             return token;
         }
@@ -25,16 +25,16 @@ std::shared_ptr<Token> BaseParser::expect_token(const std::vector<TokenType> &ex
         Parser::to_string(token->get_type());
 }
 
-std::shared_ptr<Token> BaseParser::expect_word(const std::string &expected_value) {
+std::shared_ptr<Token> BaseParser::expect_word(const std::string& expected_value) {
     auto token = tokens->pop_front();
     if (!is_word(token, expected_value)) {
         throw "Expected word token with value '" + expected_value + "', received '" +
-              token->get_value() + "'";
+            token->get_value() + "'";
     }
     return token;
 }
 
-std::shared_ptr<Token> BaseParser::expect_name(const std::string &identifier) {
+std::shared_ptr<Token> BaseParser::expect_name(const std::string& identifier) {
     auto token = tokens->pop_front();
     if (!is_name(token)) {
         throw "Expected name token " + identifier + ", received '" + token->get_value() + "'";
@@ -42,7 +42,7 @@ std::shared_ptr<Token> BaseParser::expect_name(const std::string &identifier) {
     return token;
 }
 
-std::shared_ptr<Token> BaseParser::expect_integer(const std::string &identifier) {
+std::shared_ptr<Token> BaseParser::expect_integer(const std::string& identifier) {
     auto token = tokens->pop_front();
     if (!is_integer(token)) {
         throw "Expected integer token " + identifier + ", received '" + token->get_value() + "'";
@@ -54,7 +54,7 @@ bool BaseParser::is_token_type(std::shared_ptr<Token> token, TokenType expected_
     return token->get_type() == expected_type;
 }
 
-bool BaseParser::is_word(std::shared_ptr<Token> token, const std::string &expected_value) {
+bool BaseParser::is_word(std::shared_ptr<Token> token, const std::string& expected_value) {
     return token->get_type() == TokenType::WORD && token->get_value() == expected_value;
 }
 
@@ -71,7 +71,7 @@ bool BaseParser::is_integer(std::shared_ptr<Token> token) {
     return std::all_of(token_value.begin(), token_value.end(), ::isdigit);
 }
 
-std::string BaseParser::to_string(const std::vector<TokenType> &token_types) {
+std::string BaseParser::to_string(const std::vector<TokenType>& token_types) {
     std::string value;
     for (auto const token_type : token_types) {
         if (value.empty()) {

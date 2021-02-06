@@ -20,7 +20,7 @@ public:
 
     void set_type(StatementRefType statement_ref_type);
 
-    void set_synonym(const std::string &synonym);
+    void set_synonym(const std::string& synonym);
 
     void set_statement_id(int statement_id);
 

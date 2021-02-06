@@ -18,9 +18,9 @@ public:
 
     Ref();
 
-    explicit Ref(const EntityRef &entity_ref);
+    explicit Ref(const EntityRef& entity_ref);
 
-    explicit Ref(const StatementRef &statement_ref);
+    explicit Ref(const StatementRef& statement_ref);
 
 private:
     RefType type;
