@@ -180,8 +180,6 @@ TEST_CASE("Parser::PQLParser") {
             Ref right_ref = such_that_obj.get_right_ref();
             REQUIRE(left_ref.get_type() == RefType::STATEMENT);
             REQUIRE(right_ref.get_type() == RefType::STATEMENT);
-            REQUIRE_THROWS(left_ref.get_entity_ref());
-            REQUIRE_THROWS(right_ref.get_entity_ref());
 
             StatementRef left_statement_ref = left_ref.get_statement_ref();
             StatementRef right_statement_ref = right_ref.get_statement_ref();
@@ -220,8 +218,6 @@ TEST_CASE("Parser::PQLParser") {
             Ref right_ref = such_that_obj.get_right_ref();
             REQUIRE(left_ref.get_type() == RefType::STATEMENT);
             REQUIRE(right_ref.get_type() == RefType::ENTITY);
-            REQUIRE_THROWS(left_ref.get_entity_ref());
-            REQUIRE_THROWS(right_ref.get_statement_ref());
 
             StatementRef left_statement_ref = left_ref.get_statement_ref();
             EntityRef right_entity_ref = right_ref.get_entity_ref();
@@ -260,29 +256,21 @@ TEST_CASE("Parser::PQLParser") {
             StatementRef left_statement_ref_1 = left_ref_1.get_statement_ref();
             EntityRef right_entity_ref_1 = right_ref_1.get_entity_ref();
             REQUIRE(left_statement_ref_1.get_type() == StatementRefType::ANY);
-            REQUIRE_THROWS(left_statement_ref_1.get_synonym());
-            REQUIRE_THROWS(left_statement_ref_1.get_statement_id());
             REQUIRE(right_entity_ref_1.get_type() == EntityRefType::ANY);
-            REQUIRE_THROWS(right_entity_ref_1.get_synonym());
-            REQUIRE_THROWS(right_entity_ref_1.get_name());
 
             StatementRef left_statement_ref_2 = left_ref_2.get_statement_ref();
             EntityRef right_entity_ref_2 = right_ref_2.get_entity_ref();
             REQUIRE(left_statement_ref_2.get_type() == StatementRefType::SYNONYM);
             REQUIRE(left_statement_ref_2.get_synonym() == "s");
-            REQUIRE_THROWS(left_statement_ref_2.get_statement_id());
             REQUIRE(right_entity_ref_2.get_type() == EntityRefType::SYNONYM);
             REQUIRE(right_entity_ref_2.get_synonym() == "s");
-            REQUIRE_THROWS(right_entity_ref_2.get_name());
 
             StatementRef left_statement_ref_3 = left_ref_3.get_statement_ref();
             EntityRef right_entity_ref_3 = right_ref_3.get_entity_ref();
             REQUIRE(left_statement_ref_3.get_type() == StatementRefType::STATEMENT_ID);
             REQUIRE(left_statement_ref_3.get_statement_id() == 7);
-            REQUIRE_THROWS(left_statement_ref_3.get_synonym());
             REQUIRE(right_entity_ref_3.get_type() == EntityRefType::NAME);
             REQUIRE(right_entity_ref_3.get_name() == "x");
-            REQUIRE_THROWS(right_entity_ref_3.get_synonym());
 
             delete query_object_1;
             delete query_object_2;
@@ -298,7 +286,7 @@ TEST_CASE("Parser::PQLParser") {
             QueryObject *query_object = parser.parse_query();
 
             Parser::StringLexer factor_lexer("x+1");
-            Parser::SimpleNode *pattern_node = SimpleParser(factor_lexer.tokens()).parse_expr();
+            Parser::SimpleNode *pattern_node = SimpleParser(factor_lexer).parse_expr();
 
             std::unordered_map<std::string, DesignEntity> declarations = query_object->get_declarations();
             REQUIRE(declarations.size() == 1);
@@ -372,8 +360,6 @@ TEST_CASE("Parser::PQLParser") {
         Ref right_ref = such_that_obj.get_right_ref();
         REQUIRE(left_ref.get_type() == RefType::STATEMENT);
         REQUIRE(right_ref.get_type() == RefType::ENTITY);
-        REQUIRE_THROWS(left_ref.get_entity_ref());
-        REQUIRE_THROWS(right_ref.get_statement_ref());
 
         StatementRef left_statement_ref = left_ref.get_statement_ref();
         EntityRef right_entity_ref = right_ref.get_entity_ref();

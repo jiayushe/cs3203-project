@@ -12,7 +12,7 @@ TEST_CASE("PQLParser::ExpressionSpec") {
         REQUIRE_THROWS(expression_spec.get_pattern());
 
         expression_spec.set_type(ExpressionSpecType::PATTERN);
-        expression_spec.set_pattern(NULL);
+        expression_spec.set_pattern(nullptr);
         REQUIRE_NOTHROW(expression_spec.get_pattern());
     }
 }
