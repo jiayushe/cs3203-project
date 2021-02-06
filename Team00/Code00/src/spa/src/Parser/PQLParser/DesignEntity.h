@@ -4,6 +4,7 @@
 
 namespace Parser {
 enum class DesignEntityType {
+    INVALID,
     STMT,
     READ,
     PRINT,
@@ -19,9 +20,7 @@ class DesignEntity {
 public:
     DesignEntity();
 
-    DesignEntity(DesignEntityType type, std::string synonym);
-
-    ~DesignEntity();
+    DesignEntity(DesignEntityType type, const std::string &synonym);
 
     DesignEntityType get_type();
     std::string get_synonym();

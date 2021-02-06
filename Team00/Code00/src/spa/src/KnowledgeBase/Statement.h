@@ -7,7 +7,7 @@
 
 namespace KnowledgeBase {
 
-enum StatementType {
+enum class StatementType {
     READ,
     PRINT,
     CALL,

@@ -4,6 +4,7 @@
 
 namespace Parser {
 enum class SuchThatType {
+    INVALID,
     MODIFIES_S,
     USES_S,
     PARENT,
@@ -20,13 +21,11 @@ public:
 
     SuchThat();
 
-    ~SuchThat();
-
     void set_type(SuchThatType type);
 
-    void set_left_ref(Ref left_ref);
+    void set_left_ref(const Ref &left_ref);
 
-    void set_right_ref(Ref right_ref);
+    void set_right_ref(const Ref &right_ref);
 
 private:
     SuchThatType type;

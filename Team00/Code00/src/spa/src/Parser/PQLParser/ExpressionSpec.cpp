@@ -2,23 +2,17 @@
 
 using namespace Parser;
 
-ExpressionSpec::ExpressionSpec() { this->type = ExpressionSpecType::ANY; }
-
-ExpressionSpec::~ExpressionSpec() {
-    // if (type == ExpressionSpecType::PATTERN) {
-    //    delete pattern;
-    //}
-}
+ExpressionSpec::ExpressionSpec() : type(ExpressionSpecType::INVALID) {}
 
 void ExpressionSpec::set_type(ExpressionSpecType expression_spec_type) {
     this->type = expression_spec_type;
 }
 
-void ExpressionSpec::set_pattern(Parser::SimpleNode* pattern) { this->pattern = pattern; }
+void ExpressionSpec::set_pattern(std::shared_ptr<Parser::SimpleNode> new_pattern) { pattern = new_pattern; }
 
 ExpressionSpecType ExpressionSpec::get_type() { return type; }
 
-Parser::SimpleNode* ExpressionSpec::get_pattern() {
+std::shared_ptr<Parser::SimpleNode> ExpressionSpec::get_pattern() {
     if (type != ExpressionSpecType::PATTERN) {
         throw "ExpressionSpecType is not PATTERN type";
     }

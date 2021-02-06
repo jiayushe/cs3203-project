@@ -6,15 +6,14 @@
 #include "Parser/shared/TokenList.h"
 #include "QueryObject.h"
 #include <map>
+#include <memory>
 
 namespace Parser {
 class PQLParser : public BaseParser {
 public:
-    PQLParser(TokenList* tokens);
+    explicit PQLParser(BaseLexer &lexer);
 
-    ~PQLParser();
-
-    QueryObject* parse_query();
+    std::shared_ptr<QueryObject> parse_query();
 
     void process_declaration_synonym(DesignEntityType design_entity_type);
 
@@ -35,7 +34,7 @@ public:
     EntityRef process_entity_ref();
 
 private:
-    QueryObject* query_object;
+    std::shared_ptr<QueryObject> query_object;
 
     void choice(const std::vector<std::function<void()>>& parse_funcs, std::string error_message);
 

@@ -1,17 +1,12 @@
 #include "Ref.h"
-#include <string>
 
 using namespace Parser;
 
-Ref::Ref() {}
+Ref::Ref() : type(RefType::INVALID) {}
 
-Ref::Ref(EntityRef entity_ref) : entity_ref(entity_ref) { this->type = RefType::ENTITY; }
+Ref::Ref(const EntityRef &entity_ref) : type(RefType::ENTITY), entity_ref(entity_ref) {}
 
-Ref::Ref(StatementRef statement_ref) : statement_ref(statement_ref) {
-    this->type = RefType::STATEMENT;
-}
-
-Ref::~Ref() {}
+Ref::Ref(const StatementRef &statement_ref) : type(RefType::STATEMENT), statement_ref(statement_ref) {}
 
 RefType Ref::get_type() { return type; }
 

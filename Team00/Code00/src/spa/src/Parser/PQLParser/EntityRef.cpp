@@ -3,15 +3,13 @@
 
 using namespace Parser;
 
-EntityRef::EntityRef() {}
-
-EntityRef::~EntityRef() {}
+EntityRef::EntityRef() : type(EntityRefType::INVALID) {}
 
 void EntityRef::set_type(EntityRefType entityRefType) { this->type = entityRefType; }
 
-void EntityRef::set_synonym(std::string synonym) { this->synonym = synonym; }
+void EntityRef::set_synonym(const std::string &new_synonym) { synonym = new_synonym; }
 
-void EntityRef::set_name(std::string name) { this->name = name; }
+void EntityRef::set_name(const std::string &new_name) { name = new_name; }
 
 EntityRefType EntityRef::get_type() { return type; }
 

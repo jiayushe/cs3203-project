@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Parser/SimpleParser/SimpleNode.h"
+#include <memory>
 
 namespace Parser {
 enum class ExpressionSpecType {
+    INVALID,
     ANY,
     PATTERN,
 };
@@ -11,19 +13,17 @@ enum class ExpressionSpecType {
 class ExpressionSpec {
 public:
     ExpressionSpecType get_type();
-    Parser::SimpleNode* get_pattern();
+    std::shared_ptr<Parser::SimpleNode> get_pattern();
 
     ExpressionSpec();
 
-    ~ExpressionSpec();
-
-    void set_pattern(Parser::SimpleNode* pattern);
+    void set_pattern(std::shared_ptr<Parser::SimpleNode> pattern);
 
     void set_type(ExpressionSpecType expression_spec_type);
 
 private:
     ExpressionSpecType type;
-    Parser::SimpleNode* pattern;
+    std::shared_ptr<Parser::SimpleNode> pattern;
 };
 
 } // namespace Parser

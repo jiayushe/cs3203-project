@@ -12,14 +12,12 @@ public:
 
     Pattern();
 
-    ~Pattern();
-
-    void set_assigned_synonym(std::string assigned_synonym);
-    void set_entity_ref(EntityRef entity_ref);
-    void set_expression_spec(ExpressionSpec expression_spec);
+    void set_assigned_synonym(const std::string &assigned_synonym);
+    void set_entity_ref(const EntityRef &entity_ref);
+    void set_expression_spec(const ExpressionSpec &expression_spec);
 
 private:
-    std::string synonym;
+    std::string assigned_synonym;
     EntityRef entity_ref;
     ExpressionSpec expression_spec;
 };

@@ -22,8 +22,6 @@ TEST_CASE("Parser::SimpleParser") {
         REQUIRE(var_name_node->get_type() == SimpleNodeType::VAR_NAME);
         REQUIRE(var_name_node->get_value() == "varname123");
         REQUIRE(var_name_node->get_children().size() == 0);
-
-        delete read_node;
     }
 
     SECTION("print") {
@@ -40,8 +38,6 @@ TEST_CASE("Parser::SimpleParser") {
         REQUIRE(var_name_node->get_type() == SimpleNodeType::VAR_NAME);
         REQUIRE(var_name_node->get_value() == "var123name");
         REQUIRE(var_name_node->get_children().size() == 0);
-
-        delete print_node;
     }
 
     SECTION("call") {
@@ -58,8 +54,6 @@ TEST_CASE("Parser::SimpleParser") {
         REQUIRE(proc_name_node->get_type() == SimpleNodeType::PROC_NAME);
         REQUIRE(proc_name_node->get_value() == "Proc123Name456");
         REQUIRE(proc_name_node->get_children().size() == 0);
-
-        delete call_node;
     }
 
     SECTION("assign") {
@@ -82,8 +76,6 @@ TEST_CASE("Parser::SimpleParser") {
             REQUIRE(right_var_name_node->get_type() == SimpleNodeType::VAR_NAME);
             REQUIRE(right_var_name_node->get_value() == "anothervar123");
             REQUIRE(right_var_name_node->get_children().size() == 0);
-
-            delete assign_node;
         }
 
         SECTION("assign to constant") {
@@ -105,8 +97,6 @@ TEST_CASE("Parser::SimpleParser") {
             REQUIRE(const_value_node->get_type() == SimpleNodeType::CONST_VALUE);
             REQUIRE(const_value_node->get_value() == "123456");
             REQUIRE(const_value_node->get_children().size() == 0);
-
-            delete assign_node;
         }
 
         SECTION("assign to arithmetic operation") {
@@ -126,8 +116,6 @@ TEST_CASE("Parser::SimpleParser") {
 
             auto arith_node = assign_node->get_child(1);
             REQUIRE(arith_node->get_type() == SimpleNodeType::ARITHMETIC);
-
-            delete assign_node;
         }
     }
 
@@ -147,8 +135,6 @@ TEST_CASE("Parser::SimpleParser") {
         REQUIRE(while_node->get_child(1)->get_type() == SimpleNodeType::STMT_LST);
         REQUIRE(while_node->get_child(1)->get_child(0)->get_type() == SimpleNodeType::PRINT);
         REQUIRE(while_node->get_child(1)->get_child(0)->get_statement_id() == 2);
-
-        delete while_node;
     }
 
     SECTION("if") {
@@ -180,8 +166,6 @@ TEST_CASE("Parser::SimpleParser") {
         REQUIRE(else_stmt_lst_node->get_type() == SimpleNodeType::STMT_LST);
         REQUIRE(else_stmt_lst_node->get_child(0)->get_type() == SimpleNodeType::READ);
         REQUIRE(else_stmt_lst_node->get_child(0)->get_statement_id() == 3);
-
-        delete if_node;
     }
 
     SECTION("arithmetic") {
@@ -206,8 +190,6 @@ TEST_CASE("Parser::SimpleParser") {
             REQUIRE(const_value_node->get_type() == SimpleNodeType::CONST_VALUE);
             REQUIRE(const_value_node->get_value() == "5");
             REQUIRE(const_value_node->get_children().size() == 0);
-
-            delete arith_node;
         }
 
         SECTION("left-associative") {
@@ -239,8 +221,6 @@ TEST_CASE("Parser::SimpleParser") {
             REQUIRE(middle_var_name_node->get_type() == SimpleNodeType::VAR_NAME);
             REQUIRE(middle_var_name_node->get_value() == "z");
             REQUIRE(middle_var_name_node->get_children().size() == 0);
-
-            delete arith_node;
         }
 
         SECTION("*, /, and % have higher precedence than + and -") {
@@ -272,8 +252,6 @@ TEST_CASE("Parser::SimpleParser") {
             REQUIRE(right_const_value_node->get_type() == SimpleNodeType::CONST_VALUE);
             REQUIRE(right_const_value_node->get_value() == "5");
             REQUIRE(right_const_value_node->get_children().size() == 0);
-
-            delete arith_node;
         }
 
         SECTION("(...) has higher precedence than *, /, and %") {
@@ -305,8 +283,6 @@ TEST_CASE("Parser::SimpleParser") {
             REQUIRE(middle_var_name_node->get_type() == SimpleNodeType::VAR_NAME);
             REQUIRE(middle_var_name_node->get_value() == "z");
             REQUIRE(middle_var_name_node->get_children().size() == 0);
-
-            delete arith_node;
         }
     }
 
@@ -332,8 +308,6 @@ TEST_CASE("Parser::SimpleParser") {
             REQUIRE(const_value_node->get_type() == SimpleNodeType::CONST_VALUE);
             REQUIRE(const_value_node->get_value() == "5");
             REQUIRE(const_value_node->get_children().size() == 0);
-
-            delete cond_node;
         }
 
         SECTION("negation") {
@@ -352,8 +326,6 @@ TEST_CASE("Parser::SimpleParser") {
             REQUIRE(inner_cond_node->get_children().size() == 2);
             REQUIRE(inner_cond_node->get_child(0)->get_type() == SimpleNodeType::VAR_NAME);
             REQUIRE(inner_cond_node->get_child(1)->get_type() == SimpleNodeType::CONST_VALUE);
-
-            delete cond_node;
         }
 
         SECTION("and/or") {
@@ -381,8 +353,6 @@ TEST_CASE("Parser::SimpleParser") {
             REQUIRE(right_cond_node->get_children().size() == 2);
             REQUIRE(right_cond_node->get_child(0)->get_type() == SimpleNodeType::CONST_VALUE);
             REQUIRE(right_cond_node->get_child(1)->get_type() == SimpleNodeType::VAR_NAME);
-
-            delete cond_node;
         }
 
         SECTION("deeply nested") {
@@ -429,8 +399,6 @@ TEST_CASE("Parser::SimpleParser") {
                     SimpleNodeType::VAR_NAME);
             REQUIRE(left_inner_right_cond_node->get_child(1)->get_type() ==
                     SimpleNodeType::CONST_VALUE);
-
-            delete cond_node;
         }
     }
 
@@ -466,8 +434,6 @@ TEST_CASE("Parser::SimpleParser") {
         REQUIRE(stmt_lst_node->get_child(4)->get_statement_id() == 6);
         REQUIRE(stmt_lst_node->get_child(5)->get_type() == SimpleNodeType::ASSIGN);
         REQUIRE(stmt_lst_node->get_child(5)->get_statement_id() == 9);
-
-        delete stmt_lst_node;
     }
 
     SECTION("procedure") {
@@ -489,8 +455,6 @@ TEST_CASE("Parser::SimpleParser") {
 
         auto stmt_lst_node = procedure_node->get_child(1);
         REQUIRE(stmt_lst_node->get_type() == SimpleNodeType::STMT_LST);
-
-        delete procedure_node;
     }
 
     SECTION("program") {
@@ -505,7 +469,5 @@ TEST_CASE("Parser::SimpleParser") {
         REQUIRE(program_node->get_type() == SimpleNodeType::PROGRAM);
         REQUIRE(program_node->get_children().size() == 1);
         REQUIRE(program_node->get_child(0)->get_type() == SimpleNodeType::PROCEDURE);
-
-        delete program_node;
     }
 }
