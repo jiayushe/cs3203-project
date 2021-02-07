@@ -38,6 +38,9 @@ public:
     // Throws unless its type is ASSIGN.
     std::shared_ptr<Parser::SimpleNode> get_pattern();
 
+    // Sets the AST pattern of this statement
+    void set_pattern(std::shared_ptr<Parser::SimpleNode> ast_pattern);
+
     // Gets the id of the parent statement.
     // Returns -1 if it has no parent statement.
     int get_parent();

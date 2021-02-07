@@ -38,6 +38,10 @@ std::shared_ptr<Parser::SimpleNode> Statement::get_pattern() {
     return pattern;
 }
 
+void Statement::set_pattern(std::shared_ptr<Parser::SimpleNode> ast_pattern) {
+    pattern = ast_pattern;
+}
+
 int Statement::get_parent() { return parent; }
 
 std::vector<int> Statement::get_children() {
