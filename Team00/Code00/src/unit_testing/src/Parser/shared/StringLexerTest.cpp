@@ -2,12 +2,13 @@
 
 #include "Parser/shared/StringLexer.h"
 #include "Parser/shared/Token.h"
+#include <memory>
 #include <string>
 
 using namespace Parser;
 
 TEST_CASE("Parser::StringLexer") {
-    TokenList* tokens;
+    std::shared_ptr<TokenList> tokens;
 
     SECTION("words") {
         std::string source = "alphabetical alphanumeric123 12345";
@@ -139,6 +140,4 @@ TEST_CASE("Parser::StringLexer") {
 
     auto end = tokens->pop_front();
     REQUIRE(end->get_type() == TokenType::END);
-
-    delete tokens;
 }

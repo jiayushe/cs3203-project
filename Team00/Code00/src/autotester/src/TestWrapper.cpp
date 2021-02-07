@@ -28,8 +28,6 @@ void TestWrapper::parse(std::string filename) {
         // TODO: PKB logic here...
         // FIXME: For now, simply print out the AST parsed
         std::cout << root_node->to_string();
-
-        delete root_node;
     } catch (char const* message) {
         std::cout << "Error: " << message << std::endl;
         throw message;
@@ -49,13 +47,10 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
     try {
         std::cout << "Query string: " << query << std::endl;
         Parser::StringLexer lexer(query);
-        Parser::PQLParser parser(lexer.tokens());
-        Parser::QueryObject* query_object = parser.parse_query();
+        Parser::PQLParser parser(lexer);
+        auto query_object = parser.parse_query();
 
         // TODO: QE code...
-
-        delete query_object;
-
     } catch (const std::string& message) {
         std::cout << "Error: " << message << std::endl;
         throw message;

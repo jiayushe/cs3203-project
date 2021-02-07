@@ -3,12 +3,10 @@
 
 using namespace Parser;
 
-DesignEntity::DesignEntity() {}
+DesignEntity::DesignEntity() : type(DesignEntityType::INVALID) {}
 
-DesignEntity::DesignEntity(DesignEntityType type, std::string synonym)
+DesignEntity::DesignEntity(DesignEntityType type, const std::string& synonym)
     : type(type), synonym(synonym) {}
-
-DesignEntity::~DesignEntity() {}
 
 DesignEntityType DesignEntity::get_type() { return type; }
 

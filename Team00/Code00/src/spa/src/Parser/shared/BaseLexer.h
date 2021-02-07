@@ -2,6 +2,7 @@
 
 #include "Token.h"
 #include "TokenList.h"
+#include <memory>
 
 namespace Parser {
 
@@ -9,10 +10,10 @@ namespace Parser {
 class BaseLexer {
 public:
     // Gets a list of tokens representing the supplied source.
-    TokenList* tokens();
+    std::shared_ptr<TokenList> tokens();
 
 private:
-    Token* next_token();
+    std::shared_ptr<Token> next_token();
 
     virtual bool has_more() = 0;
 

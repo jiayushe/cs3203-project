@@ -1,17 +1,14 @@
 #include "SuchThat.h"
-#include <string>
 
 using namespace Parser;
 
-SuchThat::SuchThat() {}
+SuchThat::SuchThat() : type(SuchThatType::INVALID) {}
 
-SuchThat::~SuchThat() {}
+void SuchThat::set_type(SuchThatType new_type) { type = new_type; }
 
-void SuchThat::set_type(SuchThatType type) { this->type = type; }
+void SuchThat::set_left_ref(const Ref& new_left_ref) { left_ref = new_left_ref; }
 
-void SuchThat::set_left_ref(Ref left_ref) { this->left_ref = left_ref; }
-
-void SuchThat::set_right_ref(Ref right_ref) { this->right_ref = right_ref; }
+void SuchThat::set_right_ref(const Ref& new_right_ref) { right_ref = new_right_ref; }
 
 SuchThatType SuchThat::get_type() { return type; }
 

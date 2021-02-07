@@ -5,6 +5,7 @@
 
 namespace Parser {
 enum class RefType {
+    INVALID,
     ENTITY,
     STATEMENT,
 };
@@ -17,11 +18,9 @@ public:
 
     Ref();
 
-    Ref(EntityRef entity_ref);
+    explicit Ref(const EntityRef& entity_ref);
 
-    Ref(StatementRef statement_ref);
-
-    ~Ref();
+    explicit Ref(const StatementRef& statement_ref);
 
 private:
     RefType type;

@@ -4,6 +4,7 @@
 
 namespace Parser {
 enum class StatementRefType {
+    INVALID,
     ANY,
     SYNONYM,
     STATEMENT_ID,
@@ -17,11 +18,9 @@ public:
 
     StatementRef();
 
-    ~StatementRef();
-
     void set_type(StatementRefType statement_ref_type);
 
-    void set_synonym(std::string synonym);
+    void set_synonym(const std::string& synonym);
 
     void set_statement_id(int statement_id);
 

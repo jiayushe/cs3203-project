@@ -7,45 +7,39 @@ using namespace Parser;
 SimpleParser::SimpleParser(BaseLexer& lexer)
     : BaseParser(lexer.tokens()), next_statement_id(1), should_delete_token_list(true) {}
 
-SimpleParser::SimpleParser(TokenList* tokens)
+SimpleParser::SimpleParser(std::shared_ptr<TokenList> tokens)
     : BaseParser(tokens), next_statement_id(1), should_delete_token_list(false) {}
 
-SimpleParser::~SimpleParser() {
-    if (should_delete_token_list) {
-        delete tokens;
-    }
-}
-
-SimpleNode* SimpleParser::parse_program() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_program() {
     auto procedure_node = parse_procedure();
     expect_token(TokenType::END);
 
-    auto program_node = new SimpleNode(SimpleNodeType::PROGRAM);
+    auto program_node = std::make_shared<SimpleNode>(SimpleNodeType::PROGRAM);
     program_node->add_child(procedure_node);
 
     return program_node;
 }
 
-SimpleNode* SimpleParser::parse_procedure() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_procedure() {
     expect_word("procedure");
     auto proc_name_node = parse_proc_name();
     expect_token(TokenType::LCURL);
     auto stmt_lst_node = parse_stmt_lst();
     expect_token(TokenType::RCURL);
 
-    auto procedure_node = new SimpleNode(SimpleNodeType::PROCEDURE);
+    auto procedure_node = std::make_shared<SimpleNode>(SimpleNodeType::PROCEDURE);
     procedure_node->add_child(proc_name_node);
     procedure_node->add_child(stmt_lst_node);
 
     return procedure_node;
 }
 
-SimpleNode* SimpleParser::parse_stmt_lst() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_stmt_lst() {
     auto first_stmt_node = parse_stmt();
-    auto stmt_lst_node = new SimpleNode(SimpleNodeType::STMT_LST);
+    auto stmt_lst_node = std::make_shared<SimpleNode>(SimpleNodeType::STMT_LST);
     stmt_lst_node->add_child(first_stmt_node);
     return repeat(
-        [&](SimpleNode* stmt_lst_node) {
+        [&](std::shared_ptr<SimpleNode> stmt_lst_node) {
             auto next_stmt_node = parse_stmt();
             stmt_lst_node->add_child(next_stmt_node);
             return stmt_lst_node;
@@ -53,7 +47,7 @@ SimpleNode* SimpleParser::parse_stmt_lst() {
         stmt_lst_node);
 }
 
-SimpleNode* SimpleParser::parse_stmt() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_stmt() {
     return choice({
                       // stmt: read
                       [this]() { return parse_read(); },
@@ -76,46 +70,46 @@ SimpleNode* SimpleParser::parse_stmt() {
                   "Expected stmt, received '" + tokens->front()->get_value() + "'");
 }
 
-SimpleNode* SimpleParser::parse_read() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_read() {
     auto statement_id = next_statement_id++;
 
     expect_word("read");
     auto var_name_node = parse_var_name();
     expect_token(TokenType::SEMICOLON);
 
-    auto read_node = new SimpleNode(SimpleNodeType::READ, statement_id);
+    auto read_node = std::make_shared<SimpleNode>(SimpleNodeType::READ, statement_id);
     read_node->add_child(var_name_node);
 
     return read_node;
 }
 
-SimpleNode* SimpleParser::parse_print() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_print() {
     auto statement_id = next_statement_id++;
 
     expect_word("print");
     auto var_name_node = parse_var_name();
     expect_token(TokenType::SEMICOLON);
 
-    auto print_node = new SimpleNode(SimpleNodeType::PRINT, statement_id);
+    auto print_node = std::make_shared<SimpleNode>(SimpleNodeType::PRINT, statement_id);
     print_node->add_child(var_name_node);
 
     return print_node;
 }
 
-SimpleNode* SimpleParser::parse_call() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_call() {
     auto statement_id = next_statement_id++;
 
     expect_word("call");
     auto proc_name_node = parse_proc_name();
     expect_token(TokenType::SEMICOLON);
 
-    auto call_node = new SimpleNode(SimpleNodeType::CALL, statement_id);
+    auto call_node = std::make_shared<SimpleNode>(SimpleNodeType::CALL, statement_id);
     call_node->add_child(proc_name_node);
 
     return call_node;
 }
 
-SimpleNode* SimpleParser::parse_while() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_while() {
     auto statement_id = next_statement_id++;
 
     expect_word("while");
@@ -126,14 +120,14 @@ SimpleNode* SimpleParser::parse_while() {
     auto stmt_lst_node = parse_stmt_lst();
     expect_token(TokenType::RCURL);
 
-    auto while_node = new SimpleNode(SimpleNodeType::WHILE, statement_id);
+    auto while_node = std::make_shared<SimpleNode>(SimpleNodeType::WHILE, statement_id);
     while_node->add_child(cond_expr_node);
     while_node->add_child(stmt_lst_node);
 
     return while_node;
 }
 
-SimpleNode* SimpleParser::parse_if() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_if() {
     auto statement_id = next_statement_id++;
 
     expect_word("if");
@@ -149,7 +143,7 @@ SimpleNode* SimpleParser::parse_if() {
     auto else_stmt_lst_node = parse_stmt_lst();
     expect_token(TokenType::RCURL);
 
-    auto if_node = new SimpleNode(SimpleNodeType::IF, statement_id);
+    auto if_node = std::make_shared<SimpleNode>(SimpleNodeType::IF, statement_id);
     if_node->add_child(cond_expr_node);
     if_node->add_child(then_stmt_lst_node);
     if_node->add_child(else_stmt_lst_node);
@@ -157,7 +151,7 @@ SimpleNode* SimpleParser::parse_if() {
     return if_node;
 }
 
-SimpleNode* SimpleParser::parse_assign() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_assign() {
     auto statement_id = next_statement_id++;
 
     auto var_name_node = parse_var_name();
@@ -165,14 +159,14 @@ SimpleNode* SimpleParser::parse_assign() {
     auto expr_node = parse_expr();
     expect_token(TokenType::SEMICOLON);
 
-    auto assign_node = new SimpleNode(SimpleNodeType::ASSIGN, statement_id);
+    auto assign_node = std::make_shared<SimpleNode>(SimpleNodeType::ASSIGN, statement_id);
     assign_node->add_child(var_name_node);
     assign_node->add_child(expr_node);
 
     return assign_node;
 }
 
-SimpleNode* SimpleParser::parse_cond_expr() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_cond_expr() {
     return choice({// cond_expr: ‘!’ ‘(’ cond_expr ‘)’
                    [this]() {
                        auto op_token = expect_token(TokenType::NOT);
@@ -180,8 +174,8 @@ SimpleNode* SimpleParser::parse_cond_expr() {
                        auto inner_cond_expr_node = parse_cond_expr();
                        expect_token(TokenType::RPAREN);
 
-                       auto cond_expr_node =
-                           new SimpleNode(SimpleNodeType::CONDITIONAL, op_token->get_value());
+                       auto cond_expr_node = std::make_shared<SimpleNode>(
+                           SimpleNodeType::CONDITIONAL, op_token->get_value());
                        cond_expr_node->add_child(inner_cond_expr_node);
 
                        return cond_expr_node;
@@ -198,8 +192,8 @@ SimpleNode* SimpleParser::parse_cond_expr() {
                        auto right_cond_expr_node = parse_cond_expr();
                        expect_token(TokenType::RPAREN);
 
-                       auto cond_expr_node =
-                           new SimpleNode(SimpleNodeType::CONDITIONAL, op_token->get_value());
+                       auto cond_expr_node = std::make_shared<SimpleNode>(
+                           SimpleNodeType::CONDITIONAL, op_token->get_value());
                        cond_expr_node->add_child(left_cond_expr_node);
                        cond_expr_node->add_child(right_cond_expr_node);
 
@@ -211,20 +205,21 @@ SimpleNode* SimpleParser::parse_cond_expr() {
                   "Expected cond_expr, received '" + tokens->front()->get_value() + "'");
 }
 
-SimpleNode* SimpleParser::parse_rel_expr() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_rel_expr() {
     auto left_rel_factor = parse_rel_factor();
     auto op_token = expect_token({TokenType::GT, TokenType::GTE, TokenType::LT, TokenType::LTE,
                                   TokenType::DEQUAL, TokenType::NEQUAL});
     auto right_rel_factor = parse_rel_factor();
 
-    auto rel_expr_node = new SimpleNode(SimpleNodeType::CONDITIONAL, op_token->get_value());
+    auto rel_expr_node =
+        std::make_shared<SimpleNode>(SimpleNodeType::CONDITIONAL, op_token->get_value());
     rel_expr_node->add_child(left_rel_factor);
     rel_expr_node->add_child(right_rel_factor);
 
     return rel_expr_node;
 }
 
-SimpleNode* SimpleParser::parse_rel_factor() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_rel_factor() {
     return choice({// rel_factor: expr
                    [this]() { return parse_expr(); },
 
@@ -237,14 +232,15 @@ SimpleNode* SimpleParser::parse_rel_factor() {
 }
 
 // expr: term (('+' | '-') term)*
-SimpleNode* SimpleParser::parse_expr() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_expr() {
     auto term_node = parse_term();
     return repeat(
-        [&](SimpleNode* prev_node) {
+        [&](std::shared_ptr<SimpleNode> prev_node) {
             auto op_token = expect_token({TokenType::PLUS, TokenType::MINUS});
             auto term_node = parse_term();
 
-            auto expr_node = new SimpleNode(SimpleNodeType::ARITHMETIC, op_token->get_value());
+            auto expr_node =
+                std::make_shared<SimpleNode>(SimpleNodeType::ARITHMETIC, op_token->get_value());
             expr_node->add_child(prev_node);
             expr_node->add_child(term_node);
 
@@ -254,15 +250,16 @@ SimpleNode* SimpleParser::parse_expr() {
 }
 
 // term: factor (('*' | '/' | '%') factor)*
-SimpleNode* SimpleParser::parse_term() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_term() {
     auto factor_node = parse_factor();
     return repeat(
-        [&](SimpleNode* prev_node) {
+        [&](std::shared_ptr<SimpleNode> prev_node) {
             auto op_token =
                 expect_token({TokenType::ASTERISK, TokenType::SLASH, TokenType::PERCENT});
             auto factor_node = parse_factor();
 
-            auto term_node = new SimpleNode(SimpleNodeType::ARITHMETIC, op_token->get_value());
+            auto term_node =
+                std::make_shared<SimpleNode>(SimpleNodeType::ARITHMETIC, op_token->get_value());
             term_node->add_child(prev_node);
             term_node->add_child(factor_node);
 
@@ -271,7 +268,7 @@ SimpleNode* SimpleParser::parse_term() {
         factor_node);
 }
 
-SimpleNode* SimpleParser::parse_factor() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_factor() {
     return choice({
                       // factor: var_name
                       [this]() { return parse_var_name(); },
@@ -290,23 +287,25 @@ SimpleNode* SimpleParser::parse_factor() {
                   "Expected parse_factor, received '" + tokens->front()->get_value() + "'");
 }
 
-SimpleNode* SimpleParser::parse_var_name() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_var_name() {
     auto var_name_token = expect_name("parse_var_name");
-    return new SimpleNode(SimpleNodeType::VAR_NAME, var_name_token->get_value());
+    return std::make_shared<SimpleNode>(SimpleNodeType::VAR_NAME, var_name_token->get_value());
 }
 
-SimpleNode* SimpleParser::parse_proc_name() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_proc_name() {
     auto proc_name_token = expect_name("parse_proc_name");
-    return new SimpleNode(SimpleNodeType::PROC_NAME, proc_name_token->get_value());
+    return std::make_shared<SimpleNode>(SimpleNodeType::PROC_NAME, proc_name_token->get_value());
 }
 
-SimpleNode* SimpleParser::parse_const_value() {
+std::shared_ptr<SimpleNode> SimpleParser::parse_const_value() {
     auto const_value_token = expect_integer("parse_const_value");
-    return new SimpleNode(SimpleNodeType::CONST_VALUE, const_value_token->get_value());
+    return std::make_shared<SimpleNode>(SimpleNodeType::CONST_VALUE,
+                                        const_value_token->get_value());
 }
 
-SimpleNode* SimpleParser::choice(const std::vector<std::function<SimpleNode*()>>& parse_funcs,
-                                 std::string error_message) {
+std::shared_ptr<SimpleNode>
+SimpleParser::choice(const std::vector<std::function<std::shared_ptr<SimpleNode>()>>& parse_funcs,
+                     std::string error_message) {
     auto saved_pos = tokens->current_pos();
     auto saved_next_statement_id = next_statement_id;
     for (const auto& parse_func : parse_funcs) {
@@ -320,8 +319,9 @@ SimpleNode* SimpleParser::choice(const std::vector<std::function<SimpleNode*()>>
     throw error_message;
 }
 
-SimpleNode* SimpleParser::repeat(const std::function<SimpleNode*(SimpleNode*)>& parse_func,
-                                 SimpleNode* initial_node) {
+std::shared_ptr<SimpleNode> SimpleParser::repeat(
+    const std::function<std::shared_ptr<SimpleNode>(std::shared_ptr<SimpleNode>)>& parse_func,
+    std::shared_ptr<SimpleNode> initial_node) {
     auto node = initial_node;
     auto saved_pos = tokens->current_pos();
     auto saved_next_statement_id = next_statement_id;

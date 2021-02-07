@@ -1,12 +1,13 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 
 namespace Parser {
 
 // All possible token types for PQL + SIMPLE.
-enum TokenType {
-    INVALID_TOKEN,
+enum class TokenType {
+    INVALID,
 
     WORD, // Consecutive alphanumeric characters
 
@@ -40,6 +41,9 @@ enum TokenType {
 
     END, // EOF
 };
+
+// Gets friendly string representing the different token types.
+std::string to_string(TokenType token_type);
 
 // A single token (in parser parlance) for PQL + SIMPLE.
 class Token {

@@ -11,10 +11,8 @@ class QueryObject {
 public:
     QueryObject();
 
-    ~QueryObject();
-
     // Function
-    void add_declaration(std::string synonym, DesignEntity design_entity);
+    void add_declaration(const std::string& synonym, const DesignEntity& design_entity);
 
     // getters
     std::unordered_map<std::string, DesignEntity> get_declarations();
@@ -26,12 +24,12 @@ public:
     Pattern get_pattern();
 
     // setters
-    void set_selection(std::string selection);
+    void set_selection(const std::string& selection);
     void set_has_such_that(bool has_such_that);
     void set_has_pattern(bool has_pattern);
 
-    void set_such_that(SuchThat such_that_cl);
-    void set_pattern(Pattern pattern_cl);
+    void set_such_that(const SuchThat& such_that_cl);
+    void set_pattern(const Pattern& pattern_cl);
 
     // this is just for view purpose
     void to_string();
