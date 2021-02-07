@@ -50,7 +50,7 @@ private:
                                                std::shared_ptr<Parser::SimpleNode> stmt_list);
     static void extract_follow_relationship_from_stmt(KnowledgeBase::PKB pkb, std::string proc_name,
                                                       std::shared_ptr<Parser::SimpleNode> stmt,
-                                                      int prev_stmt_id, int next_stmt_id);
+                                                      int next_stmt_id);
 
     static KnowledgeBase::StatementType
     convert_node_type_to_stmt_type(Parser::SimpleNodeType node_type);

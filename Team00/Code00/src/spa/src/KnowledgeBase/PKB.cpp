@@ -115,3 +115,20 @@ void PKB::add_use_relationship(int stmt_id, std::string var_name) {
     stmt.add_uses(var_name);
     var.add_used_by(stmt_id);
 }
+
+void PKB::add_follow_relationship(int following_id, int follower_id) {
+    if (follower_id == -1) {
+        return;
+    }
+    Statement following_stmt = this->get_statement_by_id(following_id);
+    Statement follower_stmt = this->get_statement_by_id(follower_id);
+    following_stmt.set_follower(follower_id);
+    follower_stmt.set_following(following_id);
+}
+
+void PKB::add_parent_relationship(int parent_id, int child_id) {
+    Statement parent_stmt = this->get_statement_by_id(parent_id);
+    Statement child_stmt = this->get_statement_by_id(child_id);
+    parent_stmt.add_child(child_id);
+    child_stmt.set_parent(parent_id);
+}

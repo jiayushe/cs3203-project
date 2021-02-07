@@ -109,43 +109,33 @@ void SimpleExtractor::DesignExtractor::extract_follow_relationship_from_stmt_lis
     KnowledgeBase::PKB pkb, std::string proc_name, std::shared_ptr<Parser::SimpleNode> stmt_list) {
     auto stmts = stmt_list->get_children();
     int num_stmt = stmts.size();
-    int prev_stmt_id = -1;
     for (int i = 0; i < num_stmt; i++) {
         std::shared_ptr<Parser::SimpleNode> curr_stmt_node = stmts.at(i);
-        int next_stmt_id = -1;
-        if (i < num_stmt - 1) {
-            std::shared_ptr<Parser::SimpleNode> next_stmt_node = stmts.at(i + 1);
-            next_stmt_id = next_stmt_node->get_statement_id();
-        }
-        extract_follow_relationship_from_stmt(pkb, proc_name, curr_stmt_node, prev_stmt_id,
-                                              next_stmt_id);
-        prev_stmt_id = curr_stmt_node->get_statement_id();
+        int next_stmt_id = i < num_stmt - 1 ? stmts.at(i + 1)->get_statement_id() : -1;
+        extract_follow_relationship_from_stmt(pkb, proc_name, curr_stmt_node, next_stmt_id);
     }
 }
 
 void SimpleExtractor::DesignExtractor::extract_follow_relationship_from_stmt(
     KnowledgeBase::PKB pkb, std::string proc_name, std::shared_ptr<Parser::SimpleNode> stmt,
-    int prev_stmt_id, int next_stmt_id) {
+    int next_stmt_id) {
     KnowledgeBase::Statement curr_stmt = extract_statement(pkb, proc_name, stmt);
-    curr_stmt.set_following(prev_stmt_id);
-    curr_stmt.set_follower(next_stmt_id);
-    // Finish processing current node, start special processing for IF/WHILE/ASSIGN statements
+    pkb.add_follow_relationship(curr_stmt.get_id(), next_stmt_id);
     std::shared_ptr<Parser::SimpleNode> stmt_list;
     switch (curr_stmt.get_type()) {
     case KnowledgeBase::StatementType::WHILE:
-        // Need to process nested statements in WHILE
-        stmt->get_child(1);
+        // Process nested statements in WHILE
+        stmt_list = stmt->get_child(1);
         extract_follow_relationship_from_stmt_list(pkb, proc_name, stmt_list);
         break;
     case KnowledgeBase::StatementType::IF:
-        // Need to process then branch and else branch statements in WHILE
+        // Process then and else branch statements in IF
         stmt_list = stmt->get_child(1);
         extract_follow_relationship_from_stmt_list(pkb, proc_name, stmt_list);
         stmt_list = stmt->get_child(2);
         extract_follow_relationship_from_stmt_list(pkb, proc_name, stmt_list);
         break;
     case KnowledgeBase::StatementType::ASSIGN:
-        // Need to set the pattern of ASSIGN statement for use in PQL pattern matching
         curr_stmt.set_pattern(stmt->get_child(1));
         break;
     default:
