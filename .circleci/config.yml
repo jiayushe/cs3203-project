@@ -17,6 +17,7 @@ jobs:
       - run: 
           name: Build
           command: |
+            set -e
             export PATH="C:\Program Files\CMake\bin:$PATH"
             cd Team00/Code00
             mkdir build
