@@ -2,9 +2,8 @@
 
 using namespace KnowledgeBase;
 
-Statement::Statement(StatementType type, int id, std::string procedure_name,
-                     std::shared_ptr<Parser::SimpleNode> pattern)
-    : type(type), id(id), procedure_name(procedure_name), pattern(pattern), parent(-1),
+Statement::Statement(StatementType type, int id, std::string procedure_name)
+    : type(type), id(id), procedure_name(procedure_name), pattern(nullptr), parent(-1),
       following(-1), follower(-1) {
     children = new std::unordered_set<int>();
     modifies = new std::unordered_set<std::string>();
@@ -44,6 +43,8 @@ void Statement::set_pattern(std::shared_ptr<Parser::SimpleNode> ast_pattern) {
 
 int Statement::get_parent() { return parent; }
 
+void Statement::set_parent(int parent_id) { parent = parent_id; }
+
 std::vector<int> Statement::get_children() {
     if (this->type != StatementType::WHILE && this->type != StatementType::IF) {
         throw "This statement is not of type WHILE or IF";
@@ -53,15 +54,28 @@ std::vector<int> Statement::get_children() {
     return res;
 }
 
+void Statement::add_child(int child_id) { children->insert(child_id); }
+
 int Statement::get_following() { return following; }
 
+void Statement::set_following(int following_id) { following = following_id; }
+
 int Statement::get_follower() { return follower; }
+
+void Statement::set_follower(int follower_id) { follower = follower_id; }
 
 std::string Statement::get_procedure_called() {
     if (this->type != StatementType::CALL) {
         throw "This statement is not of type CALL";
     }
     return procedure_called;
+}
+
+void Statement::set_procedure_called(std::string proc_name) {
+    if (this->type != StatementType::CALL) {
+        throw "This statement is not of type CALL";
+    }
+    procedure_called = proc_name;
 }
 
 std::vector<std::string> Statement::get_modifies() {

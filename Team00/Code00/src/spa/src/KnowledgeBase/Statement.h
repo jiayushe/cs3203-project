@@ -18,8 +18,7 @@ enum class StatementType {
 
 class Statement {
 public:
-    Statement(StatementType type, int id, std::string procedure_name,
-              std::shared_ptr<Parser::SimpleNode> pattern);
+    Statement(StatementType type, int id, std::string procedure_name);
 
     Statement();
 

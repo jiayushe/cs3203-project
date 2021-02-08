@@ -5,11 +5,11 @@
 using namespace SimpleExtractor;
 
 void DesignExtractor::extract_modify_relationship(KnowledgeBase::PKB pkb) {
-    auto ast = pkb.get_ast();
-    assert_node_type(ast, Parser::SimpleNodeType::PROGRAM);
-    KnowledgeBase::Procedure proc = extract_procedure(pkb, ast);
-    auto proc_node = ast->get_child(0);
-    std::shared_ptr<Parser::SimpleNode> stmt_list_node = proc_node->get_child(1);
+    auto ast = assert_node_type(pkb.get_ast(), Parser::SimpleNodeType::PROGRAM);
+    auto proc_node = assert_node_type(ast->get_child(0), Parser::SimpleNodeType::PROCEDURE);
+    KnowledgeBase::Procedure proc = extract_procedure(pkb, proc_node);
+    auto stmt_list_node =
+        assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
     extract_modify_relationship_from_stmt_list(pkb, proc.get_name(), stmt_list_node);
 }
 
@@ -50,7 +50,6 @@ void DesignExtractor::extract_modify_relationship_from_stmt(
         extract_modify_relationship_from_stmt_list(pkb, proc_name, stmt_list);
         break;
     case KnowledgeBase::StatementType::ASSIGN:
-        curr_stmt.set_pattern(stmt->get_child(1));
         extract_modify_relationship_from_assign_stmt(pkb, proc_name, stmt);
         break;
     }
@@ -71,12 +70,21 @@ void DesignExtractor::extract_modify_relationship_from_assign_stmt(
 }
 
 void DesignExtractor::extract_use_relationship(KnowledgeBase::PKB pkb) {
-    auto ast = pkb.get_ast();
-    assert_node_type(ast, Parser::SimpleNodeType::PROGRAM);
-    KnowledgeBase::Procedure proc = extract_procedure(pkb, ast);
-    auto proc_node = ast->get_child(0);
-    std::shared_ptr<Parser::SimpleNode> stmt_list_node = proc_node->get_child(1);
+    auto ast = assert_node_type(pkb.get_ast(), Parser::SimpleNodeType::PROGRAM);
+    auto proc_node = assert_node_type(ast->get_child(0), Parser::SimpleNodeType::PROCEDURE);
+    KnowledgeBase::Procedure proc = extract_procedure(pkb, proc_node);
+    auto stmt_list_node =
+        assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
     extract_use_relationship_from_stmt_list(pkb, proc.get_name(), stmt_list_node);
+}
+
+void DesignExtractor::extract_use_relationship_from_stmt_list(
+    KnowledgeBase::PKB pkb, std::string proc_name, std::shared_ptr<Parser::SimpleNode> stmt_list) {
+    auto stmts = stmt_list->get_children();
+    int num_stmt = stmts.size();
+    for (int i = 0; i < num_stmt; i++) {
+        extract_use_relationship_from_stmt(pkb, proc_name, stmts[i]);
+    }
 }
 
 void DesignExtractor::extract_use_relationship_from_stmt(KnowledgeBase::PKB pkb,
@@ -87,7 +95,6 @@ void DesignExtractor::extract_use_relationship_from_stmt(KnowledgeBase::PKB pkb,
     switch (curr_stmt.get_type()) {
     case KnowledgeBase::StatementType::READ:
         // READ statements do not have use relationship
-        extract_modify_relationship_from_read_stmt(pkb, proc_name, stmt);
         break;
     case KnowledgeBase::StatementType::PRINT:
         extract_use_relationship_from_print_stmt(pkb, proc_name, stmt);
@@ -111,7 +118,6 @@ void DesignExtractor::extract_use_relationship_from_stmt(KnowledgeBase::PKB pkb,
         extract_use_relationship_from_stmt_list(pkb, proc_name, stmt_list);
         break;
     case KnowledgeBase::StatementType::ASSIGN:
-        curr_stmt.set_pattern(stmt->get_child(1));
         extract_use_relationship_from_assign_stmt(pkb, proc_name, stmt);
         break;
     }
@@ -126,8 +132,19 @@ void DesignExtractor::extract_use_relationship_from_print_stmt(
 
 void DesignExtractor::extract_use_relationship_from_assign_stmt(
     KnowledgeBase::PKB pkb, std::string proc_name, std::shared_ptr<Parser::SimpleNode> stmt) {
-    extract_use_relationship_from_arithmetic_or_conditional_stmt(pkb, proc_name,
-                                                                 stmt->get_child(1));
+    auto child_node = stmt->get_child(1);
+    switch (child_node->get_type()) {
+    case Parser::SimpleNodeType::ARITHMETIC:
+        extract_use_relationship_from_arithmetic_or_conditional_stmt(pkb, proc_name, child_node);
+        break;
+    case Parser::SimpleNodeType::VAR_NAME:
+        KnowledgeBase::Variable var = extract_variable(pkb, child_node);
+        pkb.add_use_relationship(stmt->get_statement_id(), var.get_name());
+        break;
+    case Parser::SimpleNodeType::CONST_VALUE:
+        extract_constant(pkb, child_node);
+        break;
+    }
 }
 
 void DesignExtractor::extract_use_relationship_from_arithmetic_or_conditional_stmt(
@@ -143,6 +160,7 @@ void DesignExtractor::extract_use_relationship_from_arithmetic_or_conditional_st
                                                                          child_node);
             break;
         case Parser::SimpleNodeType::CONST_VALUE:
+            extract_constant(pkb, child_node);
             break;
         case Parser::SimpleNodeType::VAR_NAME:
             KnowledgeBase::Variable var = extract_variable(pkb, child_node);
@@ -153,11 +171,11 @@ void DesignExtractor::extract_use_relationship_from_arithmetic_or_conditional_st
 }
 
 void DesignExtractor::extract_follow_relationship(KnowledgeBase::PKB pkb) {
-    std::shared_ptr<Parser::SimpleNode> ast = pkb.get_ast();
-    assert_node_type(ast, Parser::SimpleNodeType::PROGRAM);
-    KnowledgeBase::Procedure proc = extract_procedure(pkb, ast);
-    auto proc_node = ast->get_child(0);
-    std::shared_ptr<Parser::SimpleNode> stmt_list_node = proc_node->get_child(1);
+    auto ast = assert_node_type(pkb.get_ast(), Parser::SimpleNodeType::PROGRAM);
+    auto proc_node = assert_node_type(ast->get_child(0), Parser::SimpleNodeType::PROCEDURE);
+    KnowledgeBase::Procedure proc = extract_procedure(pkb, proc_node);
+    auto stmt_list_node =
+        assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
     extract_follow_relationship_from_stmt_list(pkb, proc.get_name(), stmt_list_node);
 }
 
@@ -191,9 +209,6 @@ void SimpleExtractor::DesignExtractor::extract_follow_relationship_from_stmt(
         stmt_list = stmt->get_child(2);
         extract_follow_relationship_from_stmt_list(pkb, proc_name, stmt_list);
         break;
-    case KnowledgeBase::StatementType::ASSIGN:
-        curr_stmt.set_pattern(stmt->get_child(1));
-        break;
     default:
         break;
     }
@@ -203,8 +218,7 @@ void DesignExtractor::extract_parent_relationship(KnowledgeBase::PKB pkb) {}
 
 KnowledgeBase::Procedure
 DesignExtractor::extract_procedure(KnowledgeBase::PKB pkb,
-                                   std::shared_ptr<Parser::SimpleNode> ast) {
-    auto proc_node = ast->get_child(0);
+                                   std::shared_ptr<Parser::SimpleNode> proc_node) {
     std::string proc_name = proc_node->get_child(0)->get_value();
     return pkb.add_procedure(proc_name);
 }
@@ -215,7 +229,7 @@ DesignExtractor::extract_statement(KnowledgeBase::PKB pkb, std::string proc_name
     int stmt_id = stmt_node->get_statement_id();
     KnowledgeBase::StatementType statement_type =
         convert_node_type_to_stmt_type(stmt_node->get_type());
-    return pkb.add_statement(statement_type, stmt_id, proc_name, nullptr);
+    return pkb.add_statement(statement_type, stmt_id, proc_name, stmt_node);
 }
 
 KnowledgeBase::Variable
@@ -223,6 +237,13 @@ DesignExtractor::extract_variable(KnowledgeBase::PKB pkb,
                                   std::shared_ptr<Parser::SimpleNode> var_node) {
     std::string var_name = var_node->get_value();
     return pkb.add_variable(var_name);
+}
+
+KnowledgeBase::Constant
+DesignExtractor::extract_constant(KnowledgeBase::PKB pkb,
+                                  std::shared_ptr<Parser::SimpleNode> cst_node) {
+    int value = stoi(cst_node->get_value());
+    return pkb.add_constant(value);
 }
 
 KnowledgeBase::StatementType
@@ -245,11 +266,13 @@ DesignExtractor::convert_node_type_to_stmt_type(Parser::SimpleNodeType node_type
     }
 }
 
-void DesignExtractor::assert_node_type(std::shared_ptr<Parser::SimpleNode> node,
-                                       Parser::SimpleNodeType expected_type) {
+std::shared_ptr<Parser::SimpleNode>
+DesignExtractor::assert_node_type(std::shared_ptr<Parser::SimpleNode> node,
+                                  Parser::SimpleNodeType expected_type) {
     Parser::SimpleNodeType actual_type = node->get_type();
     if (actual_type != expected_type) {
         throw "Expected " + to_string(expected_type) + ", but encountered " +
             to_string(actual_type);
     }
+    return node;
 }

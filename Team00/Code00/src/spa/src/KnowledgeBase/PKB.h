@@ -53,6 +53,13 @@ public:
     // Gets the list of all constants.
     std::vector<Constant> get_constants();
 
+    // Gets the constant with the given value.
+    // Throws if the given constant value does not exist.
+    Constant get_constant_by_value(int value);
+
+    // Creates a constant with the given value and adds it to the table.
+    Constant add_constant(int value);
+
     // Adds a modify relationship between a statement id and a variable name.
     void add_modify_relationship(int stmt_id, std::string var_name);
 
@@ -74,7 +81,7 @@ private:
     std::unordered_map<int, Statement>* statements;
     // Variable table which maps variable names to variables
     std::unordered_map<std::string, Variable>* variables;
-    // Constant table which maps ids to constants
+    // Constant table which maps values to constants
     std::unordered_map<int, Constant>* constants;
 };
 

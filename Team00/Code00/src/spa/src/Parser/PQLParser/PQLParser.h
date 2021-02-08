@@ -5,9 +5,9 @@
 #include "Parser/shared/Token.h"
 #include "Parser/shared/TokenList.h"
 #include "QueryObject.h"
+#include <functional>
 #include <map>
 #include <vector>
-#include <functional>
 
 namespace Parser {
 class PQLParser : public BaseParser {

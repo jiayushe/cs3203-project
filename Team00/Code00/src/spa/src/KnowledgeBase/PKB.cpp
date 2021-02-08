@@ -59,13 +59,21 @@ Statement PKB::get_statement_by_id(int id) {
 }
 
 Statement PKB::add_statement(StatementType type, int id, std::string procedure_name,
-                             std::shared_ptr<Parser::SimpleNode> pattern) {
+                             std::shared_ptr<Parser::SimpleNode> stmt_node) {
     std::unordered_map<int, Statement>::const_iterator it = statements->find(id);
     if (it != statements->end()) {
         return it->second;
     }
-    Statement stmt(type, id, procedure_name, pattern);
+    Statement stmt(type, id, procedure_name);
     statements->insert({id, stmt});
+    switch (type) {
+    case KnowledgeBase::StatementType::ASSIGN:
+        stmt.set_pattern(stmt_node->get_child(1));
+        break;
+    case KnowledgeBase::StatementType::CALL:
+        stmt.set_procedure_called(stmt_node->get_child(0)->get_value());
+        break;
+    }
     return stmt;
 }
 
@@ -100,6 +108,23 @@ std::vector<Constant> PKB::get_constants() {
         res.push_back(kv.second);
     }
     return res;
+}
+
+Constant PKB::get_constant_by_value(int value) {
+    if (constants->find(value) == constants->end()) {
+        throw "Constant " + std::to_string(value) + " does not exist";
+    }
+    return constants->at(value);
+}
+
+Constant PKB::add_constant(int value) {
+    std::unordered_map<int, Constant>::const_iterator it = constants->find(value);
+    if (it != constants->end()) {
+        return it->second;
+    }
+    Constant cst(value);
+    constants->insert({value, cst});
+    return cst;
 }
 
 void PKB::add_modify_relationship(int stmt_id, std::string var_name) {
