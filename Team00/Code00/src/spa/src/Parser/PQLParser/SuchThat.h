@@ -15,16 +15,14 @@ enum class SuchThatType {
 
 class SuchThat {
 public:
-    SuchThatType get_type();
-    Ref get_left_ref();
-    Ref get_right_ref();
+    SuchThatType get_type() const;
+    Ref get_left_ref() const;
+    Ref get_right_ref() const;
 
     SuchThat();
 
     void set_type(SuchThatType type);
-
     void set_left_ref(const Ref& left_ref);
-
     void set_right_ref(const Ref& right_ref);
 
 private:

@@ -12,16 +12,14 @@ enum class StatementRefType {
 
 class StatementRef {
 public:
-    StatementRefType get_type();
-    std::string get_synonym();
-    int get_statement_id();
+    StatementRefType get_type() const;
+    std::string get_synonym() const;
+    int get_statement_id() const;
 
     StatementRef();
 
     void set_type(StatementRefType statement_ref_type);
-
     void set_synonym(const std::string& synonym);
-
     void set_statement_id(int statement_id);
 
 private:

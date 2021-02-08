@@ -13,10 +13,7 @@ AbstractWrapper* WrapperFactory::createWrapper() {
 volatile bool AbstractWrapper::GlobalStop = false;
 
 // a default constructor
-TestWrapper::TestWrapper() {
-    // create any objects here as instance variables of this class
-    // as well as any initialization required for your spa program
-}
+TestWrapper::TestWrapper() {}
 
 // method for parsing the SIMPLE source
 void TestWrapper::parse(std::string filename) {
@@ -39,18 +36,16 @@ void TestWrapper::parse(std::string filename) {
 
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
-    // call your evaluator to evaluate the query here
-    // ...code to evaluate query...
-
-    // store the answers to the query in the results list (it is initially empty)
-    // each result must be a string.
     try {
         std::cout << "Query string: " << query << std::endl;
         Parser::StringLexer lexer(query);
         Parser::PQLParser parser(lexer);
         auto query_object = parser.parse_query();
 
-        // TODO: QE code...
+        QueryEvaluator::BruteForceEvaluator::evaluate(pkb, query_object, results);
+    } catch (char const* message) {
+        std::cout << "Error: " << message << std::endl;
+        throw message;
     } catch (const std::string& message) {
         std::cout << "Error: " << message << std::endl;
         throw message;

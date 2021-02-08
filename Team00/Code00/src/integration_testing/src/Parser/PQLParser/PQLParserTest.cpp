@@ -31,18 +31,17 @@ TEST_CASE("Parser::PQLParser") {
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
-            std::unordered_map<std::string, DesignEntity> declarations =
-                query_object->get_declarations();
+            auto declarations = query_object.get_declarations();
             REQUIRE(declarations.size() == 1);
-            REQUIRE(declarations.find("s") != declarations.end());
-            REQUIRE(declarations["s"].get_synonym() == "s");
-            REQUIRE(declarations["s"].get_type() == design_entity_map[op]);
+            REQUIRE(declarations.has("s"));
+            REQUIRE(declarations.get("s").get_synonym() == "s");
+            REQUIRE(declarations.get("s").get_type() == design_entity_map[op]);
 
-            std::string selection = query_object->get_selection();
+            std::string selection = query_object.get_selection();
             REQUIRE(selection == "s");
 
-            bool has_such_that_cl = query_object->has_such_that();
-            bool has_pattern_cl = query_object->has_pattern();
+            bool has_such_that_cl = query_object.has_such_that();
+            bool has_pattern_cl = query_object.has_pattern();
             REQUIRE_FALSE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
         }
@@ -53,24 +52,23 @@ TEST_CASE("Parser::PQLParser") {
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
-            std::unordered_map<std::string, DesignEntity> declarations =
-                query_object->get_declarations();
+            auto declarations = query_object.get_declarations();
             REQUIRE(declarations.size() == 3);
-            REQUIRE(declarations.find("s") != declarations.end());
-            REQUIRE(declarations.find("u") != declarations.end());
-            REQUIRE(declarations.find("v") != declarations.end());
-            REQUIRE(declarations["s"].get_synonym() == "s");
-            REQUIRE(declarations["u"].get_synonym() == "u");
-            REQUIRE(declarations["v"].get_synonym() == "v");
-            REQUIRE(declarations["s"].get_type() == DesignEntityType::STMT);
-            REQUIRE(declarations["u"].get_type() == DesignEntityType::STMT);
-            REQUIRE(declarations["v"].get_type() == DesignEntityType::STMT);
+            REQUIRE(declarations.has("s"));
+            REQUIRE(declarations.has("u"));
+            REQUIRE(declarations.has("v"));
+            REQUIRE(declarations.get("s").get_synonym() == "s");
+            REQUIRE(declarations.get("u").get_synonym() == "u");
+            REQUIRE(declarations.get("v").get_synonym() == "v");
+            REQUIRE(declarations.get("s").get_type() == DesignEntityType::STMT);
+            REQUIRE(declarations.get("u").get_type() == DesignEntityType::STMT);
+            REQUIRE(declarations.get("v").get_type() == DesignEntityType::STMT);
 
-            std::string selection = query_object->get_selection();
+            std::string selection = query_object.get_selection();
             REQUIRE(selection == "s");
 
-            bool has_such_that_cl = query_object->has_such_that();
-            bool has_pattern_cl = query_object->has_pattern();
+            bool has_such_that_cl = query_object.has_such_that();
+            bool has_pattern_cl = query_object.has_pattern();
             REQUIRE_FALSE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
         }
@@ -81,24 +79,23 @@ TEST_CASE("Parser::PQLParser") {
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
-            std::unordered_map<std::string, DesignEntity> declarations =
-                query_object->get_declarations();
+            auto declarations = query_object.get_declarations();
             REQUIRE(declarations.size() == 3);
-            REQUIRE(declarations.find("s") != declarations.end());
-            REQUIRE(declarations.find("ifs") != declarations.end());
-            REQUIRE(declarations.find("w") != declarations.end());
-            REQUIRE(declarations["s"].get_synonym() == "s");
-            REQUIRE(declarations["ifs"].get_synonym() == "ifs");
-            REQUIRE(declarations["w"].get_synonym() == "w");
-            REQUIRE(declarations["s"].get_type() == DesignEntityType::STMT);
-            REQUIRE(declarations["ifs"].get_type() == DesignEntityType::IF);
-            REQUIRE(declarations["w"].get_type() == DesignEntityType::WHILE);
+            REQUIRE(declarations.has("s"));
+            REQUIRE(declarations.has("ifs"));
+            REQUIRE(declarations.has("w"));
+            REQUIRE(declarations.get("s").get_synonym() == "s");
+            REQUIRE(declarations.get("ifs").get_synonym() == "ifs");
+            REQUIRE(declarations.get("w").get_synonym() == "w");
+            REQUIRE(declarations.get("s").get_type() == DesignEntityType::STMT);
+            REQUIRE(declarations.get("ifs").get_type() == DesignEntityType::IF);
+            REQUIRE(declarations.get("w").get_type() == DesignEntityType::WHILE);
 
-            std::string selection = query_object->get_selection();
+            std::string selection = query_object.get_selection();
             REQUIRE(selection == "w");
 
-            bool has_such_that_cl = query_object->has_such_that();
-            bool has_pattern_cl = query_object->has_pattern();
+            bool has_such_that_cl = query_object.has_such_that();
+            bool has_pattern_cl = query_object.has_pattern();
             REQUIRE_FALSE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
         }
@@ -109,28 +106,27 @@ TEST_CASE("Parser::PQLParser") {
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
-            std::unordered_map<std::string, DesignEntity> declarations =
-                query_object->get_declarations();
+            auto declarations = query_object.get_declarations();
             REQUIRE(declarations.size() == 6);
 
             std::string var[] = {"s", "u", "v", "ifs", "var1", "var2"};
             for (const std::string& text : var) {
-                REQUIRE(declarations.find(text) != declarations.end());
-                REQUIRE(declarations[text].get_synonym() == text);
+                REQUIRE(declarations.has(text));
+                REQUIRE(declarations.get(text).get_synonym() == text);
             }
 
-            REQUIRE(declarations["s"].get_type() == DesignEntityType::STMT);
-            REQUIRE(declarations["u"].get_type() == DesignEntityType::STMT);
-            REQUIRE(declarations["v"].get_type() == DesignEntityType::STMT);
-            REQUIRE(declarations["ifs"].get_type() == DesignEntityType::IF);
-            REQUIRE(declarations["var1"].get_type() == DesignEntityType::VARIABLE);
-            REQUIRE(declarations["var2"].get_type() == DesignEntityType::VARIABLE);
+            REQUIRE(declarations.get("s").get_type() == DesignEntityType::STMT);
+            REQUIRE(declarations.get("u").get_type() == DesignEntityType::STMT);
+            REQUIRE(declarations.get("v").get_type() == DesignEntityType::STMT);
+            REQUIRE(declarations.get("ifs").get_type() == DesignEntityType::IF);
+            REQUIRE(declarations.get("var1").get_type() == DesignEntityType::VARIABLE);
+            REQUIRE(declarations.get("var2").get_type() == DesignEntityType::VARIABLE);
 
-            std::string selection = query_object->get_selection();
+            std::string selection = query_object.get_selection();
             REQUIRE(selection == "var1");
 
-            bool has_such_that_cl = query_object->has_such_that();
-            bool has_pattern_cl = query_object->has_pattern();
+            bool has_such_that_cl = query_object.has_such_that();
+            bool has_pattern_cl = query_object.has_pattern();
             REQUIRE_FALSE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
         }
@@ -151,20 +147,19 @@ TEST_CASE("Parser::PQLParser") {
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
-            std::unordered_map<std::string, DesignEntity> declarations =
-                query_object->get_declarations();
+            auto declarations = query_object.get_declarations();
             REQUIRE(declarations.size() == 1);
-            REQUIRE(declarations.find("w") != declarations.end());
+            REQUIRE(declarations.has("w"));
 
-            std::string selection = query_object->get_selection();
+            std::string selection = query_object.get_selection();
             REQUIRE(selection == "w");
 
-            bool has_such_that_cl = query_object->has_such_that();
-            bool has_pattern_cl = query_object->has_pattern();
+            bool has_such_that_cl = query_object.has_such_that();
+            bool has_pattern_cl = query_object.has_pattern();
             REQUIRE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
 
-            SuchThat such_that_obj = query_object->get_such_that();
+            SuchThat such_that_obj = query_object.get_such_that();
             REQUIRE(such_that_obj.get_type() == such_that_map[op]);
 
             Ref left_ref = such_that_obj.get_left_ref();
@@ -188,20 +183,19 @@ TEST_CASE("Parser::PQLParser") {
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
-            std::unordered_map<std::string, DesignEntity> declarations =
-                query_object->get_declarations();
+            auto declarations = query_object.get_declarations();
             REQUIRE(declarations.size() == 1);
-            REQUIRE(declarations.find("s") != declarations.end());
+            REQUIRE(declarations.has("s"));
 
-            std::string selection = query_object->get_selection();
+            std::string selection = query_object.get_selection();
             REQUIRE(selection == "s");
 
-            bool has_such_that_cl = query_object->has_such_that();
-            bool has_pattern_cl = query_object->has_pattern();
+            bool has_such_that_cl = query_object.has_such_that();
+            bool has_pattern_cl = query_object.has_pattern();
             REQUIRE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
 
-            SuchThat such_that_obj = query_object->get_such_that();
+            SuchThat such_that_obj = query_object.get_such_that();
             REQUIRE(such_that_obj.get_type() == such_that_map[op]);
 
             Ref left_ref = such_that_obj.get_left_ref();
@@ -231,9 +225,9 @@ TEST_CASE("Parser::PQLParser") {
             auto query_object_2 = parser_2.parse_query();
             auto query_object_3 = parser_3.parse_query();
 
-            SuchThat such_that_obj_1 = query_object_1->get_such_that();
-            SuchThat such_that_obj_2 = query_object_2->get_such_that();
-            SuchThat such_that_obj_3 = query_object_3->get_such_that();
+            SuchThat such_that_obj_1 = query_object_1.get_such_that();
+            SuchThat such_that_obj_2 = query_object_2.get_such_that();
+            SuchThat such_that_obj_3 = query_object_3.get_such_that();
             Ref left_ref_1 = such_that_obj_1.get_left_ref();
             Ref right_ref_1 = such_that_obj_1.get_right_ref();
             Ref left_ref_2 = such_that_obj_2.get_left_ref();
@@ -272,20 +266,19 @@ TEST_CASE("Parser::PQLParser") {
             Parser::StringLexer factor_lexer("x+1");
             auto pattern_node = SimpleParser(factor_lexer).parse_expr();
 
-            std::unordered_map<std::string, DesignEntity> declarations =
-                query_object->get_declarations();
+            auto declarations = query_object.get_declarations();
             REQUIRE(declarations.size() == 1);
-            REQUIRE(declarations.find("a") != declarations.end());
+            REQUIRE(declarations.has("a"));
 
-            std::string selection = query_object->get_selection();
+            std::string selection = query_object.get_selection();
             REQUIRE(selection == "a");
 
-            bool has_such_that_cl = query_object->has_such_that();
-            bool has_pattern_cl = query_object->has_pattern();
+            bool has_such_that_cl = query_object.has_such_that();
+            bool has_pattern_cl = query_object.has_pattern();
             REQUIRE_FALSE(has_such_that_cl);
             REQUIRE(has_pattern_cl);
 
-            Pattern pattern_obj = query_object->get_pattern();
+            Pattern pattern_obj = query_object.get_pattern();
             std::string assigned_synonym = pattern_obj.get_assigned_synonym();
             REQUIRE(assigned_synonym == "a");
 
@@ -301,7 +294,7 @@ TEST_CASE("Parser::PQLParser") {
             Parser::StringLexer lexer(query);
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
-            Pattern pattern_obj = query_object->get_pattern();
+            Pattern pattern_obj = query_object.get_pattern();
             ExpressionSpec expression_spec = pattern_obj.get_expression_spec();
             REQUIRE(expression_spec.get_type() == ExpressionSpecType::ANY);
         }
@@ -317,25 +310,24 @@ TEST_CASE("Parser::PQLParser") {
         Parser::StringLexer factor_lexer("z");
         auto pattern_node = SimpleParser(factor_lexer.tokens()).parse_expr();
 
-        std::unordered_map<std::string, DesignEntity> declarations =
-            query_object->get_declarations();
+        auto declarations = query_object.get_declarations();
         REQUIRE(declarations.size() == 3);
-        REQUIRE(declarations.find("v") != declarations.end());
-        REQUIRE(declarations.find("a") != declarations.end());
-        REQUIRE(declarations.find("w") != declarations.end());
-        REQUIRE(declarations["v"].get_type() == DesignEntityType::VARIABLE);
-        REQUIRE(declarations["a"].get_type() == DesignEntityType::ASSIGN);
-        REQUIRE(declarations["w"].get_type() == DesignEntityType::WHILE);
+        REQUIRE(declarations.has("v"));
+        REQUIRE(declarations.has("a"));
+        REQUIRE(declarations.has("w"));
+        REQUIRE(declarations.get("v").get_type() == DesignEntityType::VARIABLE);
+        REQUIRE(declarations.get("a").get_type() == DesignEntityType::ASSIGN);
+        REQUIRE(declarations.get("w").get_type() == DesignEntityType::WHILE);
 
-        std::string selection = query_object->get_selection();
+        std::string selection = query_object.get_selection();
         REQUIRE(selection == "w");
 
-        bool has_such_that_cl = query_object->has_such_that();
-        bool has_pattern_cl = query_object->has_pattern();
+        bool has_such_that_cl = query_object.has_such_that();
+        bool has_pattern_cl = query_object.has_pattern();
         REQUIRE(has_such_that_cl);
         REQUIRE(has_pattern_cl);
 
-        SuchThat such_that_obj = query_object->get_such_that();
+        SuchThat such_that_obj = query_object.get_such_that();
         REQUIRE(such_that_obj.get_type() == SuchThatType::USES_S);
 
         Ref left_ref = such_that_obj.get_left_ref();
@@ -350,7 +342,7 @@ TEST_CASE("Parser::PQLParser") {
         REQUIRE(right_entity_ref.get_type() == EntityRefType::SYNONYM);
         REQUIRE(right_entity_ref.get_synonym() == "v");
 
-        Pattern pattern_obj = query_object->get_pattern();
+        Pattern pattern_obj = query_object.get_pattern();
         std::string assigned_synonym = pattern_obj.get_assigned_synonym();
         REQUIRE(assigned_synonym == "a");
 

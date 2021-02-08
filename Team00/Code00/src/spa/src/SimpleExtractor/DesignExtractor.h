@@ -25,15 +25,15 @@ public:
 private:
     static void extract_modify_relationship_from_stmt_list(KnowledgeBase::PKB pkb,
                                                            std::string proc_name,
-                                                           SimpleParser::Node* stmt_list);
+                                                           Parser::SimpleNode* stmt_list);
     static void extract_modify_relationship_from_stmt(KnowledgeBase::PKB pkb, std::string proc_name,
-                                                      SimpleParser::Node* stmt);
+                                                      Parser::SimpleNode* stmt);
     static void extract_modify_relationship_from_read_stmt(KnowledgeBase::PKB pkb,
                                                            std::string proc_name,
-                                                           SimpleParser::Node* stmt);
+                                                           Parser::SimpleNode* stmt);
     static void extract_modify_relationship_from_assign_stmt(KnowledgeBase::PKB pkb,
                                                              std::string proc_name,
-                                                             SimpleParser::Node* stmt);
+                                                             Parser::SimpleNode* stmt);
 };
 
 } // namespace SimpleExtractor

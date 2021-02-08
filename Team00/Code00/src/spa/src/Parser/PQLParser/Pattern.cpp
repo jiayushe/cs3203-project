@@ -15,8 +15,8 @@ void Pattern::set_expression_spec(const ExpressionSpec& new_expression_spec) {
     expression_spec = new_expression_spec;
 }
 
-std::string Pattern::get_assigned_synonym() { return assigned_synonym; }
+std::string Pattern::get_assigned_synonym() const { return assigned_synonym; }
 
-EntityRef Pattern::get_entity_ref() { return entity_ref; }
+EntityRef Pattern::get_entity_ref() const { return entity_ref; }
 
-ExpressionSpec Pattern::get_expression_spec() { return expression_spec; }
+ExpressionSpec Pattern::get_expression_spec() const { return expression_spec; }

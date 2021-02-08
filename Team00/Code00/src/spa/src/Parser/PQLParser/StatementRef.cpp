@@ -11,20 +11,18 @@ void StatementRef::set_synonym(const std::string& new_synonym) { synonym = new_s
 
 void StatementRef::set_statement_id(int new_statement_id) { statement_id = new_statement_id; }
 
-StatementRefType StatementRef::get_type() { return type; }
+StatementRefType StatementRef::get_type() const { return type; }
 
-std::string StatementRef::get_synonym() {
+std::string StatementRef::get_synonym() const {
     if (type != StatementRefType::SYNONYM) {
         throw "StatementRefType is not SYNONYM type";
     }
-
     return synonym;
 }
 
-int StatementRef::get_statement_id() {
+int StatementRef::get_statement_id() const {
     if (type != StatementRefType::STATEMENT_ID) {
         throw "StatementRefType is not STATEMENT_ID type";
     }
-
     return statement_id;
 }

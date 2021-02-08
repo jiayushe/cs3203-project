@@ -12,14 +12,13 @@ enum class ExpressionSpecType {
 
 class ExpressionSpec {
 public:
-    ExpressionSpecType get_type();
-    std::shared_ptr<Parser::SimpleNode> get_pattern();
+    ExpressionSpecType get_type() const;
+    std::shared_ptr<Parser::SimpleNode> get_pattern() const;
 
     ExpressionSpec();
 
-    void set_pattern(std::shared_ptr<Parser::SimpleNode> pattern);
-
     void set_type(ExpressionSpecType expression_spec_type);
+    void set_pattern(std::shared_ptr<Parser::SimpleNode> pattern);
 
 private:
     ExpressionSpecType type;

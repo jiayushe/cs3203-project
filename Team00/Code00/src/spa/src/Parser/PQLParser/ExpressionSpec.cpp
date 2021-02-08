@@ -12,12 +12,11 @@ void ExpressionSpec::set_pattern(std::shared_ptr<Parser::SimpleNode> new_pattern
     pattern = new_pattern;
 }
 
-ExpressionSpecType ExpressionSpec::get_type() { return type; }
+ExpressionSpecType ExpressionSpec::get_type() const { return type; }
 
-std::shared_ptr<Parser::SimpleNode> ExpressionSpec::get_pattern() {
+std::shared_ptr<Parser::SimpleNode> ExpressionSpec::get_pattern() const {
     if (type != ExpressionSpecType::PATTERN) {
         throw "ExpressionSpecType is not PATTERN type";
     }
-
     return pattern;
 }

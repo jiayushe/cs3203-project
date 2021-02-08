@@ -18,7 +18,7 @@ enum class StatementType {
 
 class Statement {
 public:
-    Statement(StatementType type, int id, std::string procedure_name, SimpleParser::Node* pattern);
+    Statement(StatementType type, int id, std::string procedure_name, Parser::SimpleNode* pattern);
 
     Statement();
 
@@ -35,7 +35,7 @@ public:
 
     // Gets the AST node of this statement.
     // Throws unless its type is ASSIGN.
-    SimpleParser::Node* get_pattern();
+    Parser::SimpleNode* get_pattern();
 
     // Gets the id of the parent statement.
     // Returns -1 if it has no parent statement.
@@ -89,7 +89,7 @@ private:
     StatementType type;
     int id;
     std::string procedure_name;
-    SimpleParser::Node* pattern;
+    Parser::SimpleNode* pattern;
     int parent;
     std::unordered_set<int> children;
     int following;

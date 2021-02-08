@@ -6,8 +6,7 @@
 
 using namespace Parser;
 
-PQLParser::PQLParser(BaseLexer& lexer)
-    : BaseParser(lexer.tokens()), query_object(std::make_shared<QueryObject>()) {}
+PQLParser::PQLParser(BaseLexer& lexer) : BaseParser(lexer.tokens()) {}
 
 void PQLParser::process_declaration() {
     choice({[&]() {
@@ -52,21 +51,22 @@ void PQLParser::process_declaration() {
 void PQLParser::process_declaration_synonym(DesignEntityType design_entity_type) {
     auto token = expect_name("synonym");
     DesignEntity design_entity(design_entity_type, token->get_value());
-    query_object->add_declaration(token->get_value(), design_entity);
+    query_object.add_declaration(token->get_value(), design_entity);
 
     repeat([&]() {
         expect_token(TokenType::COMMA);
         token = expect_name("synonym");
         DesignEntity design_entity(design_entity_type, token->get_value());
-        query_object->add_declaration(token->get_value(), design_entity);
+        query_object.add_declaration(token->get_value(), design_entity);
     });
+
     expect_token(TokenType::SEMICOLON);
 }
 
 void PQLParser::process_selection() {
     expect_word("Select");
     auto token = expect_name("select_synonym");
-    query_object->set_selection(token->get_value());
+    query_object.set_selection(token->get_value());
 
     choice({[&]() {
                 process_such_that_cl();
@@ -93,6 +93,7 @@ void PQLParser::process_such_that_cl() {
                 process_such_that_body(SuchThatType::PARENT);
             },
             [&]() {
+                // FIXME: Splitting below into expect_word + expect_token is buggy
                 expect_word("Parent");
                 expect_token(TokenType::ASTERISK);
                 process_such_that_body(SuchThatType::PARENT_T);
@@ -102,6 +103,7 @@ void PQLParser::process_such_that_cl() {
                 process_such_that_body(SuchThatType::FOLLOWS);
             },
             [&]() {
+                // FIXME: Splitting below into expect_word + expect_token is buggy
                 expect_word("Follows");
                 expect_token(TokenType::ASTERISK);
                 process_such_that_body(SuchThatType::FOLLOWS_T);
@@ -115,40 +117,41 @@ void PQLParser::process_such_that_body(SuchThatType such_that_type) {
 
     such_that_obj.set_type(such_that_type);
     expect_token(TokenType::LPAREN);
-    StatementRef left_statement_ref = process_statement_ref();
+    auto left_statement_ref = process_statement_ref();
     such_that_obj.set_left_ref(Ref(left_statement_ref));
     expect_token(TokenType::COMMA);
 
     if (such_that_type == SuchThatType::MODIFIES_S || such_that_type == SuchThatType::USES_S) {
-        EntityRef entity_ref = process_entity_ref();
-        such_that_obj.set_right_ref(Ref(entity_ref));
+        auto right_entity_ref = process_entity_ref();
+        such_that_obj.set_right_ref(Ref(right_entity_ref));
     } else {
-        StatementRef right_statement_ref = process_statement_ref();
+        auto right_statement_ref = process_statement_ref();
         such_that_obj.set_right_ref(Ref(right_statement_ref));
     }
 
     expect_token(TokenType::RPAREN);
-    query_object->set_such_that(such_that_obj);
-    query_object->set_has_such_that(true);
+    query_object.set_such_that(such_that_obj);
+    query_object.set_has_such_that(true);
 }
 
 void PQLParser::process_pattern_cl() {
     Pattern pattern_obj;
+
     expect_word("pattern");
 
     auto token = expect_name("pattern_synonym");
     pattern_obj.set_assigned_synonym(token->get_value());
 
     expect_token(TokenType::LPAREN);
-    EntityRef entity_ref = process_entity_ref();
+    auto entity_ref = process_entity_ref();
     expect_token(TokenType::COMMA);
-    ExpressionSpec expression_spec = process_expression_spec();
+    auto expression_spec = process_expression_spec();
     expect_token(TokenType::RPAREN);
     pattern_obj.set_entity_ref(entity_ref);
     pattern_obj.set_expression_spec(expression_spec);
 
-    query_object->set_pattern(pattern_obj);
-    query_object->set_has_pattern(true);
+    query_object.set_pattern(pattern_obj);
+    query_object.set_has_pattern(true);
 }
 
 StatementRef PQLParser::process_statement_ref() {
@@ -173,6 +176,7 @@ StatementRef PQLParser::process_statement_ref() {
                 statement_ref.set_type(StatementRefType::STATEMENT_ID);
             }},
            "Invalid statement ref format");
+
     return statement_ref;
 }
 
@@ -200,12 +204,14 @@ EntityRef PQLParser::process_entity_ref() {
                 entity_ref.set_type(EntityRefType::NAME);
             }},
            "Invalid entity ref format");
+
     return entity_ref;
 }
 
 // Parse pattern type second parameter: ExpressionSpec
 ExpressionSpec PQLParser::process_expression_spec() {
     ExpressionSpec expression_spec;
+
     choice({// expSpec: _" factor "_
             [&]() {
                 expect_token(TokenType::UNDERSCORE);
@@ -221,6 +227,7 @@ ExpressionSpec PQLParser::process_expression_spec() {
                 expression_spec.set_type(ExpressionSpecType::ANY);
             }},
            "Invalid expression spec format");
+
     return expression_spec;
 }
 
@@ -237,7 +244,6 @@ void PQLParser::choice(const std::vector<std::function<void()>>& parse_funcs,
             tokens->reset_pos(saved_pos);
         }
     }
-
     throw error_message;
 }
 
@@ -255,13 +261,13 @@ void PQLParser::repeat(const std::function<void()>& parse_func) {
 }
 
 // Parse token string and store it as a QueryObject
-std::shared_ptr<QueryObject> PQLParser::parse_query() {
+QueryObject PQLParser::parse_query() {
     repeat({[&]() { process_declaration(); }});
     process_selection();
     expect_token(TokenType::END);
 
     // print for checking purposes
-    query_object->to_string();
+    query_object.to_string();
 
     return query_object;
 }

@@ -6,9 +6,9 @@
 namespace Parser {
 class Pattern {
 public:
-    std::string get_assigned_synonym();
-    EntityRef get_entity_ref();
-    ExpressionSpec get_expression_spec();
+    std::string get_assigned_synonym() const;
+    EntityRef get_entity_ref() const;
+    ExpressionSpec get_expression_spec() const;
 
     Pattern();
 

@@ -1,5 +1,4 @@
 #include "QueryObject.h"
-#include "DesignEntity.h"
 #include <iostream>
 #include <string>
 
@@ -7,31 +6,22 @@ using namespace Parser;
 
 QueryObject::QueryObject() : has_such_that_cl(false), has_pattern_cl(false) {}
 
-std::unordered_map<std::string, DesignEntity> QueryObject::get_declarations() {
-    return declarations;
-}
+DeclarationMap QueryObject::get_declarations() const { return declarations; }
 
-void QueryObject::add_declaration(const std::string& synonym, const DesignEntity& design_entity) {
-    if (declarations.find(synonym) != declarations.end()) {
-        throw "Synonym has been defined";
-    }
-    declarations[synonym] = design_entity;
-}
+std::string QueryObject::get_selection() const { return selection; }
 
-std::string QueryObject::get_selection() { return selection; }
+bool QueryObject::has_such_that() const { return has_such_that_cl; }
 
-bool QueryObject::has_such_that() { return has_such_that_cl; }
+bool QueryObject::has_pattern() const { return has_pattern_cl; }
 
-bool QueryObject::has_pattern() { return has_pattern_cl; }
-
-SuchThat QueryObject::get_such_that() {
+SuchThat QueryObject::get_such_that() const {
     if (!has_such_that_cl) {
         throw "Query object doesn't have a such that clause";
     }
     return such_that_obj;
 }
 
-Pattern QueryObject::get_pattern() {
+Pattern QueryObject::get_pattern() const {
     if (!has_pattern_cl) {
         throw "Query object doesn't have a pattern clause";
     }
@@ -39,6 +29,10 @@ Pattern QueryObject::get_pattern() {
 }
 
 void QueryObject::set_selection(const std::string& new_selection) { selection = new_selection; }
+
+void QueryObject::add_declaration(const std::string& synonym, const DesignEntity& design_entity) {
+    declarations.add(synonym, design_entity);
+}
 
 void QueryObject::set_has_such_that(bool new_has_such_that) {
     has_such_that_cl = new_has_such_that;

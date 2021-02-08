@@ -1,9 +1,9 @@
 #pragma once
 
+#include "DeclarationMap.h"
 #include "DesignEntity.h"
 #include "Pattern.h"
 #include "SuchThat.h"
-#include <unordered_map>
 
 namespace Parser {
 // AST node for the SIMPLE language.
@@ -11,23 +11,19 @@ class QueryObject {
 public:
     QueryObject();
 
-    // Function
-    void add_declaration(const std::string& synonym, const DesignEntity& design_entity);
-
     // getters
-    std::unordered_map<std::string, DesignEntity> get_declarations();
-    bool has_such_that();
-    bool has_pattern();
-
-    std::string get_selection();
-    SuchThat get_such_that();
-    Pattern get_pattern();
+    std::string get_selection() const;
+    DeclarationMap get_declarations() const;
+    bool has_such_that() const;
+    bool has_pattern() const;
+    SuchThat get_such_that() const;
+    Pattern get_pattern() const;
 
     // setters
     void set_selection(const std::string& selection);
+    void add_declaration(const std::string& synonym, const DesignEntity& design_entity);
     void set_has_such_that(bool has_such_that);
     void set_has_pattern(bool has_pattern);
-
     void set_such_that(const SuchThat& such_that_cl);
     void set_pattern(const Pattern& pattern_cl);
 
@@ -35,7 +31,7 @@ public:
     void to_string();
 
 private:
-    std::unordered_map<std::string, DesignEntity> declarations;
+    DeclarationMap declarations;
     std::string selection;
 
     bool has_such_that_cl;

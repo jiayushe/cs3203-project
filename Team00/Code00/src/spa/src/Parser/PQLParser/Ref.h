@@ -12,15 +12,13 @@ enum class RefType {
 
 class Ref {
 public:
-    RefType get_type();
-    EntityRef get_entity_ref();
-    StatementRef get_statement_ref();
+    RefType get_type() const;
+    EntityRef get_entity_ref() const;
+    StatementRef get_statement_ref() const;
 
     Ref();
-
-    explicit Ref(const EntityRef& entity_ref);
-
-    explicit Ref(const StatementRef& statement_ref);
+    explicit Ref(EntityRef entity_ref);
+    explicit Ref(StatementRef statement_ref);
 
 private:
     RefType type;

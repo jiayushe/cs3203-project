@@ -12,16 +12,14 @@ enum class EntityRefType {
 
 class EntityRef {
 public:
-    EntityRefType get_type();
-    std::string get_synonym();
-    std::string get_name();
+    EntityRefType get_type() const;
+    std::string get_synonym() const;
+    std::string get_name() const;
 
     EntityRef();
 
     void set_type(EntityRefType entityRefType);
-
     void set_synonym(const std::string& synonym);
-
     void set_name(const std::string& name);
 
 private:

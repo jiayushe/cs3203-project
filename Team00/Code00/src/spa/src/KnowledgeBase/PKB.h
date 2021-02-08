@@ -11,12 +11,12 @@ namespace KnowledgeBase {
 
 class PKB {
 public:
-    PKB(SimpleParser::Node* ast);
+    PKB(Parser::SimpleNode* ast);
 
     ~PKB();
 
     // Gets the base AST.
-    SimpleParser::Node* get_ast();
+    Parser::SimpleNode* get_ast();
 
     // Gets the list of all procedures.
     std::vector<Procedure> get_procedures();
@@ -37,7 +37,7 @@ public:
 
     // Creates a statement with the given id and adds it to the table.
     Statement add_statement(StatementType type, int id, std::string procedure_name,
-                            SimpleParser::Node* pattern);
+                            Parser::SimpleNode* pattern);
 
     // Gets the list of all variables.
     std::vector<Variable> get_variables();
@@ -63,7 +63,7 @@ public:
 
 private:
     // Base AST
-    SimpleParser::Node* ast;
+    Parser::SimpleNode* ast;
     // Procedure table which maps procedure names to procedures
     std::unordered_map<std::string, Procedure> procedures;
     // Statement table which maps statement ids to statements
