@@ -20,15 +20,16 @@ ConstraintUtils::get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
             // TODO: Implement this
             break;
         case Parser::SuchThatType::PARENT:
-            // TODO: Implement this
+            constraints.push_back(std::make_shared<ParentConstraint>(
+                pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
         case Parser::SuchThatType::PARENT_T:
             // TODO: Implement this
             break;
         case Parser::SuchThatType::FOLLOWS:
             // TODO: Uncomment this
-            // constraints.push_back(std::make_shared<FollowsConstraint>(
-            // pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
+            constraints.push_back(std::make_shared<FollowsConstraint>(
+                pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
         case Parser::SuchThatType::FOLLOWS_T:
             // TODO: Implement this

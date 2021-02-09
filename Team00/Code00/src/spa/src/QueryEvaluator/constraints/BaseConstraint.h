@@ -1,6 +1,7 @@
 #pragma once
 
 #include "QueryEvaluator/Assignment.h"
+#include "Parser/PQLParser/StatementRef.h"
 
 namespace QueryEvaluator {
 
@@ -9,6 +10,8 @@ namespace QueryEvaluator {
 class BaseConstraint {
 public:
     virtual bool is_valid(const AssignmentMap& assignment) = 0;
-};
 
+protected:
+    int get_statement_id(const AssignmentMap& assignments, Parser::StatementRef& statement_ref);
+};
 } // namespace QueryEvaluator

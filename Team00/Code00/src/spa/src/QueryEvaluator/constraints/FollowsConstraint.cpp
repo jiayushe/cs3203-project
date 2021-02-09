@@ -9,7 +9,13 @@ FollowsConstraint::FollowsConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
 bool FollowsConstraint::is_valid(const AssignmentMap& assignments) {
     if (lhs.get_type() == Parser::StatementRefType::ANY &&
         rhs.get_type() == Parser::StatementRefType::ANY) {
-        return true;
+        auto statements = pkb->get_statements();
+        for (auto const &statement : statements) {
+          if (statement.get_follower() != -1) {
+            return true;
+          }
+        }
+        return false;
     }
 
     if (lhs.get_type() != Parser::StatementRefType::ANY &&
@@ -30,18 +36,4 @@ bool FollowsConstraint::is_valid(const AssignmentMap& assignments) {
     auto lhs_statement = pkb->get_statement_by_id(lhs_statement_id);
     auto rhs_statement_id = get_statement_id(assignments, rhs);
     return lhs_statement.get_follower() == rhs_statement_id;
-}
-
-int FollowsConstraint::get_statement_id(const AssignmentMap& assignments,
-                                        Parser::StatementRef& statement_ref) {
-    switch (statement_ref.get_type()) {
-    case Parser::StatementRefType::STATEMENT_ID:
-        return statement_ref.get_statement_id();
-    case Parser::StatementRefType::SYNONYM:
-        return assignments.at(statement_ref.get_synonym()).get_int_value();
-    case Parser::StatementRefType::ANY:
-        throw "Cannot get statement id for ANY statement ref";
-    default:
-        throw "Unknown statement ref type";
-    }
 }
