@@ -7,7 +7,7 @@ Procedure::Procedure(std::string name) : name(name) {
     called_by = new std::unordered_set<int>();
 }
 
-Procedure::Procedure() : name("DEFAULT") {
+Procedure::Procedure() : name("") {
     statements = new std::unordered_set<int>();
     called_by = new std::unordered_set<int>();
 }
@@ -19,14 +19,10 @@ Procedure::~Procedure() {
 
 std::string Procedure::get_name() { return name; }
 
-std::vector<int> Procedure::get_statements() {
-    std::vector<int> res;
-    res.insert(res.end(), statements->begin(), statements->end());
-    return res;
-}
+std::unordered_set<int> Procedure::get_statements() { return *statements; }
 
-std::vector<int> Procedure::get_called_by() {
-    std::vector<int> res;
-    res.insert(res.end(), called_by->begin(), called_by->end());
-    return res;
-}
+void Procedure::add_statement(int stmt_id) { statements->insert(stmt_id); }
+
+std::unordered_set<int> Procedure::get_called_by() { return *called_by; }
+
+void Procedure::add_called_by(int stmt_id) { called_by->insert(stmt_id); }

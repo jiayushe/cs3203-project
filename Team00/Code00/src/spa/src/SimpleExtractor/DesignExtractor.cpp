@@ -133,12 +133,13 @@ void DesignExtractor::extract_use_relationship_from_print_stmt(
 void DesignExtractor::extract_use_relationship_from_assign_stmt(
     KnowledgeBase::PKB pkb, std::string proc_name, std::shared_ptr<Parser::SimpleNode> stmt) {
     auto child_node = stmt->get_child(1);
+    KnowledgeBase::Variable var;
     switch (child_node->get_type()) {
     case Parser::SimpleNodeType::ARITHMETIC:
         extract_use_relationship_from_arithmetic_or_conditional_stmt(pkb, proc_name, child_node);
         break;
     case Parser::SimpleNodeType::VAR_NAME:
-        KnowledgeBase::Variable var = extract_variable(pkb, child_node);
+        var = extract_variable(pkb, child_node);
         pkb.add_use_relationship(stmt->get_statement_id(), var.get_name());
         break;
     case Parser::SimpleNodeType::CONST_VALUE:
@@ -153,6 +154,7 @@ void DesignExtractor::extract_use_relationship_from_arithmetic_or_conditional_st
     int num_children = children_nodes.size();
     for (int i = 0; i < num_children; i++) {
         auto child_node = children_nodes[i];
+        KnowledgeBase::Variable var;
         switch (child_node->get_type()) {
         case Parser::SimpleNodeType::ARITHMETIC:
         case Parser::SimpleNodeType::CONDITIONAL:
@@ -163,7 +165,7 @@ void DesignExtractor::extract_use_relationship_from_arithmetic_or_conditional_st
             extract_constant(pkb, child_node);
             break;
         case Parser::SimpleNodeType::VAR_NAME:
-            KnowledgeBase::Variable var = extract_variable(pkb, child_node);
+            var = extract_variable(pkb, child_node);
             pkb.add_use_relationship(stmt->get_statement_id(), var.get_name());
             break;
         }

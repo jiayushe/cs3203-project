@@ -2,7 +2,6 @@
 
 #include <string>
 #include <unordered_set>
-#include <vector>
 
 namespace KnowledgeBase {
 
@@ -18,13 +17,13 @@ public:
     std::string get_name();
 
     // Gets the list of ids for statements in the procedure.
-    std::vector<int> get_statements();
+    std::unordered_set<int> get_statements();
 
     // Adds a statement in the procedure via id.
     void add_statement(int stmt_id);
 
     // Gets the list of ids for statements that call this procedure.
-    std::vector<int> get_called_by();
+    std::unordered_set<int> get_called_by();
 
     // Adds a statement that calls this procedure via id.
     void add_called_by(int stmt_id);

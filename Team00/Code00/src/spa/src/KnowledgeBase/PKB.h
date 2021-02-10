@@ -37,7 +37,7 @@ public:
     Statement get_statement_by_id(int id);
 
     // Creates a statement with the given id and adds it to the table.
-    Statement add_statement(StatementType type, int id, std::string procedure_name,
+    Statement add_statement(StatementType type, int id, std::string proc_name,
                             std::shared_ptr<Parser::SimpleNode> pattern);
 
     // Gets the list of all variables.

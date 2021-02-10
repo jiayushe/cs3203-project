@@ -1,7 +1,7 @@
 #pragma once
 
-#include "QueryEvaluator/Assignment.h"
 #include "Parser/PQLParser/StatementRef.h"
+#include "QueryEvaluator/Assignment.h"
 
 namespace QueryEvaluator {
 

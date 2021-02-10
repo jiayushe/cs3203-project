@@ -3,24 +3,42 @@
 using namespace KnowledgeBase;
 
 Statement::Statement(StatementType type, int id, std::string procedure_name)
-    : type(type), id(id), procedure_name(procedure_name), pattern(nullptr), parent(-1),
-      following(-1), follower(-1) {
+    : type(type), id(id), procedure_name(procedure_name), parent(-1), direct_following(-1),
+      direct_follower(-1), pattern(nullptr) {
+    ancestors = new std::unordered_set<int>();
     children = new std::unordered_set<int>();
+    descendants = new std::unordered_set<int>();
+    followings = new std::unordered_set<int>();
+    followers = new std::unordered_set<int>();
+    direct_modifies = new std::unordered_set<std::string>();
     modifies = new std::unordered_set<std::string>();
+    direct_uses = new std::unordered_set<std::string>();
     uses = new std::unordered_set<std::string>();
 }
 
 Statement::Statement()
-    : type(StatementType::ASSIGN), id(0), procedure_name("DEFAULT"), pattern(nullptr), parent(-1),
-      following(-1), follower(-1) {
+    : type(StatementType::ASSIGN), id(0), procedure_name(""), parent(-1), direct_following(-1),
+      direct_follower(-1), pattern(nullptr) {
+    ancestors = new std::unordered_set<int>();
     children = new std::unordered_set<int>();
+    descendants = new std::unordered_set<int>();
+    followings = new std::unordered_set<int>();
+    followers = new std::unordered_set<int>();
+    direct_modifies = new std::unordered_set<std::string>();
     modifies = new std::unordered_set<std::string>();
+    direct_uses = new std::unordered_set<std::string>();
     uses = new std::unordered_set<std::string>();
 }
 
 Statement::~Statement() {
+    delete ancestors;
     delete children;
+    delete descendants;
+    delete followings;
+    delete followers;
+    delete direct_modifies;
     delete modifies;
+    delete direct_uses;
     delete uses;
 }
 
@@ -30,39 +48,58 @@ int Statement::get_id() { return id; }
 
 std::string Statement::get_procedure_name() { return procedure_name; }
 
-std::shared_ptr<Parser::SimpleNode> Statement::get_pattern() {
-    if (this->type != StatementType::ASSIGN) {
-        throw "This statement is not of type ASSIGN";
-    }
-    return pattern;
-}
-
-void Statement::set_pattern(std::shared_ptr<Parser::SimpleNode> ast_pattern) {
-    pattern = ast_pattern;
-}
-
 int Statement::get_parent() { return parent; }
 
 void Statement::set_parent(int parent_id) { parent = parent_id; }
 
-std::vector<int> Statement::get_children() {
+std::unordered_set<int> Statement::get_ancestors() { return *ancestors; }
+
+void Statement::add_ancestor(int ancestor_id) { ancestors->insert(ancestor_id); }
+
+std::unordered_set<int> Statement::get_children() {
     if (this->type != StatementType::WHILE && this->type != StatementType::IF) {
         throw "This statement is not of type WHILE or IF";
     }
-    std::vector<int> res;
-    res.insert(res.end(), children->begin(), children->end());
-    return res;
+    return *children;
 }
 
 void Statement::add_child(int child_id) { children->insert(child_id); }
 
-int Statement::get_following() { return following; }
+std::unordered_set<int> Statement::get_descendants() { return *descendants; }
 
-void Statement::set_following(int following_id) { following = following_id; }
+void Statement::add_descendant(int descendant_id) { descendants->insert(descendant_id); }
 
-int Statement::get_follower() { return follower; }
+int Statement::get_direct_following() { return direct_following; }
 
-void Statement::set_follower(int follower_id) { follower = follower_id; }
+void Statement::set_direct_following(int following_id) { direct_following = following_id; }
+
+std::unordered_set<int> Statement::get_followings() { return *followings; }
+
+void Statement::add_following(int following_id) { followings->insert(following_id); }
+
+int Statement::get_direct_follower() { return direct_follower; }
+
+void Statement::set_direct_follower(int follower_id) { direct_follower = follower_id; }
+
+std::unordered_set<int> Statement::get_followers() { return *followers; }
+
+void Statement::add_follower(int follower_id) { followers->insert(follower_id); }
+
+std::unordered_set<std::string> Statement::get_direct_modifies() { return *direct_modifies; }
+
+void Statement::add_direct_modifies(std::string var_name) { direct_modifies->insert(var_name); }
+
+std::unordered_set<std::string> Statement::get_modifies() { return *modifies; }
+
+void Statement::add_modifies(std::string var_name) { modifies->insert(var_name); }
+
+std::unordered_set<std::string> Statement::get_direct_uses() { return *direct_uses; }
+
+void Statement::add_direct_uses(std::string var_name) { direct_uses->insert(var_name); }
+
+std::unordered_set<std::string> Statement::get_uses() { return *uses; }
+
+void Statement::add_uses(std::string var_name) { uses->insert(var_name); }
 
 std::string Statement::get_procedure_called() {
     if (this->type != StatementType::CALL) {
@@ -78,18 +115,16 @@ void Statement::set_procedure_called(std::string proc_name) {
     procedure_called = proc_name;
 }
 
-std::vector<std::string> Statement::get_modifies() {
-    std::vector<std::string> res;
-    res.insert(res.end(), modifies->begin(), modifies->end());
-    return res;
+std::shared_ptr<Parser::SimpleNode> Statement::get_pattern() {
+    if (this->type != StatementType::ASSIGN) {
+        throw "This statement is not of type ASSIGN";
+    }
+    return pattern;
 }
 
-void Statement::add_modifies(std::string var_name) { modifies->insert(var_name); }
-
-std::vector<std::string> Statement::get_uses() {
-    std::vector<std::string> res;
-    res.insert(res.end(), uses->begin(), uses->end());
-    return res;
+void Statement::set_pattern(std::shared_ptr<Parser::SimpleNode> ast_pattern) {
+    if (this->type != StatementType::ASSIGN) {
+        throw "This statement is not of type ASSIGN";
+    }
+    pattern = ast_pattern;
 }
-
-void Statement::add_uses(std::string var_name) { uses->insert(var_name); }

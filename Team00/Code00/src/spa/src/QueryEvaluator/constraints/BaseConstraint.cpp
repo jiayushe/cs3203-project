@@ -3,7 +3,7 @@
 using namespace QueryEvaluator;
 
 int BaseConstraint::get_statement_id(const AssignmentMap& assignments,
-                                       Parser::StatementRef& statement_ref) {
+                                     Parser::StatementRef& statement_ref) {
     switch (statement_ref.get_type()) {
     case Parser::StatementRefType::STATEMENT_ID:
         return statement_ref.get_statement_id();
