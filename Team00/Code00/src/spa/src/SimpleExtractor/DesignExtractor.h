@@ -59,6 +59,15 @@ private:
                                                       std::shared_ptr<Parser::SimpleNode> stmt,
                                                       int next_stmt_id);
 
+    /* Parent */
+    static void
+    extract_parent_relationship_from_stmt_list(KnowledgeBase::PKB pkb, std::string proc_name,
+                                               std::shared_ptr<Parser::SimpleNode> stmt_list,
+                                               int parent_stmt_id);
+    static void extract_parent_relationship_from_stmt(KnowledgeBase::PKB pkb, std::string proc_name,
+                                                      std::shared_ptr<Parser::SimpleNode> stmt,
+                                                      int parent_stmt_id);
+
     /* Util */
     static KnowledgeBase::Procedure
     extract_procedure(KnowledgeBase::PKB pkb, std::shared_ptr<Parser::SimpleNode> proc_node);

@@ -205,9 +205,10 @@ void SimpleExtractor::DesignExtractor::extract_follow_relationship_from_stmt(
         extract_follow_relationship_from_stmt_list(pkb, proc_name, stmt_list);
         break;
     case KnowledgeBase::StatementType::IF:
-        // Process then and else branch statements in IF
+        // Process then branch statements in IF
         stmt_list = stmt->get_child(1);
         extract_follow_relationship_from_stmt_list(pkb, proc_name, stmt_list);
+        // Process else branch statements in IF
         stmt_list = stmt->get_child(2);
         extract_follow_relationship_from_stmt_list(pkb, proc_name, stmt_list);
         break;
@@ -216,7 +217,51 @@ void SimpleExtractor::DesignExtractor::extract_follow_relationship_from_stmt(
     }
 }
 
-void DesignExtractor::extract_parent_relationship(KnowledgeBase::PKB pkb) {}
+void DesignExtractor::extract_parent_relationship(KnowledgeBase::PKB pkb) {
+    auto ast = assert_node_type(pkb.get_ast(), Parser::SimpleNodeType::PROGRAM);
+    auto proc_node = assert_node_type(ast->get_child(0), Parser::SimpleNodeType::PROCEDURE);
+    KnowledgeBase::Procedure proc = extract_procedure(pkb, proc_node);
+    auto stmt_list_node =
+        assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
+    extract_parent_relationship_from_stmt_list(pkb, proc.get_name(), stmt_list_node, -1);
+}
+
+void SimpleExtractor::DesignExtractor::extract_parent_relationship_from_stmt_list(
+    KnowledgeBase::PKB pkb, std::string proc_name, std::shared_ptr<Parser::SimpleNode> stmt_list,
+    int parent_stmt_id) {
+    auto stmts = stmt_list->get_children();
+    int num_stmt = stmts.size();
+    for (int i = 0; i < num_stmt; i++) {
+        std::shared_ptr<Parser::SimpleNode> curr_stmt_node = stmts.at(i);
+        extract_parent_relationship_from_stmt(pkb, proc_name, curr_stmt_node, parent_stmt_id);
+    }
+}
+
+void SimpleExtractor::DesignExtractor::extract_parent_relationship_from_stmt(
+    KnowledgeBase::PKB pkb, std::string proc_name, std::shared_ptr<Parser::SimpleNode> stmt,
+    int parent_stmt_id) {
+    KnowledgeBase::Statement curr_stmt = extract_statement(pkb, proc_name, stmt);
+    int curr_stmt_id = curr_stmt.get_id();
+    pkb.add_parent_relationship(parent_stmt_id, curr_stmt_id);
+    std::shared_ptr<Parser::SimpleNode> stmt_list;
+    switch (curr_stmt.get_type()) {
+    case KnowledgeBase::StatementType::WHILE:
+        // Process nested statements in WHILE
+        stmt_list = stmt->get_child(1);
+        extract_parent_relationship_from_stmt_list(pkb, proc_name, stmt_list, curr_stmt_id);
+        break;
+    case KnowledgeBase::StatementType::IF:
+        // Process then branch statements in IF
+        stmt_list = stmt->get_child(1);
+        extract_parent_relationship_from_stmt_list(pkb, proc_name, stmt_list, curr_stmt_id);
+        // Process else branch statements in IF
+        stmt_list = stmt->get_child(2);
+        extract_parent_relationship_from_stmt_list(pkb, proc_name, stmt_list, curr_stmt_id);
+        break;
+    default:
+        break;
+    }
+}
 
 KnowledgeBase::Procedure
 DesignExtractor::extract_procedure(KnowledgeBase::PKB pkb,

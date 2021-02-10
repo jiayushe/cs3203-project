@@ -192,6 +192,9 @@ void PKB::add_follow_relationship(int following_id, int follower_id) {
 }
 
 void PKB::add_parent_relationship(int parent_id, int child_id) {
+    if (parent_id == -1) {
+        return;
+    }
     Statement parent_stmt = this->get_statement_by_id(parent_id);
     Statement child_stmt = this->get_statement_by_id(child_id);
     parent_stmt.add_child(child_id);
