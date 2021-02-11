@@ -5,6 +5,7 @@
 #include "QueryEvaluator/constraints/BaseConstraint.h"
 #include "QueryEvaluator/constraints/FollowsConstraint.h"
 #include "QueryEvaluator/constraints/ParentConstraint.h"
+#include "QueryEvaluator/constraints/UsesConstraint.h"
 #include <list>
 #include <memory>
 

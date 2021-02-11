@@ -3,7 +3,7 @@
 using namespace QueryEvaluator;
 
 int BaseConstraint::get_statement_id(const AssignmentMap& assignments,
-                                     Parser::StatementRef& statement_ref) {
+                                       Parser::StatementRef& statement_ref) {
     switch (statement_ref.get_type()) {
     case Parser::StatementRefType::STATEMENT_ID:
         return statement_ref.get_statement_id();
@@ -13,5 +13,16 @@ int BaseConstraint::get_statement_id(const AssignmentMap& assignments,
         throw "Cannot get statement id for ANY statement ref";
     default:
         throw "Unknown statement ref type";
+    }
+}
+
+std::string BaseConstraint::get_variable_name(const AssignmentMap& assignments, Parser::EntityRef& entity_ref) {
+    switch (entity_ref.get_type()) {
+    case Parser::EntityRefType::NAME:
+        return entity_ref.get_name();
+    case Parser::EntityRefType::SYNONYM:
+        return assignments.at(entity_ref.get_synonym()).get_string_value();
+    default:
+        throw "Unhandled entity ref type";
     }
 }

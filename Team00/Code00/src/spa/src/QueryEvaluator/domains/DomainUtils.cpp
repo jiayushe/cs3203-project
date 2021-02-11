@@ -1,6 +1,14 @@
 #include "DomainUtils.h"
 
 #include "StatementDomain.h"
+#include "ReadDomain.h"
+#include "PrintDomain.h"
+#include "WhileDomain.h"
+#include "IfDomain.h"
+#include "AssignDomain.h"
+#include "VariableDomain.h"
+#include "ConstantDomain.h"
+#include "ProcedureDomain.h"
 
 using namespace QueryEvaluator;
 
@@ -8,33 +16,23 @@ std::list<Assignment> DomainUtils::get_domain(std::shared_ptr<KnowledgeBase::PKB
                                               Parser::DesignEntityType design_entity_type) {
     switch (design_entity_type) {
     case Parser::DesignEntityType::STMT:
-        // TODO: Uncomment this
-        // return StatementDomain::get_domain(pkb);
-        return std::list<Assignment>();
+        return StatementDomain::get_domain(pkb);
     case Parser::DesignEntityType::READ:
-        // TODO: Implement this
-        return std::list<Assignment>();
+        return ReadDomain::get_domain(pkb);
     case Parser::DesignEntityType::PRINT:
-        // TODO: Implement this
-        return std::list<Assignment>();
+        return PrintDomain::get_domain(pkb);
     case Parser::DesignEntityType::WHILE:
-        // TODO: Implement this
-        return std::list<Assignment>();
+        return WhileDomain::get_domain(pkb);
     case Parser::DesignEntityType::IF:
-        // TODO: Implement this
-        return std::list<Assignment>();
+        return IfDomain::get_domain(pkb);
     case Parser::DesignEntityType::ASSIGN:
-        // TODO: Implement this
-        return std::list<Assignment>();
+        return AssignDomain::get_domain(pkb);
     case Parser::DesignEntityType::VARIABLE:
-        // TODO: Implement this
-        return std::list<Assignment>();
+        return VariableDomain::get_domain(pkb);
     case Parser::DesignEntityType::CONSTANT:
-        // TODO: Implement this
-        return std::list<Assignment>();
+        return ConstantDomain::get_domain(pkb);
     case Parser::DesignEntityType::PROCEDURE:
-        // TODO: Implement this
-        return std::list<Assignment>();
+        return ProcedureDomain::get_domain(pkb);
     default:
         throw "Unknown design entity type";
     }
