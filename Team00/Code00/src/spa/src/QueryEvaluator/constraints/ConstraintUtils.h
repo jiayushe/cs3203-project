@@ -4,7 +4,9 @@
 #include "Parser/PQLParser/QueryObject.h"
 #include "QueryEvaluator/constraints/BaseConstraint.h"
 #include "QueryEvaluator/constraints/FollowsConstraint.h"
+#include "QueryEvaluator/constraints/FollowsTConstraint.h"
 #include "QueryEvaluator/constraints/ParentConstraint.h"
+#include "QueryEvaluator/constraints/ParentTConstraint.h"
 #include "QueryEvaluator/constraints/UsesConstraint.h"
 #include <list>
 #include <memory>

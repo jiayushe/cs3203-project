@@ -24,15 +24,16 @@ ConstraintUtils::get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
                 pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
         case Parser::SuchThatType::PARENT_T:
-            // TODO: Implement this
+            constraints.push_back(std::make_shared<ParentTConstraint>(
+                pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
         case Parser::SuchThatType::FOLLOWS:
-            // TODO: Uncomment this
             constraints.push_back(std::make_shared<FollowsConstraint>(
                 pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
         case Parser::SuchThatType::FOLLOWS_T:
-            // TODO: Implement this
+            constraints.push_back(std::make_shared<FollowsTConstraint>(
+                pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
         default:
             throw "Unknown such that type";
