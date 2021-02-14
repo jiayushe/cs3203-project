@@ -1,0 +1,45 @@
+procedure procedure{
+  read read;read    print;    read ALLCAPS;
+
+  while ((read < 289) && ((print < 18 * 18 - 35) && (!(ALLCAPS >= 289 % 1000)))) {
+    if (read < print) then {read = read + 1;}
+    else {
+      if (print < ALLCAPS) then {
+        print =print+1;
+      } else {
+        ALLCAPS=ALLCAPS   
+            + 1 ;
+      }
+    }
+
+    Useless = 10;
+    while ( Useless>0 ){
+      Useless = Useless - 1; }
+  }
+
+  if ((read > 17 * 17)||((!(print <= 100 + 189))  ||(ALLCAPS> 64 +   15*15)))then{
+    read = read * print/ALLCAPS - read / print / (ALLCAPS - 1221);
+    print = read * (print / ALLCAPS - read/print  )/ALLCAPS - 36;
+    ALLCAPS = read * print / (ALLCAPS - read) / print / ALLCAPS -   64;
+    if (print > ALLCAPS) then {
+      Temp123Variable456 = read;
+      read = print; print = ALLCAPS;
+      ALLCAPS = Temp123Variable456;
+    } else {
+      Temp123Variable456 = print;
+      read = ALLCAPS;
+      print = read; ALLCAPS = Temp123Variable456;
+    }
+  }else{
+    read = 121*
+      625 % (100 + 225)
+      / 100;
+    print=(256/9/1)-81+53;
+    ALLCAPS=99999999;
+  }
+
+  print read;
+  print print;
+  print ALLCAPS;
+
+  print    unmodified; read   unused ;}

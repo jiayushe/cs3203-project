@@ -1,9 +1,6 @@
 # OSX filesystem 
 .DS_Store
 
-# Test folder
-tests/
-
 # CLion
 .idea
 cmake-build-debug
@@ -12,5 +9,7 @@ cmake-build-debug
 .vs
 build_win
 
-# Output
+# Testing
+tests
 out.xml
+1.out.xml
