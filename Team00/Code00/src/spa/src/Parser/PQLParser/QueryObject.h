@@ -28,7 +28,7 @@ public:
     void set_pattern(const Pattern& pattern_cl);
 
     // this is just for view purpose
-    void to_string();
+    std::string to_string();
 
 private:
     DeclarationMap declarations;

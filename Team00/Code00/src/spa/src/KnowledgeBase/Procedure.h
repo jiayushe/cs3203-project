@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <unordered_set>
 
@@ -30,8 +31,8 @@ public:
 
 private:
     std::string name;
-    std::unordered_set<int>* statements;
-    std::unordered_set<int>* called_by;
+    std::unordered_set<int> statements;
+    std::unordered_set<int> called_by;
 };
 
 } // namespace KnowledgeBase

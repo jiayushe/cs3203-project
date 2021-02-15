@@ -265,9 +265,5 @@ QueryObject PQLParser::parse_query() {
     repeat({[&]() { process_declaration(); }});
     process_selection();
     expect_token(TokenType::END);
-
-    // print for checking purposes
-    query_object.to_string();
-
     return query_object;
 }

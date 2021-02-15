@@ -1,14 +1,14 @@
 #include "DomainUtils.h"
 
-#include "StatementDomain.h"
-#include "ReadDomain.h"
-#include "PrintDomain.h"
-#include "WhileDomain.h"
-#include "IfDomain.h"
 #include "AssignDomain.h"
-#include "VariableDomain.h"
 #include "ConstantDomain.h"
+#include "IfDomain.h"
+#include "PrintDomain.h"
 #include "ProcedureDomain.h"
+#include "ReadDomain.h"
+#include "StatementDomain.h"
+#include "VariableDomain.h"
+#include "WhileDomain.h"
 
 using namespace QueryEvaluator;
 

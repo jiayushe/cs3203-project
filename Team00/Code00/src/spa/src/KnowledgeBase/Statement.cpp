@@ -4,43 +4,13 @@ using namespace KnowledgeBase;
 
 Statement::Statement(StatementType type, int id, std::string procedure_name)
     : type(type), id(id), procedure_name(procedure_name), parent(-1), direct_following(-1),
-      direct_follower(-1), pattern(nullptr) {
-    ancestors = new std::unordered_set<int>();
-    children = new std::unordered_set<int>();
-    descendants = new std::unordered_set<int>();
-    followings = new std::unordered_set<int>();
-    followers = new std::unordered_set<int>();
-    direct_modifies = new std::unordered_set<std::string>();
-    modifies = new std::unordered_set<std::string>();
-    direct_uses = new std::unordered_set<std::string>();
-    uses = new std::unordered_set<std::string>();
-}
+      direct_follower(-1), pattern(nullptr) {}
 
 Statement::Statement()
     : type(StatementType::ASSIGN), id(0), procedure_name(""), parent(-1), direct_following(-1),
-      direct_follower(-1), pattern(nullptr) {
-    ancestors = new std::unordered_set<int>();
-    children = new std::unordered_set<int>();
-    descendants = new std::unordered_set<int>();
-    followings = new std::unordered_set<int>();
-    followers = new std::unordered_set<int>();
-    direct_modifies = new std::unordered_set<std::string>();
-    modifies = new std::unordered_set<std::string>();
-    direct_uses = new std::unordered_set<std::string>();
-    uses = new std::unordered_set<std::string>();
-}
+      direct_follower(-1), pattern(nullptr) {}
 
-Statement::~Statement() {
-    delete ancestors;
-    delete children;
-    delete descendants;
-    delete followings;
-    delete followers;
-    delete direct_modifies;
-    delete modifies;
-    delete direct_uses;
-    delete uses;
-}
+Statement::~Statement() {}
 
 StatementType Statement::get_type() { return type; }
 
@@ -52,54 +22,54 @@ int Statement::get_parent() { return parent; }
 
 void Statement::set_parent(int parent_id) { parent = parent_id; }
 
-std::unordered_set<int> Statement::get_ancestors() { return *ancestors; }
+std::unordered_set<int> Statement::get_ancestors() { return ancestors; }
 
-void Statement::add_ancestor(int ancestor_id) { ancestors->insert(ancestor_id); }
+void Statement::add_ancestor(int ancestor_id) { ancestors.insert(ancestor_id); }
 
 std::unordered_set<int> Statement::get_children() {
     if (this->type != StatementType::WHILE && this->type != StatementType::IF) {
         throw "This statement is not of type WHILE or IF";
     }
-    return *children;
+    return children;
 }
 
-void Statement::add_child(int child_id) { children->insert(child_id); }
+void Statement::add_child(int child_id) { children.insert(child_id); }
 
-std::unordered_set<int> Statement::get_descendants() { return *descendants; }
+std::unordered_set<int> Statement::get_descendants() { return descendants; }
 
-void Statement::add_descendant(int descendant_id) { descendants->insert(descendant_id); }
+void Statement::add_descendant(int descendant_id) { descendants.insert(descendant_id); }
 
 int Statement::get_direct_following() { return direct_following; }
 
 void Statement::set_direct_following(int following_id) { direct_following = following_id; }
 
-std::unordered_set<int> Statement::get_followings() { return *followings; }
+std::unordered_set<int> Statement::get_followings() { return followings; }
 
-void Statement::add_following(int following_id) { followings->insert(following_id); }
+void Statement::add_following(int following_id) { followings.insert(following_id); }
 
 int Statement::get_direct_follower() { return direct_follower; }
 
 void Statement::set_direct_follower(int follower_id) { direct_follower = follower_id; }
 
-std::unordered_set<int> Statement::get_followers() { return *followers; }
+std::unordered_set<int> Statement::get_followers() { return followers; }
 
-void Statement::add_follower(int follower_id) { followers->insert(follower_id); }
+void Statement::add_follower(int follower_id) { followers.insert(follower_id); }
 
-std::unordered_set<std::string> Statement::get_direct_modifies() { return *direct_modifies; }
+std::unordered_set<std::string> Statement::get_direct_modifies() { return direct_modifies; }
 
-void Statement::add_direct_modifies(std::string var_name) { direct_modifies->insert(var_name); }
+void Statement::add_direct_modifies(std::string var_name) { direct_modifies.insert(var_name); }
 
-std::unordered_set<std::string> Statement::get_modifies() { return *modifies; }
+std::unordered_set<std::string> Statement::get_modifies() { return modifies; }
 
-void Statement::add_modifies(std::string var_name) { modifies->insert(var_name); }
+void Statement::add_modifies(std::string var_name) { modifies.insert(var_name); }
 
-std::unordered_set<std::string> Statement::get_direct_uses() { return *direct_uses; }
+std::unordered_set<std::string> Statement::get_direct_uses() { return direct_uses; }
 
-void Statement::add_direct_uses(std::string var_name) { direct_uses->insert(var_name); }
+void Statement::add_direct_uses(std::string var_name) { direct_uses.insert(var_name); }
 
-std::unordered_set<std::string> Statement::get_uses() { return *uses; }
+std::unordered_set<std::string> Statement::get_uses() { return uses; }
 
-void Statement::add_uses(std::string var_name) { uses->insert(var_name); }
+void Statement::add_uses(std::string var_name) { uses.insert(var_name); }
 
 std::string Statement::get_procedure_called() {
     if (this->type != StatementType::CALL) {

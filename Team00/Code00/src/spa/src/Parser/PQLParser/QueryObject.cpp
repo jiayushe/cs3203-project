@@ -1,5 +1,4 @@
 #include "QueryObject.h"
-#include <iostream>
 #include <string>
 
 using namespace Parser;
@@ -46,9 +45,11 @@ void QueryObject::set_such_that(const SuchThat& new_such_that_cl) {
 
 void QueryObject::set_pattern(const Pattern& new_pattern_cl) { pattern_obj = new_pattern_cl; }
 
-void QueryObject::to_string() {
-    std::cout << "Declaration size:" << declarations.size() << std::endl;
-    std::cout << "Has Such That:" << has_such_that_cl << std::endl;
-    std::cout << "Has Pattern:" << has_pattern_cl << std::endl;
-    std::cout << "Selection:" << selection << std::endl;
+std::string QueryObject::to_string() {
+    std::string output;
+    output += "QueryObject(declaration.size=" + std::to_string(declarations.size());
+    output += ", has_such_that=" + (has_such_that_cl ? std::string("TRUE") : std::string("FALSE"));
+    output += ", has_pattern= " + (has_pattern_cl ? std::string("TRUE") : std::string("FALSE"));
+    output += ", selection=" + selection + ")";
+    return output;
 }

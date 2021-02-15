@@ -15,6 +15,7 @@
 #include "Parser/shared/FileLexer.h"
 #include "Parser/shared/StringLexer.h"
 #include "QueryEvaluator/BruteForceEvaluator.h"
+#include "SimpleExtractor/DesignExtractor.h"
 
 class TestWrapper : public AbstractWrapper {
 public:

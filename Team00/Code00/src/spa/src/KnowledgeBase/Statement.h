@@ -129,17 +129,17 @@ private:
     int id;
     std::string procedure_name;
     int parent;
-    std::unordered_set<int>* ancestors;
-    std::unordered_set<int>* children;
-    std::unordered_set<int>* descendants;
+    std::unordered_set<int> ancestors;
+    std::unordered_set<int> children;
+    std::unordered_set<int> descendants;
     int direct_following;
-    std::unordered_set<int>* followings;
+    std::unordered_set<int> followings;
     int direct_follower;
-    std::unordered_set<int>* followers;
-    std::unordered_set<std::string>* direct_modifies;
-    std::unordered_set<std::string>* modifies;
-    std::unordered_set<std::string>* direct_uses;
-    std::unordered_set<std::string>* uses;
+    std::unordered_set<int> followers;
+    std::unordered_set<std::string> direct_modifies;
+    std::unordered_set<std::string> modifies;
+    std::unordered_set<std::string> direct_uses;
+    std::unordered_set<std::string> uses;
     // Only for CALL.
     std::string procedure_called;
     // Only for ASSIGN.

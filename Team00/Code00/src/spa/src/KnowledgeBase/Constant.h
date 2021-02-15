@@ -4,6 +4,8 @@ namespace KnowledgeBase {
 
 class Constant {
 public:
+    Constant();
+
     Constant(int value);
 
     ~Constant();

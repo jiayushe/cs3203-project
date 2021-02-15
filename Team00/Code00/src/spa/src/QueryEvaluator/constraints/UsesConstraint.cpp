@@ -15,12 +15,12 @@ bool UsesConstraint::is_valid(const AssignmentMap& assignments) {
         auto lhs_statement_id = get_statement_id(assignments, lhs);
         auto lhs_statement = pkb->get_statement_by_id(lhs_statement_id);
 
-        switch (lhs_statement.get_type()) {
+        switch (lhs_statement->get_type()) {
         case KnowledgeBase::StatementType::WHILE:
         case KnowledgeBase::StatementType::IF:
         case KnowledgeBase::StatementType::ASSIGN:
         case KnowledgeBase::StatementType::PRINT:
-            return !lhs_statement.get_uses().empty();
+            return !lhs_statement->get_uses().empty();
         default:
             return false;
         }
@@ -28,14 +28,14 @@ bool UsesConstraint::is_valid(const AssignmentMap& assignments) {
 
     auto rhs_string = get_variable_name(assignments, rhs);
     auto lhs_statement_id = get_statement_id(assignments, lhs);
-    auto lhs_statement = pkb->get_statement_by_id(lhs_statement_id);    
+    auto lhs_statement = pkb->get_statement_by_id(lhs_statement_id);
 
-    switch (lhs_statement.get_type()) {
+    switch (lhs_statement->get_type()) {
     case KnowledgeBase::StatementType::WHILE:
     case KnowledgeBase::StatementType::IF:
     case KnowledgeBase::StatementType::ASSIGN:
     case KnowledgeBase::StatementType::PRINT: {
-        auto lhs_statement_uses = lhs_statement.get_uses();
+        auto lhs_statement_uses = lhs_statement->get_uses();
         return lhs_statement_uses.find(rhs_string) != lhs_statement_uses.end();
     }
     default:

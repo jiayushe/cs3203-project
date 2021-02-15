@@ -22,9 +22,11 @@ void TestWrapper::parse(std::string filename) {
         Parser::SimpleParser parser(lexer);
         auto root_node = parser.parse_program();
 
-        // TODO: PKB logic here...
-        // FIXME: For now, simply print out the AST parsed
-        std::cout << root_node->to_string();
+        pkb = std::make_shared<KnowledgeBase::PKB>(root_node);
+        SimpleExtractor::DesignExtractor::extract_follow_relationship(pkb);
+        SimpleExtractor::DesignExtractor::extract_parent_relationship(pkb);
+        SimpleExtractor::DesignExtractor::extract_modify_relationship(pkb);
+        SimpleExtractor::DesignExtractor::extract_use_relationship(pkb);
     } catch (char const* message) {
         std::cout << "Error: " << message << std::endl;
         throw message;
@@ -37,7 +39,6 @@ void TestWrapper::parse(std::string filename) {
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
     try {
-        std::cout << "Query string: " << query << std::endl;
         Parser::StringLexer lexer(query);
         Parser::PQLParser parser(lexer);
         auto query_object = parser.parse_query();
@@ -45,9 +46,9 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
         QueryEvaluator::BruteForceEvaluator::evaluate(pkb, query_object, results);
     } catch (char const* message) {
         std::cout << "Error: " << message << std::endl;
-        throw message;
+        results.clear();
     } catch (const std::string& message) {
         std::cout << "Error: " << message << std::endl;
-        throw message;
+        results.clear();
     }
 }
