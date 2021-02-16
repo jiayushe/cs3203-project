@@ -1,0 +1,65 @@
+procedure P1 {
+  read V1;read V2;read  V3;   read V4;
+     read V5;
+read V6;read V7;
+    read V8;read V9;    read V10;
+  read Unused; print V1;
+
+  while (V1 > 0) { if (!(V2 != 0)) then {
+      V7 = V7 % 100;
+      if (V3 + V5 > 0) then {
+        print V10;
+      } else {
+        read V10; if (V1 < 1000) then {
+          V8 = V8+1;
+          V9 = V9- 1;
+          V10 =  V10   /    1;
+        } else {
+          V6=99;
+        }}
+    } else {
+      while (V4 % 2==0){
+        print V6;
+        print V8;print V10;
+      }
+    }
+
+    while (1000 > 0) {
+    V8 = V9 / (1000 + 123) % 999;
+      V9 = V10 * 11;
+        V10 = V9 - (V10/1000) + 88;}
+  }
+
+  V1 = V2 +   V3;
+  V2 = V3+ V4;
+  V3 = V4 +V5; Unused = 5000;
+
+  if (   V9 +    V10-1000<=100)then{
+    while (V8 * 2 > 0) {
+      read V1;
+      V1 = V1 /
+          1000 % 14;
+      while ((V10 > 0) || (V10 == 0)) {
+        print V5;
+      }
+    }
+  }else{print V3;}
+
+  print Unmodified;
+
+  while (V6 == 0) {
+    V2 = 1;
+    while (Unmodified != 0) {
+      print V1;
+      print V2;
+    }V3=0;
+  }
+
+  print V1;
+  print V2;
+      print V3;print V4;
+          print V5;print V6;
+  print 
+    V7;
+  print V8; print V9;print V10;
+}
