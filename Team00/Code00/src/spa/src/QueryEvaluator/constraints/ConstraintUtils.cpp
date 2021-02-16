@@ -14,7 +14,8 @@ ConstraintUtils::get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
 
         switch (such_that.get_type()) {
         case Parser::SuchThatType::MODIFIES_S:
-            // TODO: Implement this
+            constraints.push_back(std::make_shared<ModifiesConstraint>(
+                pkb, left_ref.get_statement_ref(), right_ref.get_entity_ref()));
             break;
         case Parser::SuchThatType::USES_S:
             constraints.push_back(std::make_shared<UsesConstraint>(
