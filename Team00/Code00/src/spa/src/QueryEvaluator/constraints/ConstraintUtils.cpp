@@ -43,7 +43,7 @@ ConstraintUtils::get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
     }
 
     if (query_object.has_pattern()) {
-        // TODO: Implement this
+        constraints.push_back(std::make_shared<PatternConstraint>(pkb, query_object.get_pattern()));
     }
 
     return constraints;
