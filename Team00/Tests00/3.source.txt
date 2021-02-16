@@ -1,0 +1,94 @@
+procedure P1 {
+  read  V14;
+  read  Unused;
+  print Unmodified;
+
+  while(V14-99  >=  100*5){
+
+    read V1;
+read V2;read V3;read  V7;
+  read V8;   read V9;
+      read V10;
+        read V11;read V12;
+read V13;read V15;read V17;read V18;read    V19;read 
+  V20;
+
+  if((V20>20)||(V20<10)) then{
+      V20= V20 - 5;
+    } else { V20=V20+11;
+    }
+    print V20;
+
+    while(V15 != 0) {
+      while(!(V3 + V5 == 243)) {
+        while(V1 <= 99) {print V2;}
+        V4 = V9 + (V10 / 11) * V8 + 22 % 33;
+        V5 = V7-V11
+            * 5 /
+            6 / 7 + 8;
+      }
+      while(V4 / V2%2 == 0){
+        V1 = V20 /V19/V18 /V17 + 9876;
+        V2 = (V12+V13) / 50;
+        V3=131;
+      }
+print V1;print V2;
+print V3;
+    print V4;
+        print V5;
+    }
+  }
+
+  read V16;
+
+  if (V4 + 1 != 50)   then   {
+    if (V16 * 2 >= 50)then{
+      read V5;
+      read V6;
+      if (V10 / 20 - 10 <= 1) then {read V7;} else {read V8;}
+      if ((V5 <= 0) && (V6 < 0)) then {
+        print V5;
+        print V6;
+        Temp = V6;
+        V6 = V5;
+        V5 = Temp;
+      } else {
+        print V1;
+        if (V1 % 99 +  5>   10) then {
+          V1=199+50/29/V2;
+        } else {
+          V1=    V3+2;
+        }
+      }
+    print  V1;
+      print   V5;
+      print  V6;
+      print  V7;
+      print   V8;
+    } else {
+      read V16;
+      while (V16 * 2 < 50) {read V16;
+      }
+    }
+  } else {
+    if (V16 - 50 < 0) then {
+      print V17;
+    } else {
+      print V18;
+    }
+    while (V17 > 1000){
+      V12   = 1 / V12 / 
+        100 + 255 % 256 + 1000;
+      V13 =  29 * 29 * 29 + V12 / V13 + 1000;
+      V14 =  (25 / 2)
+        + V12;
+      V15 =29 * 29 * (29 + V12) / (V13 + 1000);
+      V16   = 25 / 2 + V12;
+      V17= 1/ (V12
+    / 100) + 343;
+    }
+    print V13;
+    print V14;
+    print V15;
+    print V16;
+    print V17;}}
