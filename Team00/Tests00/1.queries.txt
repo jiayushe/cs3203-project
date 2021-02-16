@@ -76,7 +76,7 @@ read, print, ALLCAPS, unused
 16 - [1 Modifies] All variables modified by while statements
 while w; variable v;
 Select v such that Modifies(w, v)
-read, print, ALLCAPS, Temp123Variable456, Useless
+read, print, ALLCAPS, Useless
 5000
 17 - [1 Modifies] All variables which modify some statements
 variable v; stmt s;
@@ -666,7 +666,7 @@ Select a such that Uses(a, v) pattern a(v, _"read"_)
 134 - [1 Uses + 1 Pattern] All variables which are both used by some while and modified by some assign statements
 while w; assign a; variable v;
 Select v such that Uses(w, v) pattern a(v, _)
-read, print, ALLCAPS, Useless, Temp123Variable456
+read, print, ALLCAPS, Useless
 5000
 135 - [1 Uses + 1 Pattern] All statements, as long as some statements modify some variables and some variables are on the LHS of some assign statements with RHS pattern 'read'
 stmt s1, s2; variable v1, v2; assign a;
@@ -676,17 +676,17 @@ Select s1 such that Uses(s2, v1) pattern a(v2, _"read"_)
 136 - [1 Parent + 1 Pattern] All variables which are in the LHS of some assign statements which are children of some while statements
 while w; assign a; variable v;
 Select v such that Parent(w, a) pattern a(v, _)
-10, 12
+Useless
 5000
 137 - [1 Parent + 1 Pattern] All assign statements with the RHS pattern 'ALLCAPS' which are children of some if statements
 assign a; if i;
 Select a such that Parent(i, a) pattern a(_, _"ALLCAPS"_)
 9, 14, 15, 16, 20, 23
 5000
-138 - [1 Parent* + 1 Pattern] All variables which are in the LHS of some assign statements which are descendants of some if statements
-variable v; if i; assign a;
-Select v such that Parent*(i, a) pattern a(v, _"256"_)
-read
+138 - [1 Parent* + 1 Pattern] All variables which are in the LHS of some assign statements with RHS pattern '1' which are descendants of statement 13
+variable v; assign a;
+Select v such that Parent*(13, a) pattern a(v, _"1"_)
+print
 5000
 139 - [1 Parent* + 1 Pattern] All assign statements which are children of some statements and with the LHS 'print' and RHS pattern 'read'
 stmt s; assign a;
@@ -701,7 +701,7 @@ Select a such that Parent*(4, a) pattern a(_, _"1"_)
 141 - [1 Follows + 1 Pattern] All variables on the LHS of some assign statements with RHS pattern 'read' and following another assign statement
 assign a1, a2; variable v;
 Select v such that Follows(a1, a2) pattern a2(v, _"read"_)
-15, 16, 24
+print, ALLCAPS
 5000
 142 - [1 Follows + 1 Pattern] All statements, as long as there exists some statements which follow some other statements and some assign statements with RHS pattern 'print'
 stmt s1, s2, s3; variable v; assign a;
