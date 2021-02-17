@@ -576,7 +576,7 @@ none
 116 - [1 Pattern] All variables that are on the LHS on some assign statements
 assign a; variable v;
 Select v pattern a(v, _)
-V1, V2, V3, V6, V7, V8, V9, V10
+V1, V2, V3, V6, V7, V8, V9, V10, Unused
 5000
 117 - [1 Pattern] All variables that are on the LHS of some assign statements with the RHS pattern 'V9'
 assign a; variable v;
@@ -601,7 +601,7 @@ none
 121 - [1 Pattern] All procedures, as long as there exist assign statements with the LHS 'V1'
 procedure p; assign a;
 Select p pattern a("V1", _)
-32, 39
+P1
 5000
 122 - [1 Pattern] All assign statements with the LHS 'V8' and RHS pattern 'V8'
 assign a;
@@ -655,7 +655,7 @@ Select a such that Parent(w, a) pattern a(_, _"1"_)
 5000
 132 - [1 Parent + 1 Pattern] All statements which are parents of some assign statements with the LHS variable 'V8'
 stmt s; assign a;
-Select s such that Parent(s, a), pattern a("V8", _)
+Select s such that Parent(s, a) pattern a("V8", _)
 19, 28
 5000
 133 - [1 Parent + 1 Pattern] All variables which are on the LHS of some assign statements which are children of statement 19
@@ -691,7 +691,7 @@ Select s1 such that Follows(s2, s3) pattern a(v, _"999"_)
 139 - [1 Follows* + 1 Pattern] All variables which are in the LHS of some assign statements which follows* statement 13
 assign a; variable v;
 Select v such that Follows*(13, a) pattern a(v, _)
-V1, V2, V3
+V1, V2, V3, Unused
 5000
 140 - [1 Follows* + 1 Pattern] All statements which are followed* by assign statements with the LHS variable 'V1'
 stmt s; assign a;
