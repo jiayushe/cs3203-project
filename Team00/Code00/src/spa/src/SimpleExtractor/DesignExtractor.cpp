@@ -6,11 +6,14 @@ using namespace SimpleExtractor;
 
 void DesignExtractor::extract_modify_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
     auto ast = assert_node_type(pkb->get_ast(), Parser::SimpleNodeType::PROGRAM);
-    auto proc_node = assert_node_type(ast->get_child(0), Parser::SimpleNodeType::PROCEDURE);
-    auto proc = extract_procedure(pkb, proc_node);
-    auto stmt_list_node =
-        assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
-    extract_modify_relationship_from_stmt_list(pkb, proc->get_name(), stmt_list_node);
+    int num_proc = ast->get_children().size();
+    for (int i = 0; i < num_proc; i++) {
+        auto proc_node = assert_node_type(ast->get_child(i), Parser::SimpleNodeType::PROCEDURE);
+        auto proc = extract_procedure(pkb, proc_node);
+        auto stmt_list_node =
+            assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
+        extract_modify_relationship_from_stmt_list(pkb, proc->get_name(), stmt_list_node);
+    }
 }
 
 void DesignExtractor::extract_modify_relationship_from_stmt_list(
@@ -77,11 +80,14 @@ void DesignExtractor::extract_modify_relationship_from_assign_stmt(
 
 void DesignExtractor::extract_use_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
     auto ast = assert_node_type(pkb->get_ast(), Parser::SimpleNodeType::PROGRAM);
-    auto proc_node = assert_node_type(ast->get_child(0), Parser::SimpleNodeType::PROCEDURE);
-    auto proc = extract_procedure(pkb, proc_node);
-    auto stmt_list_node =
-        assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
-    extract_use_relationship_from_stmt_list(pkb, proc->get_name(), stmt_list_node);
+    int num_proc = ast->get_children().size();
+    for (int i = 0; i < num_proc; i++) {
+        auto proc_node = assert_node_type(ast->get_child(i), Parser::SimpleNodeType::PROCEDURE);
+        auto proc = extract_procedure(pkb, proc_node);
+        auto stmt_list_node =
+            assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
+        extract_use_relationship_from_stmt_list(pkb, proc->get_name(), stmt_list_node);
+    }
 }
 
 void DesignExtractor::extract_use_relationship_from_stmt_list(
@@ -191,11 +197,14 @@ void DesignExtractor::extract_use_relationship_from_arithmetic_or_conditional(
 
 void DesignExtractor::extract_follow_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
     auto ast = assert_node_type(pkb->get_ast(), Parser::SimpleNodeType::PROGRAM);
-    auto proc_node = assert_node_type(ast->get_child(0), Parser::SimpleNodeType::PROCEDURE);
-    auto proc = extract_procedure(pkb, proc_node);
-    auto stmt_list_node =
-        assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
-    extract_follow_relationship_from_stmt_list(pkb, proc->get_name(), stmt_list_node);
+    int num_proc = ast->get_children().size();
+    for (int i = 0; i < num_proc; i++) {
+        auto proc_node = assert_node_type(ast->get_child(i), Parser::SimpleNodeType::PROCEDURE);
+        auto proc = extract_procedure(pkb, proc_node);
+        auto stmt_list_node =
+            assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
+        extract_follow_relationship_from_stmt_list(pkb, proc->get_name(), stmt_list_node);
+    }
 }
 
 void SimpleExtractor::DesignExtractor::extract_follow_relationship_from_stmt_list(
@@ -237,11 +246,14 @@ void SimpleExtractor::DesignExtractor::extract_follow_relationship_from_stmt(
 
 void DesignExtractor::extract_parent_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
     auto ast = assert_node_type(pkb->get_ast(), Parser::SimpleNodeType::PROGRAM);
-    auto proc_node = assert_node_type(ast->get_child(0), Parser::SimpleNodeType::PROCEDURE);
-    auto proc = extract_procedure(pkb, proc_node);
-    auto stmt_list_node =
-        assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
-    extract_parent_relationship_from_stmt_list(pkb, proc->get_name(), stmt_list_node, -1);
+    int num_proc = ast->get_children().size();
+    for (int i = 0; i < num_proc; i++) {
+        auto proc_node = assert_node_type(ast->get_child(i), Parser::SimpleNodeType::PROCEDURE);
+        auto proc = extract_procedure(pkb, proc_node);
+        auto stmt_list_node =
+            assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
+        extract_parent_relationship_from_stmt_list(pkb, proc->get_name(), stmt_list_node, -1);
+    }
 }
 
 void SimpleExtractor::DesignExtractor::extract_parent_relationship_from_stmt_list(

@@ -26,18 +26,23 @@ std::unordered_set<int> Statement::get_ancestors() { return ancestors; }
 
 void Statement::add_ancestor(int ancestor_id) { ancestors.insert(ancestor_id); }
 
-std::unordered_set<int> Statement::get_children() {
+std::unordered_set<int> Statement::get_children() { return children; }
+
+void Statement::add_child(int child_id) {
     if (this->type != StatementType::WHILE && this->type != StatementType::IF) {
         throw "This statement is not of type WHILE or IF";
     }
-    return children;
+    children.insert(child_id);
 }
-
-void Statement::add_child(int child_id) { children.insert(child_id); }
 
 std::unordered_set<int> Statement::get_descendants() { return descendants; }
 
-void Statement::add_descendant(int descendant_id) { descendants.insert(descendant_id); }
+void Statement::add_descendant(int descendant_id) {
+    if (this->type != StatementType::WHILE && this->type != StatementType::IF) {
+        throw "This statement is not of type WHILE or IF";
+    }
+    descendants.insert(descendant_id);
+}
 
 int Statement::get_direct_following() { return direct_following; }
 

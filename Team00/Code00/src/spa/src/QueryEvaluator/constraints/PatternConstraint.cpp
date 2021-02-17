@@ -41,7 +41,6 @@ bool PatternConstraint::is_valid(const AssignmentMap& assignments) {
     if (assigned_statement_modifies.find(lhs_name) == assigned_statement_modifies.end()) {
         return false;
     }
-
     switch (rhs.get_type()) {
     case Parser::ExpressionSpecType::ANY:
         return true;

@@ -46,16 +46,17 @@ public:
     void add_ancestor(int ancestor_id);
 
     // Gets the list of ids for the children statements.
-    // Throws unless its type is WHILE/IF.
     std::unordered_set<int> get_children();
 
     // Adds a children statement via id.
+    // Throws unless its type is WHILE/IF.
     void add_child(int child_id);
 
     // Gets the list of ids of the descendant statements.
     std::unordered_set<int> get_descendants();
 
     // Adds a descendant statement via id.
+    // Throws unless its type is WHILE/IF.
     void add_descendant(int descendant_id);
 
     // Gets the id of the previous statement.
