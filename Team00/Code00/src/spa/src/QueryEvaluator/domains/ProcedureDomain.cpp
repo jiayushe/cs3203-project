@@ -2,8 +2,8 @@
 
 using namespace QueryEvaluator;
 
-std::list<Assignment> ProcedureDomain::get_domain(std::shared_ptr<KnowledgeBase::PKB> pkb) {
-    std::list<Assignment> domain;
+std::vector<Assignment> ProcedureDomain::get_domain(std::shared_ptr<KnowledgeBase::PKB> pkb) {
+    std::vector<Assignment> domain;
     for (auto& procedure : pkb->get_procedures()) {
         Assignment assignment(procedure->get_name());
         domain.push_back(assignment);

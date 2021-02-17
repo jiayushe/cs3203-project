@@ -15,13 +15,15 @@ namespace QueryEvaluator {
 // Constraint for matching a pattern constraint
 class PatternConstraint : public BaseConstraint {
 public:
-    PatternConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb, Parser::Pattern pattern);
+    PatternConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb, const Parser::Pattern& pattern);
 
     bool is_valid(const AssignmentMap& assignment) override;
+    std::unordered_set<std::string> get_synonyms() const override;
 
 private:
     std::shared_ptr<KnowledgeBase::PKB> pkb;
     Parser::Pattern pattern;
+    std::unordered_set<std::string> synonyms;
 };
 
 } // namespace QueryEvaluator

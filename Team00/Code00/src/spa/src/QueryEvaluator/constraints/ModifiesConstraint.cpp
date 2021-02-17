@@ -3,8 +3,16 @@
 using namespace QueryEvaluator;
 
 ModifiesConstraint::ModifiesConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
-                                       Parser::StatementRef lhs, Parser::EntityRef rhs)
-    : pkb(std::move(pkb)), lhs(std::move(lhs)), rhs(std::move(rhs)) {}
+                                       const Parser::StatementRef& lhs,
+                                       const Parser::EntityRef& rhs)
+    : pkb(std::move(pkb)), lhs(lhs), rhs(rhs) {
+    if (lhs.get_type() == Parser::StatementRefType::SYNONYM) {
+        synonyms.insert(lhs.get_synonym());
+    }
+    if (rhs.get_type() == Parser::EntityRefType::SYNONYM) {
+        synonyms.insert(rhs.get_synonym());
+    }
+}
 
 bool ModifiesConstraint::is_valid(const AssignmentMap& assignments) {
     if (lhs.get_type() == Parser::StatementRefType::ANY) {
@@ -21,8 +29,11 @@ bool ModifiesConstraint::is_valid(const AssignmentMap& assignments) {
         case KnowledgeBase::StatementType::ASSIGN:
         case KnowledgeBase::StatementType::READ:
             return !lhs_statement->get_modifies().empty();
-        default:
+        case KnowledgeBase::StatementType::CALL:
+        case KnowledgeBase::StatementType::PRINT:
             return false;
+        default:
+            throw "Unhandled statement type";
         }
     }
 
@@ -38,7 +49,12 @@ bool ModifiesConstraint::is_valid(const AssignmentMap& assignments) {
         auto lhs_statement_modifies = lhs_statement->get_modifies();
         return lhs_statement_modifies.find(rhs_string) != lhs_statement_modifies.end();
     }
-    default:
+    case KnowledgeBase::StatementType::CALL:
+    case KnowledgeBase::StatementType::PRINT:
         return false;
+    default:
+        throw "Unhandled statement type";
     }
 }
+
+std::unordered_set<std::string> ModifiesConstraint::get_synonyms() const { return synonyms; }

@@ -2,10 +2,10 @@
 
 using namespace QueryEvaluator;
 
-std::list<std::shared_ptr<BaseConstraint>>
+std::vector<std::shared_ptr<BaseConstraint>>
 ConstraintUtils::get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
                                  Parser::QueryObject& query_object) {
-    std::list<std::shared_ptr<BaseConstraint>> constraints;
+    std::vector<std::shared_ptr<BaseConstraint>> constraints;
 
     if (query_object.has_such_that()) {
         auto such_that = query_object.get_such_that();

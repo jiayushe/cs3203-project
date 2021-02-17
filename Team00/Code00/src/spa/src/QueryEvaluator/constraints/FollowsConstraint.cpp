@@ -3,8 +3,16 @@
 using namespace QueryEvaluator;
 
 FollowsConstraint::FollowsConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
-                                     Parser::StatementRef lhs, Parser::StatementRef rhs)
-    : pkb(std::move(pkb)), lhs(std::move(lhs)), rhs(std::move(rhs)) {}
+                                     const Parser::StatementRef& lhs,
+                                     const Parser::StatementRef& rhs)
+    : pkb(std::move(pkb)), lhs(lhs), rhs(rhs) {
+    if (lhs.get_type() == Parser::StatementRefType::SYNONYM) {
+        synonyms.insert(lhs.get_synonym());
+    }
+    if (this->rhs.get_type() == Parser::StatementRefType::SYNONYM) {
+        synonyms.insert(rhs.get_synonym());
+    }
+}
 
 bool FollowsConstraint::is_valid(const AssignmentMap& assignments) {
     if (lhs.get_type() == Parser::StatementRefType::ANY &&
@@ -37,3 +45,5 @@ bool FollowsConstraint::is_valid(const AssignmentMap& assignments) {
     auto rhs_statement_id = get_statement_id(assignments, rhs);
     return lhs_statement->get_direct_follower() == rhs_statement_id;
 }
+
+std::unordered_set<std::string> FollowsConstraint::get_synonyms() const { return synonyms; }

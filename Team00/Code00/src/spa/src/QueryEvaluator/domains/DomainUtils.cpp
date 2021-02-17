@@ -1,19 +1,9 @@
 #include "DomainUtils.h"
 
-#include "AssignDomain.h"
-#include "ConstantDomain.h"
-#include "IfDomain.h"
-#include "PrintDomain.h"
-#include "ProcedureDomain.h"
-#include "ReadDomain.h"
-#include "StatementDomain.h"
-#include "VariableDomain.h"
-#include "WhileDomain.h"
-
 using namespace QueryEvaluator;
 
-std::list<Assignment> DomainUtils::get_domain(std::shared_ptr<KnowledgeBase::PKB> pkb,
-                                              Parser::DesignEntityType design_entity_type) {
+std::vector<Assignment> DomainUtils::get_domain(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                                Parser::DesignEntityType design_entity_type) {
     switch (design_entity_type) {
     case Parser::DesignEntityType::STMT:
         return StatementDomain::get_domain(pkb);

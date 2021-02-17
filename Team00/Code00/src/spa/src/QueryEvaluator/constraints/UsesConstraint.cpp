@@ -2,9 +2,16 @@
 
 using namespace QueryEvaluator;
 
-UsesConstraint::UsesConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb, Parser::StatementRef lhs,
-                               Parser::EntityRef rhs)
-    : pkb(std::move(pkb)), lhs(std::move(lhs)), rhs(std::move(rhs)) {}
+UsesConstraint::UsesConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                               const Parser::StatementRef& lhs, const Parser::EntityRef& rhs)
+    : pkb(std::move(pkb)), lhs(lhs), rhs(rhs) {
+    if (lhs.get_type() == Parser::StatementRefType::SYNONYM) {
+        synonyms.insert(lhs.get_synonym());
+    }
+    if (rhs.get_type() == Parser::EntityRefType::SYNONYM) {
+        synonyms.insert(rhs.get_synonym());
+    }
+}
 
 bool UsesConstraint::is_valid(const AssignmentMap& assignments) {
     if (lhs.get_type() == Parser::StatementRefType::ANY) {
@@ -21,8 +28,11 @@ bool UsesConstraint::is_valid(const AssignmentMap& assignments) {
         case KnowledgeBase::StatementType::ASSIGN:
         case KnowledgeBase::StatementType::PRINT:
             return !lhs_statement->get_uses().empty();
-        default:
+        case KnowledgeBase::StatementType::READ:
+        case KnowledgeBase::StatementType::CALL:
             return false;
+        default:
+            throw "Unhandled statement type";
         }
     }
 
@@ -38,7 +48,12 @@ bool UsesConstraint::is_valid(const AssignmentMap& assignments) {
         auto lhs_statement_uses = lhs_statement->get_uses();
         return lhs_statement_uses.find(rhs_string) != lhs_statement_uses.end();
     }
-    default:
+    case KnowledgeBase::StatementType::READ:
+    case KnowledgeBase::StatementType::CALL:
         return false;
+    default:
+        throw "Unhandled statement type";
     }
 }
+
+std::unordered_set<std::string> UsesConstraint::get_synonyms() const { return synonyms; }

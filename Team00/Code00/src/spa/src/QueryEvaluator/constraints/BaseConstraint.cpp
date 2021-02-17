@@ -27,3 +27,12 @@ std::string BaseConstraint::get_variable_name(const AssignmentMap& assignments,
         throw "Unhandled entity ref type";
     }
 }
+
+bool BaseConstraint::can_validate(std::unordered_set<std::string>& synonyms) const {
+    for (auto const& required_synonym : get_synonyms()) {
+        if (synonyms.find(required_synonym) == synonyms.end()) {
+            return false;
+        }
+    }
+    return true;
+}
