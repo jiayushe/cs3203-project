@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Parser/PQLParser/DesignEntity.h"
 #include "Parser/shared/Token.h"
 #include "Parser/shared/TokenList.h"
 #include <memory>

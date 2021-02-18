@@ -17,6 +17,8 @@ enum class DesignEntityType {
     PROCEDURE,
 };
 
+std::string to_string(DesignEntityType entity_type);
+
 class DesignEntity {
 public:
     DesignEntity();

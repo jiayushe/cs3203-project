@@ -212,8 +212,8 @@ TEST_CASE("Parser::PQLParser") {
         }
 
         SECTION("StatementRefType and EntityRefType combinations") {
-            std::string query_1 = "stmt s; Select s such that Modifies(_, _)";
-            std::string query_2 = "stmt s; Select s such that Modifies(s, s)";
+            std::string query_1 = "stmt s; Select s such that Modifies(s, _)";
+            std::string query_2 = "stmt s; variable v; Select s such that Modifies(s, v)";
             std::string query_3 = "stmt s; Select s such that Modifies(7, \"x\")";
             Parser::PQLStringLexer lexer_1(query_1);
             Parser::PQLParser parser_1(lexer_1);
@@ -237,7 +237,7 @@ TEST_CASE("Parser::PQLParser") {
 
             StatementRef left_statement_ref_1 = left_ref_1.get_statement_ref();
             EntityRef right_entity_ref_1 = right_ref_1.get_entity_ref();
-            REQUIRE(left_statement_ref_1.get_type() == StatementRefType::ANY);
+            REQUIRE(left_statement_ref_1.get_type() == StatementRefType::SYNONYM);
             REQUIRE(right_entity_ref_1.get_type() == EntityRefType::ANY);
 
             StatementRef left_statement_ref_2 = left_ref_2.get_statement_ref();
@@ -245,7 +245,7 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE(left_statement_ref_2.get_type() == StatementRefType::SYNONYM);
             REQUIRE(left_statement_ref_2.get_synonym() == "s");
             REQUIRE(right_entity_ref_2.get_type() == EntityRefType::SYNONYM);
-            REQUIRE(right_entity_ref_2.get_synonym() == "s");
+            REQUIRE(right_entity_ref_2.get_synonym() == "v");
 
             StatementRef left_statement_ref_3 = left_ref_3.get_statement_ref();
             EntityRef right_entity_ref_3 = right_ref_3.get_entity_ref();
@@ -351,5 +351,97 @@ TEST_CASE("Parser::PQLParser") {
         REQUIRE(entity_ref.get_type() == EntityRefType::SYNONYM);
         REQUIRE(expression_spec.get_type() == ExpressionSpecType::PATTERN);
         REQUIRE(expression_spec.get_pattern()->is_equal(pattern_node));
+    }
+
+    SECTION("Semantic validation") {
+        SECTION("Cannot have duplicate synonym") {
+            std::string query = "stmt s, s; Select s";
+            Parser::PQLStringLexer lexer(query);
+            Parser::PQLParser parser(lexer);
+            REQUIRE_THROWS(parser.parse_query());
+
+            std::string query_1 = "stmt s; assign s; Select s";
+            Parser::PQLStringLexer lexer_1(query_1);
+            Parser::PQLParser parser_1(lexer_1);
+            REQUIRE_THROWS(parser_1.parse_query());
+        }
+
+        SECTION("Synonym cannot be missing from the declaration") {
+            std::string query = "stmt s; Select s1";
+            Parser::PQLStringLexer lexer(query);
+            Parser::PQLParser parser(lexer);
+            REQUIRE_THROWS(parser.parse_query());
+
+            std::string query_1 = "stmt s; Select s such that Follows(s, s1)";
+            Parser::PQLStringLexer lexer_1(query_1);
+            Parser::PQLParser parser_1(lexer_1);
+            REQUIRE_THROWS(parser_1.parse_query());
+
+            std::string query_2 = "stmt s; Select s such that Follows(s1, s)";
+            Parser::PQLStringLexer lexer_2(query_2);
+            Parser::PQLParser parser_2(lexer_2);
+            REQUIRE_THROWS(parser_2.parse_query());
+
+            std::string query_3 = "assign a; Select a pattern a(_, s1)";
+            Parser::PQLStringLexer lexer_3(query_3);
+            Parser::PQLParser parser_3(lexer_3);
+            REQUIRE_THROWS(parser_3.parse_query());
+
+            std::string query_4 = "assign a; Select a pattern a(s1, _)";
+            Parser::PQLStringLexer lexer_4(query_4);
+            Parser::PQLParser parser_4(lexer_4);
+            REQUIRE_THROWS(parser_4.parse_query());
+
+            std::string query_5 = "assign a; Select a pattern a1(_, _)";
+            Parser::PQLStringLexer lexer_5(query_5);
+            Parser::PQLParser parser_5(lexer_5);
+            REQUIRE_THROWS(parser_5.parse_query());
+        }
+
+        SECTION("Pattern synonym must be assign") {
+            std::string query = "stmt s; Select s pattern s(_, _)";
+            Parser::PQLStringLexer lexer(query);
+            Parser::PQLParser parser(lexer);
+            REQUIRE_THROWS(parser.parse_query());
+        }
+
+        SECTION("Pattern LHS must be variable") {
+            std::string query = "assign a; stmt s; Select a pattern a(s, _)";
+            Parser::PQLStringLexer lexer(query);
+            Parser::PQLParser parser(lexer);
+            REQUIRE_THROWS(parser.parse_query());
+        }
+
+        SECTION("Modifies, Uses LHS must not be ANY") {
+            std::string op = GENERATE("Uses", "Modifies");
+            std::string query = "stmt s; Select s such that " + op + "(_, _)";
+            Parser::PQLStringLexer lexer(query);
+            Parser::PQLParser parser(lexer);
+            REQUIRE_THROWS(parser.parse_query());
+        }
+
+        SECTION("Modifies, Uses, Follows, Follows*, Parent, Parent* LHS must be statement") {
+            std::string op = GENERATE("Uses", "Modifies", "Follows", "Follows*", "Parent", "Parent*");
+            std::string query = "variable v; Select v such that " + op + "(v, _)";
+            Parser::PQLStringLexer lexer(query);
+            Parser::PQLParser parser(lexer);
+            REQUIRE_THROWS(parser.parse_query());
+        }
+
+        SECTION("Modifies, Uses RHS must be variable") {
+            std::string op = GENERATE("Uses", "Modifies");
+            std::string query = "stmt s; Select s such that " + op + "(s, s)";
+            Parser::PQLStringLexer lexer(query);
+            Parser::PQLParser parser(lexer);
+            REQUIRE_THROWS(parser.parse_query());
+        }
+
+        SECTION("Follows, Follows*, Parent, Parent* RHS must be statement") {
+            std::string op = GENERATE("Follows", "Follows*", "Parent", "Parent*");
+            std::string query = "variable v; Select v such that " + op + "(_, v)";
+            Parser::PQLStringLexer lexer(query);
+            Parser::PQLParser parser(lexer);
+            REQUIRE_THROWS(parser.parse_query());
+        }
     }
 }

@@ -8,6 +8,17 @@ using namespace Parser;
 
 PQLParser::PQLParser(BaseLexer& lexer) : BaseParser(lexer.tokens()) {}
 
+// Parse token string and store it as a QueryObject
+QueryObject PQLParser::parse_query() {
+    repeat({[&]() { process_declaration(); }});
+    process_selection();
+    expect_token(TokenType::END);
+
+    validate_query();
+
+    return query_object;
+}
+
 void PQLParser::process_declaration() {
     choice({[&]() {
                 expect_word("stmt");
@@ -154,7 +165,8 @@ StatementRef PQLParser::process_statement_ref() {
 
     choice({// stmtRef: synonym
             [&]() {
-                statement_ref.set_synonym(expect_name("stmt_synonym")->get_value());
+                auto synonym = expect_name("stmt_synonym")->get_value();
+                statement_ref.set_synonym(synonym);
                 statement_ref.set_type(StatementRefType::SYNONYM);
             },
 
@@ -180,7 +192,8 @@ EntityRef PQLParser::process_entity_ref() {
 
     choice({// entRef: synonym
             [&]() {
-                entity_ref.set_synonym(expect_name("ent_synonym")->get_value());
+                auto synonym = expect_name("ent_synonym")->get_value();
+                entity_ref.set_synonym(synonym);
                 entity_ref.set_type(EntityRefType::SYNONYM);
             },
 
@@ -255,10 +268,118 @@ void PQLParser::repeat(const std::function<void()>& parse_func) {
     }
 }
 
-// Parse token string and store it as a QueryObject
-QueryObject PQLParser::parse_query() {
-    repeat({[&]() { process_declaration(); }});
-    process_selection();
-    expect_token(TokenType::END);
-    return query_object;
+void PQLParser::validate_query() {
+    expect_declaration(query_object.get_selection());
+    if (query_object.has_such_that()) {
+        validate_such_that_cl(query_object.get_such_that());
+    }
+    if (query_object.has_pattern()) {
+        validate_pattern_cl(query_object.get_pattern());
+    }
+}
+
+void PQLParser::validate_such_that_cl(const SuchThat& such_that) {
+    auto left_ref = such_that.get_left_ref();
+    auto right_ref = such_that.get_right_ref();
+
+    switch (such_that.get_type()) {
+    case SuchThatType::MODIFIES_S:
+    case SuchThatType::USES_S: {
+        // LHS must be not be ANY and must be valid statement ref
+        auto left_statement_ref = left_ref.get_statement_ref();
+        if (left_statement_ref.get_type() == StatementRefType::ANY) {
+            throw "LHS of Uses cannot be ANY";
+        }
+        validate_statement_ref(left_statement_ref);
+
+        // RHS must be VARIABLE
+        auto right_entity_ref = right_ref.get_entity_ref();
+        validate_entity_ref(right_entity_ref, {DesignEntityType::VARIABLE});
+
+        break;
+    }
+    case SuchThatType::PARENT:
+    case SuchThatType::PARENT_T:
+    case SuchThatType::FOLLOWS:
+    case SuchThatType::FOLLOWS_T: {
+        // LHS must be valid statement ref
+        auto left_statement_ref = left_ref.get_statement_ref();
+        validate_statement_ref(left_statement_ref);
+
+        // RHS must be valid statement ref
+        auto right_statement_ref = right_ref.get_statement_ref();
+        validate_statement_ref(right_statement_ref);
+
+        break;
+    }
+    default:
+        throw "Unhandled such that type";
+    }
+}
+
+void PQLParser::validate_pattern_cl(const Pattern& pattern) {
+    // Pattern synonym must be ASSIGN
+    auto synonym = pattern.get_assigned_synonym();
+    expect_declaration(synonym, {DesignEntityType::ASSIGN});
+
+    // LHS must be VARIABLE
+    auto left_entity_ref = pattern.get_entity_ref();
+    validate_entity_ref(left_entity_ref, {DesignEntityType::VARIABLE});
+}
+
+void PQLParser::validate_statement_ref(const StatementRef& statement_ref) {
+    validate_statement_ref(statement_ref, {DesignEntityType::STMT, DesignEntityType::READ,
+                                           DesignEntityType::PRINT, DesignEntityType::WHILE,
+                                           DesignEntityType::IF, DesignEntityType::ASSIGN});
+}
+
+void PQLParser::validate_statement_ref(const StatementRef& statement_ref,
+                                       const std::vector<DesignEntityType>& expected_types) {
+    switch (statement_ref.get_type()) {
+    case StatementRefType::SYNONYM:
+        expect_declaration(statement_ref.get_synonym(), expected_types);
+        break;
+    case StatementRefType::STATEMENT_ID:
+    case StatementRefType::ANY:
+        break;
+    default:
+        throw "Unhandled statement ref type";
+    }
+}
+
+void PQLParser::validate_entity_ref(const EntityRef& entity_ref) {
+    validate_entity_ref(entity_ref, {DesignEntityType::VARIABLE, DesignEntityType::PROCEDURE});
+}
+
+void PQLParser::validate_entity_ref(const EntityRef& entity_ref,
+                                    const std::vector<DesignEntityType>& expected_types) {
+    switch (entity_ref.get_type()) {
+    case EntityRefType::SYNONYM:
+        expect_declaration(entity_ref.get_synonym(), expected_types);
+        break;
+    case EntityRefType::NAME:
+    case EntityRefType::ANY:
+        break;
+    default:
+        throw "Unhandled entity ref type";
+    }
+}
+
+DesignEntity PQLParser::expect_declaration(const std::string& synonym) {
+    auto declarations = query_object.get_declarations();
+    if (!declarations.has(synonym)) {
+        throw "Declaration for synonym '" + synonym + "' doesn't exist";
+    }
+    return declarations.get(synonym);
+}
+
+DesignEntity PQLParser::expect_declaration(const std::string& synonym,
+                                           const std::vector<DesignEntityType>& expected_types) {
+    auto declaration = expect_declaration(synonym);
+    for (auto& expected_type : expected_types) {
+        if (declaration.get_type() == expected_type) {
+            return declaration;
+        }
+    }
+    throw "Declaration for synonym '" + synonym + "' doesn't match the expected type";
 }
