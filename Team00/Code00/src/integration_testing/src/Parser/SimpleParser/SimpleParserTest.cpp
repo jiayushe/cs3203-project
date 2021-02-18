@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
 #include "Parser/SimpleParser/SimpleParser.h"
-#include "Parser/shared/StringLexer.h"
+#include "Parser/SimpleParser/SimpleStringLexer.h"
 #include <iterator>
 #include <string>
 
@@ -10,7 +10,7 @@ using namespace Parser;
 TEST_CASE("Parser::SimpleParser") {
     SECTION("read") {
         std::string source = "read varname123;";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         SimpleParser parser(lexer);
 
         auto read_node = parser.parse_read();
@@ -26,7 +26,7 @@ TEST_CASE("Parser::SimpleParser") {
 
     SECTION("print") {
         std::string source = "print var123name;";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         SimpleParser parser(lexer);
 
         auto print_node = parser.parse_print();
@@ -42,7 +42,7 @@ TEST_CASE("Parser::SimpleParser") {
 
     SECTION("call") {
         std::string source = "call Proc123Name456;";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         SimpleParser parser(lexer);
 
         auto call_node = parser.parse_call();
@@ -59,7 +59,7 @@ TEST_CASE("Parser::SimpleParser") {
     SECTION("assign") {
         SECTION("assign to variable") {
             std::string source = "var123name = anothervar123;";
-            StringLexer lexer(source);
+            SimpleStringLexer lexer(source);
             SimpleParser parser(lexer);
 
             auto assign_node = parser.parse_assign();
@@ -80,7 +80,7 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("assign to constant") {
             std::string source = "var123name = 123456;";
-            StringLexer lexer(source);
+            SimpleStringLexer lexer(source);
             SimpleParser parser(lexer);
 
             auto assign_node = parser.parse_assign();
@@ -101,7 +101,7 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("assign to arithmetic operation") {
             std::string source = "var123name = anothervar123 + 123456;";
-            StringLexer lexer(source);
+            SimpleStringLexer lexer(source);
             SimpleParser parser(lexer);
 
             auto assign_node = parser.parse_assign();
@@ -124,7 +124,7 @@ TEST_CASE("Parser::SimpleParser") {
         source += "while (x > 5) {";
         source += "  print varname123;";
         source += "}";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         SimpleParser parser(lexer);
 
         auto while_node = parser.parse_while();
@@ -144,7 +144,7 @@ TEST_CASE("Parser::SimpleParser") {
         source += "} else {";
         source += "  read varname123;";
         source += "}";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         SimpleParser parser(lexer);
 
         auto if_node = parser.parse_if();
@@ -173,7 +173,7 @@ TEST_CASE("Parser::SimpleParser") {
             std::string op = GENERATE("+", "-", "*", "/", "%");
 
             std::string source = "x " + op + " 5";
-            StringLexer lexer(source);
+            SimpleStringLexer lexer(source);
             SimpleParser parser(lexer);
 
             auto arith_node = parser.parse_expr();
@@ -194,7 +194,7 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("left-associative") {
             std::string source = "x + z + 5";
-            StringLexer lexer(source);
+            SimpleStringLexer lexer(source);
             SimpleParser parser(lexer);
 
             auto arith_node = parser.parse_expr();
@@ -225,7 +225,7 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("*, /, and % have higher precedence than + and -") {
             std::string source = "x + z * 5";
-            StringLexer lexer(source);
+            SimpleStringLexer lexer(source);
             SimpleParser parser(lexer);
 
             auto arith_node = parser.parse_expr();
@@ -256,7 +256,7 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("(...) has higher precedence than *, /, and %") {
             std::string source = "(x + z) * 5";
-            StringLexer lexer(source);
+            SimpleStringLexer lexer(source);
             SimpleParser parser(lexer);
 
             auto arith_node = parser.parse_expr();
@@ -291,7 +291,7 @@ TEST_CASE("Parser::SimpleParser") {
             std::string op = GENERATE(">", ">=", "<", "<=", "==", "!=");
 
             std::string source = "x " + op + " 5";
-            StringLexer lexer(source);
+            SimpleStringLexer lexer(source);
             SimpleParser parser(lexer);
 
             auto cond_node = parser.parse_cond_expr();
@@ -312,7 +312,7 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("negation") {
             std::string source = "!(x > 5)";
-            StringLexer lexer(source);
+            SimpleStringLexer lexer(source);
             SimpleParser parser(lexer);
 
             auto cond_node = parser.parse_cond_expr();
@@ -332,7 +332,7 @@ TEST_CASE("Parser::SimpleParser") {
             std::string op = GENERATE("&&", "||");
 
             std::string source = "(x > 5) " + op + " (6 <= y)";
-            StringLexer lexer(source);
+            SimpleStringLexer lexer(source);
             SimpleParser parser(lexer);
 
             auto cond_node = parser.parse_cond_expr();
@@ -357,7 +357,7 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("deeply nested") {
             std::string source = "(!(x + 5 < (x * 7))) || (x > 0)";
-            StringLexer lexer(source);
+            SimpleStringLexer lexer(source);
             SimpleParser parser(lexer);
 
             auto cond_node = parser.parse_cond_expr();
@@ -416,7 +416,7 @@ TEST_CASE("Parser::SimpleParser") {
         source += "  read c;";
         source += "}";
         source += "z = 10 ;";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         SimpleParser parser(lexer);
 
         auto stmt_lst_node = parser.parse_stmt_lst();
@@ -441,7 +441,7 @@ TEST_CASE("Parser::SimpleParser") {
         source += "procedure procname123 {";
         source += "  read x;";
         source += "}";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         SimpleParser parser(lexer);
 
         auto procedure_node = parser.parse_procedure();
@@ -462,7 +462,7 @@ TEST_CASE("Parser::SimpleParser") {
         source += "procedure procname123 {";
         source += "  read x;";
         source += "}";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         SimpleParser parser(lexer);
 
         auto program_node = parser.parse_program();

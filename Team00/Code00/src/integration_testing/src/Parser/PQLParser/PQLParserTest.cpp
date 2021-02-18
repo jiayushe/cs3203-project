@@ -1,8 +1,8 @@
 #include "catch.hpp"
 
 #include "Parser/PQLParser/PQLParser.h"
+#include "Parser/PQLParser/PQLStringLexer.h"
 #include "Parser/SimpleParser/SimpleParser.h"
-#include "Parser/shared/StringLexer.h"
 #include <iterator>
 #include <string>
 #include <unordered_map>
@@ -27,7 +27,7 @@ TEST_CASE("Parser::PQLParser") {
                                       "constant", "procedure");
 
             std::string query = op + " s; Select s";
-            Parser::StringLexer lexer(query);
+            Parser::PQLStringLexer lexer(query);
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
@@ -48,7 +48,7 @@ TEST_CASE("Parser::PQLParser") {
 
         SECTION("One design entity, multiple variable") {
             std::string query = "stmt s,u,v; Select s";
-            Parser::StringLexer lexer(query);
+            Parser::PQLStringLexer lexer(query);
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
@@ -75,7 +75,7 @@ TEST_CASE("Parser::PQLParser") {
 
         SECTION("Multiple design entity, one variable") {
             std::string query = "stmt s; if ifs; while w; Select w";
-            Parser::StringLexer lexer(query);
+            Parser::PQLStringLexer lexer(query);
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
@@ -102,7 +102,7 @@ TEST_CASE("Parser::PQLParser") {
 
         SECTION("Multiple design entity, multiple variable") {
             std::string query = "stmt s,u,v; if ifs; variable var1, var2; Select var1";
-            Parser::StringLexer lexer(query);
+            Parser::PQLStringLexer lexer(query);
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
@@ -143,7 +143,7 @@ TEST_CASE("Parser::PQLParser") {
             std::string op = GENERATE("Parent", "Parent*", "Follows", "Follows*");
 
             std::string query = "while w; Select w such that " + op + "(w, 7)";
-            Parser::StringLexer lexer(query);
+            Parser::PQLStringLexer lexer(query);
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
@@ -179,7 +179,7 @@ TEST_CASE("Parser::PQLParser") {
             std::string op = GENERATE("Modifies", "Uses");
 
             std::string query = "stmt s; Select s such that " + op + "(s, \"i\")";
-            Parser::StringLexer lexer(query);
+            Parser::PQLStringLexer lexer(query);
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
@@ -215,11 +215,11 @@ TEST_CASE("Parser::PQLParser") {
             std::string query_1 = "stmt s; Select s such that Modifies(_, _)";
             std::string query_2 = "stmt s; Select s such that Modifies(s, s)";
             std::string query_3 = "stmt s; Select s such that Modifies(7, \"x\")";
-            Parser::StringLexer lexer_1(query_1);
+            Parser::PQLStringLexer lexer_1(query_1);
             Parser::PQLParser parser_1(lexer_1);
-            Parser::StringLexer lexer_2(query_2);
+            Parser::PQLStringLexer lexer_2(query_2);
             Parser::PQLParser parser_2(lexer_2);
-            Parser::StringLexer lexer_3(query_3);
+            Parser::PQLStringLexer lexer_3(query_3);
             Parser::PQLParser parser_3(lexer_3);
             auto query_object_1 = parser_1.parse_query();
             auto query_object_2 = parser_2.parse_query();
@@ -258,12 +258,12 @@ TEST_CASE("Parser::PQLParser") {
 
     SECTION("One Pattern clause") {
         SECTION("General pattern test") {
-            std::string query = "assign a; Select a pattern a(_, _\"x + 1\"_)";
-            Parser::StringLexer lexer(query);
+            std::string query = "assign a; Select a pattern a(_, _\"x\"_)";
+            Parser::PQLStringLexer lexer(query);
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
 
-            Parser::StringLexer factor_lexer("x+1");
+            Parser::PQLStringLexer factor_lexer("x");
             auto pattern_node = SimpleParser(factor_lexer).parse_expr();
 
             auto declarations = query_object.get_declarations();
@@ -291,7 +291,7 @@ TEST_CASE("Parser::PQLParser") {
 
         SECTION("ExpressionSpecType of type ANY") {
             std::string query = "assign a; Select a pattern a(_, _)";
-            Parser::StringLexer lexer(query);
+            Parser::PQLStringLexer lexer(query);
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
             Pattern pattern_obj = query_object.get_pattern();
@@ -303,11 +303,11 @@ TEST_CASE("Parser::PQLParser") {
     SECTION("One Such That clause, One Pattern clause") {
         std::string query =
             "variable v; assign a; while w; Select w such that Uses(a, v) pattern a(v, _\"z\"_)";
-        Parser::StringLexer lexer(query);
+        Parser::PQLStringLexer lexer(query);
         Parser::PQLParser parser(lexer);
         auto query_object = parser.parse_query();
 
-        Parser::StringLexer factor_lexer("z");
+        Parser::PQLStringLexer factor_lexer("z");
         auto pattern_node = SimpleParser(factor_lexer.tokens()).parse_expr();
 
         auto declarations = query_object.get_declarations();

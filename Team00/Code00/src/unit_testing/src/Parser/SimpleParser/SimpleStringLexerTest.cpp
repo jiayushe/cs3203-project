@@ -1,18 +1,18 @@
 #include "catch.hpp"
 
-#include "Parser/shared/StringLexer.h"
-#include "Parser/shared/Token.h"
+#include "Parser/SimpleParser/SimpleStringLexer.h"
+#include "Parser/shared/TokenList.h"
 #include <memory>
 #include <string>
 
 using namespace Parser;
 
-TEST_CASE("Parser::StringLexer") {
+TEST_CASE("Parser::SimpleStringLexer") {
     std::shared_ptr<TokenList> tokens;
 
     SECTION("words") {
         std::string source = "alphabetical alphanumeric123 12345";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         tokens = lexer.tokens();
 
         auto first = tokens->pop_front();
@@ -30,7 +30,7 @@ TEST_CASE("Parser::StringLexer") {
 
     SECTION("brackets") {
         std::string source = "(){}";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         tokens = lexer.tokens();
 
         auto first = tokens->pop_front();
@@ -52,7 +52,7 @@ TEST_CASE("Parser::StringLexer") {
 
     SECTION("comparison operators") {
         std::string source = "> >= < <= != ==";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         tokens = lexer.tokens();
 
         auto first = tokens->pop_front();
@@ -82,7 +82,7 @@ TEST_CASE("Parser::StringLexer") {
 
     SECTION("logical operators") {
         std::string source = "! && ||";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         tokens = lexer.tokens();
 
         auto first = tokens->pop_front();
@@ -100,7 +100,7 @@ TEST_CASE("Parser::StringLexer") {
 
     SECTION("arithmetic operators") {
         std::string source = "= + - * / %";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         tokens = lexer.tokens();
 
         auto first = tokens->pop_front();
@@ -130,7 +130,7 @@ TEST_CASE("Parser::StringLexer") {
 
     SECTION("semicolon") {
         std::string source = ";";
-        StringLexer lexer(source);
+        SimpleStringLexer lexer(source);
         tokens = lexer.tokens();
 
         auto first = tokens->pop_front();

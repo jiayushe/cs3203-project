@@ -12,8 +12,8 @@ public:
     // Gets a list of tokens representing the supplied source.
     std::shared_ptr<TokenList> tokens();
 
-private:
-    std::shared_ptr<Token> next_token();
+protected:
+    virtual std::shared_ptr<Token> next_token() = 0;
 
     virtual bool has_more() = 0;
 

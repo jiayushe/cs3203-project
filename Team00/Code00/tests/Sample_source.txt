@@ -9,6 +9,5 @@ procedure Example {
     else {
       y = z + x; }
     z = z + x + i;
-    call q;
     i = i - 1; }
-  call p; }
+}

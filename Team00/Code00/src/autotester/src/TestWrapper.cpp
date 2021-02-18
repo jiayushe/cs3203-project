@@ -18,7 +18,7 @@ TestWrapper::TestWrapper() {}
 // method for parsing the SIMPLE source
 void TestWrapper::parse(std::string filename) {
     try {
-        Parser::FileLexer lexer(filename);
+        Parser::SimpleFileLexer lexer(filename);
         Parser::SimpleParser parser(lexer);
         auto root_node = parser.parse_program();
 
@@ -39,7 +39,7 @@ void TestWrapper::parse(std::string filename) {
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
     try {
-        Parser::StringLexer lexer(query);
+        Parser::PQLStringLexer lexer(query);
         Parser::PQLParser parser(lexer);
         auto query_object = parser.parse_query();
 

@@ -10,10 +10,11 @@
 #include "AbstractWrapper.h"
 #include "KnowledgeBase/PKB.h"
 #include "Parser/PQLParser/PQLParser.h"
+#include "Parser/PQLParser/PQLStringLexer.h"
 #include "Parser/PQLParser/QueryObject.h"
+#include "Parser/SimpleParser/SimpleFileLexer.h"
 #include "Parser/SimpleParser/SimpleParser.h"
-#include "Parser/shared/FileLexer.h"
-#include "Parser/shared/StringLexer.h"
+#include "Parser/SimpleParser/SimpleStringLexer.h"
 #include "QueryEvaluator/BruteForceEvaluator.h"
 #include "SimpleExtractor/DesignExtractor.h"
 

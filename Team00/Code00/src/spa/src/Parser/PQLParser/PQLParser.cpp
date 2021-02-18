@@ -77,8 +77,7 @@ void PQLParser::process_selection() {
 }
 
 void PQLParser::process_such_that_cl() {
-    expect_word("such");
-    expect_word("that");
+    expect_word("such that");
 
     choice({[&]() {
                 expect_word("Modifies");
@@ -93,9 +92,7 @@ void PQLParser::process_such_that_cl() {
                 process_such_that_body(SuchThatType::PARENT);
             },
             [&]() {
-                // FIXME: Splitting below into expect_word + expect_token is buggy
-                expect_word("Parent");
-                expect_token(TokenType::ASTERISK);
+                expect_word("Parent*");
                 process_such_that_body(SuchThatType::PARENT_T);
             },
             [&]() {
@@ -103,9 +100,7 @@ void PQLParser::process_such_that_cl() {
                 process_such_that_body(SuchThatType::FOLLOWS);
             },
             [&]() {
-                // FIXME: Splitting below into expect_word + expect_token is buggy
-                expect_word("Follows");
-                expect_token(TokenType::ASTERISK);
+                expect_word("Follows*");
                 process_such_that_body(SuchThatType::FOLLOWS_T);
             }},
            "Invalid such that type parsed");
