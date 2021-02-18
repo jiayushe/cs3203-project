@@ -211,6 +211,40 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE(right_entity_ref.get_name() == "i");
         }
 
+        SECTION("Quirky such that clause") {
+            std::string query = "stmt such; Select such such that Modifies(such, \"such\")";
+            Parser::PQLStringLexer lexer(query);
+            Parser::PQLParser parser(lexer);
+            auto query_object = parser.parse_query();
+
+            auto declarations = query_object.get_declarations();
+            REQUIRE(declarations.size() == 1);
+            REQUIRE(declarations.has("such"));
+
+            std::string selection = query_object.get_selection();
+            REQUIRE(selection == "such");
+
+            bool has_such_that_cl = query_object.has_such_that();
+            bool has_pattern_cl = query_object.has_pattern();
+            REQUIRE(has_such_that_cl);
+            REQUIRE_FALSE(has_pattern_cl);
+
+            SuchThat such_that_obj = query_object.get_such_that();
+            REQUIRE(such_that_obj.get_type() == such_that_map["Modifies"]);
+
+            Ref left_ref = such_that_obj.get_left_ref();
+            Ref right_ref = such_that_obj.get_right_ref();
+            REQUIRE(left_ref.get_type() == RefType::STATEMENT);
+            REQUIRE(right_ref.get_type() == RefType::ENTITY);
+
+            StatementRef left_statement_ref = left_ref.get_statement_ref();
+            EntityRef right_entity_ref = right_ref.get_entity_ref();
+            REQUIRE(left_statement_ref.get_type() == StatementRefType::SYNONYM);
+            REQUIRE(left_statement_ref.get_synonym() == "such");
+            REQUIRE(right_entity_ref.get_type() == EntityRefType::NAME);
+            REQUIRE(right_entity_ref.get_name() == "such");
+        }
+
         SECTION("StatementRefType and EntityRefType combinations") {
             std::string query_1 = "stmt s; Select s such that Modifies(s, _)";
             std::string query_2 = "stmt s; variable v; Select s such that Modifies(s, v)";
@@ -289,6 +323,40 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE(expression_spec.get_pattern()->is_equal(pattern_node));
         }
 
+        SECTION("Quirky pattern clause") {
+            std::string query = "assign pattern; variable Pattern; Select pattern pattern pattern(Pattern, _\"123\"_)";
+            Parser::PQLStringLexer lexer(query);
+            Parser::PQLParser parser(lexer);
+            auto query_object = parser.parse_query();
+
+            Parser::PQLStringLexer factor_lexer("123");
+            auto pattern_node = SimpleParser(factor_lexer).parse_expr();
+
+            auto declarations = query_object.get_declarations();
+            REQUIRE(declarations.size() == 2);
+            REQUIRE(declarations.has("pattern"));
+            REQUIRE(declarations.has("Pattern"));
+
+            std::string selection = query_object.get_selection();
+            REQUIRE(selection == "pattern");
+
+            bool has_such_that_cl = query_object.has_such_that();
+            bool has_pattern_cl = query_object.has_pattern();
+            REQUIRE_FALSE(has_such_that_cl);
+            REQUIRE(has_pattern_cl);
+
+            Pattern pattern_obj = query_object.get_pattern();
+            std::string assigned_synonym = pattern_obj.get_assigned_synonym();
+            REQUIRE(assigned_synonym == "pattern");
+
+            EntityRef entity_ref = pattern_obj.get_entity_ref();
+            ExpressionSpec expression_spec = pattern_obj.get_expression_spec();
+            REQUIRE(entity_ref.get_type() == EntityRefType::SYNONYM);
+            REQUIRE(entity_ref.get_synonym() == "Pattern");
+            REQUIRE(expression_spec.get_type() == ExpressionSpecType::PATTERN);
+            REQUIRE(expression_spec.get_pattern()->is_equal(pattern_node));
+        }
+
         SECTION("ExpressionSpecType of type ANY") {
             std::string query = "assign a; Select a pattern a(_, _)";
             Parser::PQLStringLexer lexer(query);
@@ -351,6 +419,15 @@ TEST_CASE("Parser::PQLParser") {
         REQUIRE(entity_ref.get_type() == EntityRefType::SYNONYM);
         REQUIRE(expression_spec.get_type() == ExpressionSpecType::PATTERN);
         REQUIRE(expression_spec.get_pattern()->is_equal(pattern_node));
+    }
+
+    SECTION("Syntactic validation") {
+        SECTION("Validate such that clause") {
+            std::string query = "stmt s; Select s such  that Modifies(s, _)";
+            Parser::PQLStringLexer lexer(query);
+            Parser::PQLParser parser(lexer);
+            REQUIRE_THROWS(parser.parse_query());
+        }
     }
 
     SECTION("Semantic validation") {
