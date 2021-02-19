@@ -5,7 +5,7 @@ using namespace QueryEvaluator;
 ParentTConstraint::ParentTConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
                                      const Parser::StatementRef& lhs,
                                      const Parser::StatementRef& rhs)
-        : pkb(std::move(pkb)), lhs(lhs), rhs(rhs) {
+    : pkb(std::move(pkb)), lhs(lhs), rhs(rhs) {
     if (lhs.get_type() == Parser::StatementRefType::SYNONYM) {
         synonyms.insert(lhs.get_synonym());
     }

@@ -324,7 +324,8 @@ TEST_CASE("Parser::PQLParser") {
         }
 
         SECTION("Quirky pattern clause") {
-            std::string query = "assign pattern; variable Pattern; Select pattern pattern pattern(Pattern, _\"123\"_)";
+            std::string query = "assign pattern; variable Pattern; Select pattern pattern "
+                                "pattern(Pattern, _\"123\"_)";
             Parser::PQLStringLexer lexer(query);
             Parser::PQLParser parser(lexer);
             auto query_object = parser.parse_query();
@@ -498,7 +499,8 @@ TEST_CASE("Parser::PQLParser") {
         }
 
         SECTION("Modifies, Uses, Follows, Follows*, Parent, Parent* LHS must be statement") {
-            std::string op = GENERATE("Uses", "Modifies", "Follows", "Follows*", "Parent", "Parent*");
+            std::string op =
+                GENERATE("Uses", "Modifies", "Follows", "Follows*", "Parent", "Parent*");
             std::string query = "variable v; Select v such that " + op + "(v, _)";
             Parser::PQLStringLexer lexer(query);
             Parser::PQLParser parser(lexer);
