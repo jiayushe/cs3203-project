@@ -7,3 +7,9 @@
 ```bash
 make format
 ```
+
+- Run test suites from PowerShell.
+```ps
+# You may need to run `Set-ExecutionPolicy Unrestricted` first to enable execution of remote scripts.
+& .\autotest.ps1
+```

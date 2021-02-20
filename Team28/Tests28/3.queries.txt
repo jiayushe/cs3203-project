@@ -45,7 +45,7 @@ P1
 50000
 10 - [1 Modifies] All while statements which modify some variables
 while  w ;
-Select  w  such  that   Modifies ( w , _ )
+Select  w  such that   Modifies ( w , _ )
 4, 24, 25, 30, 63, 68
 5000
 11 - [1 Modifies] All print statements which modify some variables
@@ -105,7 +105,7 @@ none
 5000
 22 - [1 Modifies] All procedures, as long as statement 4 modifies variable 'V4'
 procedure p;
-Select p such  that   Modifies(4,"V4")
+Select p such that   Modifies(4,"V4")
 P1
 5000
 23 - [1 Uses] All print statements which use some variables
@@ -370,7 +370,7 @@ none
 5000
 75 - [1 Follows] All procedures, as long as there exist at least one Follows relationship
 procedure p;
-Select  p  such  that    Follows (_, _)
+Select  p  such that    Follows (_, _)
 P1
 5000
 76 - [1 Follows] All statements which follows some statements
@@ -455,7 +455,7 @@ Select s such that Follows*(_, s)
 5000
 92 - [1 Follows*] All procedures, as long as statement 2 follows* some other statements
  procedure   p;
-Select   p such    that Follows*(_, 2)
+Select   p such that Follows*(_, 2)
 P1
 5000
 93 - [1 Follows*] All procedures, as long as statement 1 follows* some other statements
@@ -648,28 +648,43 @@ stmt s1, s2; assign a;
 Select s2 such that Parent*(s1, s2) pattern a("V3", _"132"_)
 none
 5000
-131 - [1 Follows + 1 Pattern] All variables on the LHS of assign statements which follows statement 71
+131 - [1 Parent* + 1 Pattern] All assign statements which are descendants of statement 24 with the RHS pattern '0'
+assign a;
+Select a such that Parent*(24, a) pattern a(_, _"0"_)
+none
+5000
+132 - [1 Follows + 1 Pattern] All variables on the LHS of assign statements which follows statement 71
 assign a; variable v;
 Select v such that Follows(71, a) pattern a(v, _)
 V15
 5000
-132 - [1 Follows + 1 Pattern] All assign statements which follows some other statements and with the RHS pattern '1000'
+133 - [1 Follows + 1 Pattern] All assign statements which follows some other statements and with the RHS pattern '1000'
 assign a;
 Select a such that Follows(_, a) pattern a(_, _"1000"_)
 70, 72
 5000
-133 - [1 Follows* + 1 Pattern] All assign statements which follows* statement 69 and with the RHS pattern 'V13'
+134 - [1 Follows + 1 Pattern] All statements which follows other statements as long as there exists an assign statement with the RHS pattern '98765'
+stmt s1, s2; assign a;
+Select s2 such that Follows(s1, s2) pattern a(_, _"98765"_)
+none
+5000
+135 - [1 Follows* + 1 Pattern] All assign statements which follows* statement 69 and with the RHS pattern 'V13'
 assign a;
 Select a such that Follows*(69, a) pattern a(_, _"V13"_)
 70, 72
 5000
-134 - [1 Follows* + 1 Pattern] All variables on the LHS of some assign statements which follows* some while statements and with the RHS pattern '5'
+136 - [1 Follows* + 1 Pattern] All variables on the LHS of some assign statements which follows* some while statements and with the RHS pattern '5'
 while w; assign a; variable v;
 Select v such that Follows*(w, a) pattern a(v, _"5"_)
 V5
 5000
-135 - [1 Follows* + 1 Pattern] All statements, as long as there exists some statements which follow* some other statements and some assign statements with RHS pattern '343'
+137 - [1 Follows* + 1 Pattern] All statements, as long as there exists some statements which follow* some other statements and some assign statements with RHS pattern '343'
 stmt s1, s2, s3; variable v; assign a;
 Select s1 such that Follows*(s2, s3) pattern a(v, _"343"_)
 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79
+5000
+138 - [1 Follows* + 1 Pattern] All assign statements which follows* statement 79
+assign a;
+Select a such that Follows(79, a) pattern a(_, _)
+none
 5000
