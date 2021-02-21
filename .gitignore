@@ -7,12 +7,12 @@ cmake-build-debug
 
 # VS
 .vs
+.vscode
 build_win
-.vscode/
 
 # Testing
 tests
 out.xml
-1.out.xml
-2.out.xml
-3.out.xml
+1_out.xml
+2_out.xml
+3_out.xml
