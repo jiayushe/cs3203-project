@@ -1,6 +1,7 @@
 #include "DesignExtractor.h"
 #include "KnowledgeBase/Procedure.h"
 #include "Parser/SimpleParser/SimpleNode.h"
+#include <stdexcept>
 
 using namespace SimpleExtractor;
 
@@ -58,7 +59,7 @@ void DesignExtractor::extract_modify_relationship_from_stmt(
         extract_modify_relationship_from_assign_stmt(pkb, proc_name, stmt);
         break;
     default:
-        throw "Unhandled statement type";
+        throw std::runtime_error("Unhandled statement type");
     }
 }
 
@@ -134,7 +135,7 @@ void DesignExtractor::extract_use_relationship_from_stmt(std::shared_ptr<Knowled
         extract_use_relationship_from_assign_stmt(pkb, proc_name, stmt);
         break;
     default:
-        throw "Unhandled statement type";
+        throw std::runtime_error("Unhandled statement type");
     }
 }
 
@@ -164,7 +165,7 @@ void DesignExtractor::extract_use_relationship_from_assign_stmt(
         extract_constant(pkb, child_node);
         break;
     default:
-        throw "Unhandled simple node type";
+        throw std::runtime_error("Unhandled statement type");
     }
 }
 
@@ -190,7 +191,7 @@ void DesignExtractor::extract_use_relationship_from_arithmetic_or_conditional(
             break;
         }
         default:
-            throw "Unhandled simple node type";
+            throw std::runtime_error("Unhandled statement type");
         }
     }
 }
@@ -339,7 +340,7 @@ DesignExtractor::convert_node_type_to_stmt_type(Parser::SimpleNodeType node_type
     case Parser::SimpleNodeType::WHILE:
         return KnowledgeBase::StatementType::WHILE;
     default:
-        throw "The AST node is not a statement node.";
+        throw std::runtime_error("The AST node is not a statement node.");
     }
 }
 
@@ -348,8 +349,8 @@ DesignExtractor::assert_node_type(std::shared_ptr<Parser::SimpleNode> node,
                                   Parser::SimpleNodeType expected_type) {
     Parser::SimpleNodeType actual_type = node->get_type();
     if (actual_type != expected_type) {
-        throw "Expected " + to_string(expected_type) + ", but encountered " +
-            to_string(actual_type);
+        throw std::runtime_error("Expected " + to_string(expected_type) + ", but encountered " +
+                                 to_string(actual_type));
     }
     return node;
 }

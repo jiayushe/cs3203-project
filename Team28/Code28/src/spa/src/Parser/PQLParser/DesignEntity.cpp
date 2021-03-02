@@ -1,4 +1,5 @@
 #include "Parser/PQLParser/DesignEntity.h"
+#include <stdexcept>
 
 using namespace Parser;
 
@@ -34,6 +35,6 @@ std::string Parser::to_string(DesignEntityType entity_type) {
     case DesignEntityType::PROCEDURE:
         return "PROCEDURE";
     default:
-        throw "Unknown token type";
+        throw std::runtime_error("Unknown token type");
     }
 }

@@ -1,6 +1,7 @@
 #include "SimpleStringLexer.h"
 #include "Parser/shared/TokenList.h"
 #include <cctype>
+#include <stdexcept>
 #include <string>
 
 using namespace Parser;
@@ -17,7 +18,7 @@ int SimpleStringLexer::pop_char() {
 
 int SimpleStringLexer::peek_char() {
     if (!has_more()) {
-        throw "String is empty";
+        throw std::runtime_error("String is empty");
     }
     return value[pos];
 }

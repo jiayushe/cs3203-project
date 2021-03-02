@@ -1,4 +1,5 @@
 #include "ConstraintUtils.h"
+#include <stdexcept>
 
 using namespace QueryEvaluator;
 
@@ -38,7 +39,7 @@ ConstraintUtils::get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
                 pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
         default:
-            throw "Unknown such that type";
+            throw std::runtime_error("Unknown such that type");
         }
     }
 

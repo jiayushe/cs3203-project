@@ -1,4 +1,5 @@
 #include "Ref.h"
+#include <stdexcept>
 
 using namespace Parser;
 
@@ -13,14 +14,14 @@ RefType Ref::get_type() const { return type; }
 
 EntityRef Ref::get_entity_ref() const {
     if (type != RefType::ENTITY) {
-        throw "RefType is not ENTITY type";
+        throw std::runtime_error("RefType is not ENTITY type");
     }
     return entity_ref;
 }
 
 StatementRef Ref::get_statement_ref() const {
     if (type != RefType::STATEMENT) {
-        throw "RefType is not STATEMENT type";
+        throw std::runtime_error("RefType is not STATEMENT type");
     }
     return statement_ref;
 }

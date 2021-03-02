@@ -1,4 +1,5 @@
 #include "BaseConstraint.h"
+#include <stdexcept>
 
 using namespace QueryEvaluator;
 
@@ -10,9 +11,9 @@ int BaseConstraint::get_statement_id(const AssignmentMap& assignments,
     case Parser::StatementRefType::SYNONYM:
         return assignments.at(statement_ref.get_synonym()).get_int_value();
     case Parser::StatementRefType::ANY:
-        throw "Cannot get statement id for ANY statement ref";
+        throw std::runtime_error("Cannot get statement id for ANY statement ref");
     default:
-        throw "Unknown statement ref type";
+        throw std::runtime_error("Unknown statement ref type");
     }
 }
 
@@ -24,7 +25,7 @@ std::string BaseConstraint::get_variable_name(const AssignmentMap& assignments,
     case Parser::EntityRefType::SYNONYM:
         return assignments.at(entity_ref.get_synonym()).get_string_value();
     default:
-        throw "Unhandled entity ref type";
+        throw std::runtime_error("Unhandled entity ref type");
     }
 }
 

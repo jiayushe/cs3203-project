@@ -1,5 +1,6 @@
 #include "BaseParser.h"
 #include <algorithm>
+#include <stdexcept>
 
 using namespace Parser;
 
@@ -8,8 +9,8 @@ BaseParser::BaseParser(std::shared_ptr<TokenList> tokens) : tokens(tokens) {}
 std::shared_ptr<Token> BaseParser::expect_token(TokenType expected_type) {
     auto token = tokens->pop_front();
     if (!is_token_type(token, expected_type)) {
-        throw "Expected token type " + Parser::to_string(expected_type) + ", received " +
-            Parser::to_string(token->get_type());
+        throw std::runtime_error("Expected token type " + Parser::to_string(expected_type) +
+                                 ", received " + Parser::to_string(token->get_type()));
     }
     return token;
 }
@@ -21,15 +22,15 @@ std::shared_ptr<Token> BaseParser::expect_token(const std::vector<TokenType>& ex
             return token;
         }
     }
-    throw "Expected token type " + to_string(expected_types) + ", received " +
-        Parser::to_string(token->get_type());
+    throw std::runtime_error("Expected token type " + to_string(expected_types) + ", received " +
+                             Parser::to_string(token->get_type()));
 }
 
 std::shared_ptr<Token> BaseParser::expect_word(const std::string& expected_value) {
     auto token = tokens->pop_front();
     if (!is_word(token, expected_value)) {
-        throw "Expected word token with value '" + expected_value + "', received '" +
-            token->get_value() + "'";
+        throw std::runtime_error("Expected word token with value '" + expected_value +
+                                 "', received '" + token->get_value() + "'");
     }
     return token;
 }
@@ -37,7 +38,8 @@ std::shared_ptr<Token> BaseParser::expect_word(const std::string& expected_value
 std::shared_ptr<Token> BaseParser::expect_name(const std::string& identifier) {
     auto token = tokens->pop_front();
     if (!is_name(token)) {
-        throw "Expected name token " + identifier + ", received '" + token->get_value() + "'";
+        throw std::runtime_error("Expected name token " + identifier + ", received '" +
+                                 token->get_value() + "'");
     }
     return token;
 }
@@ -45,7 +47,8 @@ std::shared_ptr<Token> BaseParser::expect_name(const std::string& identifier) {
 std::shared_ptr<Token> BaseParser::expect_integer(const std::string& identifier) {
     auto token = tokens->pop_front();
     if (!is_integer(token)) {
-        throw "Expected integer token " + identifier + ", received '" + token->get_value() + "'";
+        throw std::runtime_error("Expected integer token " + identifier + ", received '" +
+                                 token->get_value() + "'");
     }
     return token;
 }

@@ -1,4 +1,5 @@
 #include "PatternConstraint.h"
+#include <stdexcept>
 
 using namespace QueryEvaluator;
 
@@ -32,7 +33,7 @@ bool PatternConstraint::is_valid(const AssignmentMap& assignments) {
         case Parser::ExpressionSpecType::PATTERN:
             return assigned_statement->get_pattern()->is_subtree(rhs.get_pattern());
         default:
-            throw "Unhandled expression spec type";
+            throw std::runtime_error("Unhandled expression spec type");
         }
     }
 
@@ -47,7 +48,7 @@ bool PatternConstraint::is_valid(const AssignmentMap& assignments) {
     case Parser::ExpressionSpecType::PATTERN:
         return assigned_statement->get_pattern()->is_subtree(rhs.get_pattern());
     default:
-        throw "Unhandled expression spec type";
+        throw std::runtime_error("Unhandled expression spec type");
     }
 }
 

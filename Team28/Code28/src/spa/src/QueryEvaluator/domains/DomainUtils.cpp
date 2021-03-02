@@ -1,4 +1,5 @@
 #include "DomainUtils.h"
+#include <stdexcept>
 
 using namespace QueryEvaluator;
 
@@ -24,6 +25,6 @@ std::vector<Assignment> DomainUtils::get_domain(std::shared_ptr<KnowledgeBase::P
     case Parser::DesignEntityType::PROCEDURE:
         return ProcedureDomain::get_domain(pkb);
     default:
-        throw "Unknown design entity type";
+        throw std::runtime_error("Unknown design entity type");
     }
 }

@@ -1,4 +1,5 @@
 #include "ParentConstraint.h"
+#include <stdexcept>
 
 using namespace QueryEvaluator;
 
@@ -40,7 +41,7 @@ bool ParentConstraint::is_valid(const AssignmentMap& assignments) {
         case KnowledgeBase::StatementType::CALL:
             return false;
         default:
-            throw "Unhandled statement type";
+            throw std::runtime_error("Unhandled statement type");
         }
     }
 

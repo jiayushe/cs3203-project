@@ -1,4 +1,5 @@
 #include "Token.h"
+#include <stdexcept>
 
 using namespace Parser;
 
@@ -63,6 +64,6 @@ std::string Parser::to_string(TokenType token_type) {
     case TokenType::END:
         return "END";
     default:
-        throw "Unknown token type";
+        throw std::runtime_error("Unknown token type");
     }
 }

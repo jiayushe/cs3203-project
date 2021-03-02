@@ -1,5 +1,6 @@
 #include "SimpleParser.h"
 #include <algorithm>
+#include <stdexcept>
 #include <string>
 
 using namespace Parser;
@@ -316,7 +317,7 @@ SimpleParser::choice(const std::vector<std::function<std::shared_ptr<SimpleNode>
             next_statement_id = saved_next_statement_id;
         }
     }
-    throw error_message;
+    throw std::runtime_error(error_message);
 }
 
 std::shared_ptr<SimpleNode> SimpleParser::repeat(

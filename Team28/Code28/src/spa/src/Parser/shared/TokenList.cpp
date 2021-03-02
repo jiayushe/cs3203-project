@@ -1,10 +1,11 @@
 #include "TokenList.h"
+#include <stdexcept>
 
 using namespace Parser;
 
 std::shared_ptr<Token> TokenList::front() {
     if (pos >= tokens.size()) {
-        throw "TokenList is empty";
+        throw std::runtime_error("TokenList is empty");
     }
     return tokens[pos];
 }
@@ -21,7 +22,7 @@ int TokenList::current_pos() { return pos; }
 
 void TokenList::reset_pos(int new_pos) {
     if (new_pos < 0 || new_pos >= tokens.size()) {
-        throw "Invalid position supplied";
+        throw std::runtime_error("Invalid position supplied");
     }
     pos = new_pos;
 }

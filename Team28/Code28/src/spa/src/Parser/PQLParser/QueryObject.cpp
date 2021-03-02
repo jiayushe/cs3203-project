@@ -1,4 +1,5 @@
 #include "QueryObject.h"
+#include <stdexcept>
 #include <string>
 
 using namespace Parser;
@@ -15,14 +16,14 @@ bool QueryObject::has_pattern() const { return has_pattern_cl; }
 
 SuchThat QueryObject::get_such_that() const {
     if (!has_such_that_cl) {
-        throw "Query object doesn't have a such that clause";
+        throw std::runtime_error("Query object doesn't have a such that clause");
     }
     return such_that_obj;
 }
 
 Pattern QueryObject::get_pattern() const {
     if (!has_pattern_cl) {
-        throw "Query object doesn't have a pattern clause";
+        throw std::runtime_error("Query object doesn't have a pattern clause");
     }
     return pattern_obj;
 }

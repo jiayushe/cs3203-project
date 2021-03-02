@@ -27,12 +27,9 @@ void TestWrapper::parse(std::string filename) {
         SimpleExtractor::DesignExtractor::extract_parent_relationship(pkb);
         SimpleExtractor::DesignExtractor::extract_modify_relationship(pkb);
         SimpleExtractor::DesignExtractor::extract_use_relationship(pkb);
-    } catch (char const* message) {
-        std::cout << "Error: " << message << std::endl;
-        throw message;
-    } catch (const std::string& message) {
-        std::cout << "Error: " << message << std::endl;
-        throw message;
+    } catch (std::runtime_error& error) {
+        std::cout << "Error: " << error.what() << std::endl;
+        throw error;
     }
 }
 
@@ -44,11 +41,8 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
         auto query_object = parser.parse_query();
 
         QueryEvaluator::BruteForceEvaluator::evaluate(pkb, query_object, results);
-    } catch (char const* message) {
-        std::cout << "Error: " << message << std::endl;
-        results.clear();
-    } catch (const std::string& message) {
-        std::cout << "Error: " << message << std::endl;
+    } catch (std::runtime_error& error) {
+        std::cout << "Error: " << error.what() << std::endl;
         results.clear();
     }
 }

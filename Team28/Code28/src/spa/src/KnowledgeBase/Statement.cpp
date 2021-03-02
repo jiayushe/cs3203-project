@@ -1,4 +1,5 @@
 #include "Statement.h"
+#include <stdexcept>
 
 using namespace KnowledgeBase;
 
@@ -30,7 +31,7 @@ std::unordered_set<int> Statement::get_children() { return children; }
 
 void Statement::add_child(int child_id) {
     if (this->type != StatementType::WHILE && this->type != StatementType::IF) {
-        throw "This statement is not of type WHILE or IF";
+        throw std::runtime_error("This statement is not of type WHILE or IF");
     }
     children.insert(child_id);
 }
@@ -39,7 +40,7 @@ std::unordered_set<int> Statement::get_descendants() { return descendants; }
 
 void Statement::add_descendant(int descendant_id) {
     if (this->type != StatementType::WHILE && this->type != StatementType::IF) {
-        throw "This statement is not of type WHILE or IF";
+        throw std::runtime_error("This statement is not of type WHILE or IF");
     }
     descendants.insert(descendant_id);
 }
@@ -78,28 +79,28 @@ void Statement::add_uses(std::string var_name) { uses.insert(var_name); }
 
 std::string Statement::get_procedure_called() {
     if (this->type != StatementType::CALL) {
-        throw "This statement is not of type CALL";
+        throw std::runtime_error("This statement is not of type CALL");
     }
     return procedure_called;
 }
 
 void Statement::set_procedure_called(std::string proc_name) {
     if (this->type != StatementType::CALL) {
-        throw "This statement is not of type CALL";
+        throw std::runtime_error("This statement is not of type CALL");
     }
     procedure_called = proc_name;
 }
 
 std::shared_ptr<Parser::SimpleNode> Statement::get_pattern() {
     if (this->type != StatementType::ASSIGN) {
-        throw "This statement is not of type ASSIGN";
+        throw std::runtime_error("This statement is not of type ASSIGN");
     }
     return pattern;
 }
 
 void Statement::set_pattern(std::shared_ptr<Parser::SimpleNode> ast_pattern) {
     if (this->type != StatementType::ASSIGN) {
-        throw "This statement is not of type ASSIGN";
+        throw std::runtime_error("This statement is not of type ASSIGN");
     }
     pattern = ast_pattern;
 }

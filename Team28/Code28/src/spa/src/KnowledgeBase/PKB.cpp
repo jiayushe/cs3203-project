@@ -1,4 +1,5 @@
 #include "PKB.h"
+#include <stdexcept>
 
 using namespace KnowledgeBase;
 
@@ -18,7 +19,7 @@ std::vector<std::shared_ptr<Procedure>> PKB::get_procedures() {
 
 std::shared_ptr<Procedure> PKB::get_procedure_by_name(std::string name) {
     if (procedures.find(name) == procedures.end()) {
-        throw "Procedure " + name + " does not exist";
+        throw std::runtime_error("Procedure " + name + " does not exist");
     }
     return procedures.at(name);
 }
@@ -43,7 +44,7 @@ std::vector<std::shared_ptr<Statement>> PKB::get_statements() {
 
 std::shared_ptr<Statement> PKB::get_statement_by_id(int id) {
     if (statements.find(id) == statements.end()) {
-        throw "Statement " + std::to_string(id) + " does not exist";
+        throw std::runtime_error("Statement " + std::to_string(id) + " does not exist");
     }
     return statements.at(id);
 }
@@ -83,7 +84,7 @@ std::vector<std::shared_ptr<Variable>> PKB::get_variables() {
 
 std::shared_ptr<Variable> PKB::get_variable_by_name(std::string name) {
     if (variables.find(name) == variables.end()) {
-        throw "Variable " + name + " does not exist";
+        throw std::runtime_error("Variable " + name + " does not exist");
     }
     return variables.at(name);
 }
@@ -108,7 +109,7 @@ std::vector<std::shared_ptr<Constant>> PKB::get_constants() {
 
 std::shared_ptr<Constant> PKB::get_constant_by_value(int value) {
     if (constants.find(value) == constants.end()) {
-        throw "Constant " + std::to_string(value) + " does not exist";
+        throw std::runtime_error("Constant " + std::to_string(value) + " does not exist");
     }
     return constants.at(value);
 }

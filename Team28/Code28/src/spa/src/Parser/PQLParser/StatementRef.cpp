@@ -1,4 +1,5 @@
 #include "StatementRef.h"
+#include <stdexcept>
 #include <string>
 
 using namespace Parser;
@@ -15,14 +16,14 @@ StatementRefType StatementRef::get_type() const { return type; }
 
 std::string StatementRef::get_synonym() const {
     if (type != StatementRefType::SYNONYM) {
-        throw "StatementRefType is not SYNONYM type";
+        throw std::runtime_error("StatementRefType is not SYNONYM type");
     }
     return synonym;
 }
 
 int StatementRef::get_statement_id() const {
     if (type != StatementRefType::STATEMENT_ID) {
-        throw "StatementRefType is not STATEMENT_ID type";
+        throw std::runtime_error("StatementRefType is not STATEMENT_ID type");
     }
     return statement_id;
 }

@@ -1,4 +1,5 @@
 #include "EntityRef.h"
+#include <stdexcept>
 #include <string>
 
 using namespace Parser;
@@ -15,14 +16,14 @@ EntityRefType EntityRef::get_type() const { return type; }
 
 std::string EntityRef::get_synonym() const {
     if (type != EntityRefType::SYNONYM) {
-        throw "EntityRefType is not SYNONYM type";
+        throw std::runtime_error("EntityRefType is not SYNONYM type");
     }
     return synonym;
 }
 
 std::string EntityRef::get_name() const {
     if (type != EntityRefType::NAME) {
-        throw "EntityRefType is not NAME type";
+        throw std::runtime_error("EntityRefType is not NAME type");
     }
     return name;
 }

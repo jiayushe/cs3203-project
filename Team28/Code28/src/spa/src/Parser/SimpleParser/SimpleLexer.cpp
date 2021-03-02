@@ -1,6 +1,7 @@
 #include "SimpleLexer.h"
 #include "Parser/shared/TokenList.h"
 #include <cctype>
+#include <stdexcept>
 #include <string>
 
 using namespace Parser;
@@ -85,5 +86,5 @@ std::shared_ptr<Token> SimpleLexer::next_token() {
         return std::make_shared<Token>(TokenType::WORD, value);
     }
 
-    throw "Invalid token '" + std::string(1, next) + "'";
+    throw std::runtime_error("Invalid token '" + std::string(1, next) + "'");
 }

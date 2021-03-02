@@ -1,5 +1,6 @@
 #include "SimpleNode.h"
 #include <algorithm>
+#include <stdexcept>
 #include <string>
 
 using namespace Parser;
@@ -25,7 +26,7 @@ bool SimpleNode::has_value() {
 
 std::string SimpleNode::get_value() {
     if (!has_value()) {
-        throw "Cannot get value for node type " + Parser::to_string(type);
+        throw std::runtime_error("Cannot get value for node type " + Parser::to_string(type));
     }
     return value;
 }
@@ -38,7 +39,8 @@ bool SimpleNode::has_statement_id() {
 
 int SimpleNode::get_statement_id() {
     if (!has_statement_id()) {
-        throw "Cannot get statement_id for node type " + Parser::to_string(type);
+        throw std::runtime_error("Cannot get statement_id for node type " +
+                                 Parser::to_string(type));
     }
     return statement_id;
 }
@@ -47,7 +49,7 @@ std::vector<std::shared_ptr<SimpleNode>> SimpleNode::get_children() { return chi
 
 std::shared_ptr<SimpleNode> SimpleNode::get_child(int i) {
     if (i < 0 || i >= children.size()) {
-        throw "Children with index " + to_string(i) + " doesn't exist";
+        throw std::runtime_error("Children with index " + to_string(i) + " doesn't exist");
     }
     return children[i];
 }
@@ -147,6 +149,6 @@ std::string Parser::to_string(SimpleNodeType simple_node_type) {
     case SimpleNodeType::CONST_VALUE:
         return "CONST_VALUE";
     default:
-        throw "Unknown simple node type";
+        throw std::runtime_error("Unknown simple node type");
     }
 }

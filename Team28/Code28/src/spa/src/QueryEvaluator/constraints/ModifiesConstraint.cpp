@@ -1,4 +1,5 @@
 #include "ModifiesConstraint.h"
+#include <stdexcept>
 
 using namespace QueryEvaluator;
 
@@ -33,7 +34,7 @@ bool ModifiesConstraint::is_valid(const AssignmentMap& assignments) {
         case KnowledgeBase::StatementType::PRINT:
             return false;
         default:
-            throw "Unhandled statement type";
+            throw std::runtime_error("Unhandled statement type");
         }
     }
 
@@ -53,7 +54,7 @@ bool ModifiesConstraint::is_valid(const AssignmentMap& assignments) {
     case KnowledgeBase::StatementType::PRINT:
         return false;
     default:
-        throw "Unhandled statement type";
+        throw std::runtime_error("Unhandled statement type");
     }
 }
 

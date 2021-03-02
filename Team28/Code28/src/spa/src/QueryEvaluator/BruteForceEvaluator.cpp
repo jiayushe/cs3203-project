@@ -1,4 +1,5 @@
 #include "BruteForceEvaluator.h"
+#include <stdexcept>
 
 using namespace QueryEvaluator;
 
@@ -55,7 +56,7 @@ void BruteForceEvaluator::evaluate(std::shared_ptr<KnowledgeBase::PKB> pkb,
                      });
     if (selection_assignment_group == constrained_assignment_groups.end()) {
         // This should never happen
-        throw "Selection not found in any of the assignment groups";
+        throw std::runtime_error("Selection not found in any of the assignment groups");
     }
 
     // Get and dedupe the selection results
@@ -238,7 +239,7 @@ bool BruteForceEvaluator::has_synonym(Parser::Ref& ref) {
         return has_synonym(statement_ref);
     }
     default:
-        throw "Unknown ref type";
+        throw std::runtime_error("Unknown ref type");
     }
 }
 
@@ -261,20 +262,20 @@ std::string BruteForceEvaluator::get_synonym(Parser::Ref& ref) {
         return get_synonym(statement_ref);
     }
     default:
-        throw "Unknown ref type";
+        throw std::runtime_error("Unknown ref type");
     }
 }
 
 std::string BruteForceEvaluator::get_synonym(Parser::EntityRef& entity_ref) {
     if (!has_synonym(entity_ref)) {
-        throw "No synonym in entity ref";
+        throw std::runtime_error("No synonym in entity ref");
     }
     return entity_ref.get_synonym();
 }
 
 std::string BruteForceEvaluator::get_synonym(Parser::StatementRef& statement_ref) {
     if (!has_synonym(statement_ref)) {
-        throw "No synonym in statement ref";
+        throw std::runtime_error("No synonym in statement ref");
     }
     return statement_ref.get_synonym();
 }

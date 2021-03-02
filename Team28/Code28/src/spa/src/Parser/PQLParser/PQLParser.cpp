@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <string>
 
 #include "DesignEntity.h"
@@ -252,7 +253,7 @@ void PQLParser::choice(const std::vector<std::function<void()>>& parse_funcs,
             tokens->reset_pos(saved_pos);
         }
     }
-    throw error_message;
+    throw std::runtime_error(error_message);
 }
 
 // atomic, repeatedly running the parse_func until it fails
@@ -288,7 +289,7 @@ void PQLParser::validate_such_that_cl(const SuchThat& such_that) {
         // LHS must be not be ANY and must be valid statement ref
         auto left_statement_ref = left_ref.get_statement_ref();
         if (left_statement_ref.get_type() == StatementRefType::ANY) {
-            throw "LHS of Uses cannot be ANY";
+            throw std::runtime_error("LHS of Uses cannot be ANY");
         }
         validate_statement_ref(left_statement_ref);
 
@@ -313,7 +314,7 @@ void PQLParser::validate_such_that_cl(const SuchThat& such_that) {
         break;
     }
     default:
-        throw "Unhandled such that type";
+        throw std::runtime_error("Unhandled such that type");
     }
 }
 
@@ -343,7 +344,7 @@ void PQLParser::validate_statement_ref(const StatementRef& statement_ref,
     case StatementRefType::ANY:
         break;
     default:
-        throw "Unhandled statement ref type";
+        throw std::runtime_error("Unhandled statement ref type");
     }
 }
 
@@ -361,14 +362,14 @@ void PQLParser::validate_entity_ref(const EntityRef& entity_ref,
     case EntityRefType::ANY:
         break;
     default:
-        throw "Unhandled entity ref type";
+        throw std::runtime_error("Unhandled entity ref type");
     }
 }
 
 DesignEntity PQLParser::expect_declaration(const std::string& synonym) {
     auto declarations = query_object.get_declarations();
     if (!declarations.has(synonym)) {
-        throw "Declaration for synonym '" + synonym + "' doesn't exist";
+        throw std::runtime_error("Declaration for synonym '" + synonym + "' doesn't exist");
     }
     return declarations.get(synonym);
 }
@@ -381,5 +382,6 @@ DesignEntity PQLParser::expect_declaration(const std::string& synonym,
             return declaration;
         }
     }
-    throw "Declaration for synonym '" + synonym + "' doesn't match the expected type";
+    throw std::runtime_error("Declaration for synonym '" + synonym +
+                             "' doesn't match the expected type");
 }

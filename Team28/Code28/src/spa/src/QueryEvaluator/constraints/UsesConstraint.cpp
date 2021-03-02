@@ -1,4 +1,5 @@
 #include "UsesConstraint.h"
+#include <stdexcept>
 
 using namespace QueryEvaluator;
 
@@ -32,7 +33,7 @@ bool UsesConstraint::is_valid(const AssignmentMap& assignments) {
         case KnowledgeBase::StatementType::CALL:
             return false;
         default:
-            throw "Unhandled statement type";
+            throw std::runtime_error("Unhandled statement type");
         }
     }
 
@@ -52,7 +53,7 @@ bool UsesConstraint::is_valid(const AssignmentMap& assignments) {
     case KnowledgeBase::StatementType::CALL:
         return false;
     default:
-        throw "Unhandled statement type";
+        throw std::runtime_error("Unhandled statement type");
     }
 }
 

@@ -1,4 +1,5 @@
 #include "Assignment.h"
+#include <stdexcept>
 
 using namespace QueryEvaluator;
 
@@ -13,14 +14,14 @@ AssignmentType Assignment::get_type() const { return type; }
 
 std::string Assignment::get_string_value() const {
     if (type != AssignmentType::STRING) {
-        throw "Cannot get string value for non-string assignment";
+        throw std::runtime_error("Cannot get string value for non-string assignment");
     }
     return string_value;
 }
 
 int Assignment::get_int_value() const {
     if (type != AssignmentType::INTEGER) {
-        throw "Cannot get int value for non-int assignment";
+        throw std::runtime_error("Cannot get int value for non-int assignment");
     }
     return int_value;
 }
@@ -32,6 +33,6 @@ std::string Assignment::value_as_string() const {
     case AssignmentType::STRING:
         return string_value;
     default:
-        throw "Unknown assignment type";
+        throw std::runtime_error("Unknown assignment type");
     }
 }

@@ -1,4 +1,5 @@
 #include "ExpressionSpec.h"
+#include <stdexcept>
 
 using namespace Parser;
 
@@ -16,7 +17,7 @@ ExpressionSpecType ExpressionSpec::get_type() const { return type; }
 
 std::shared_ptr<Parser::SimpleNode> ExpressionSpec::get_pattern() const {
     if (type != ExpressionSpecType::PATTERN) {
-        throw "ExpressionSpecType is not PATTERN type";
+        throw std::runtime_error("ExpressionSpecType is not PATTERN type");
     }
     return pattern;
 }
