@@ -19,7 +19,7 @@ jobs:
           command: |
             set -e
             export PATH="C:\Program Files\CMake\bin:$PATH"
-            cd Team00/Code00
+            cd Team28/Code28
             mkdir build
             cd build
             cmake -A Win32 ..
@@ -28,7 +28,7 @@ jobs:
             cmake --build . --target autotester --config Release
             cd ..
       - persist_to_workspace:
-          root: Team00/Code00
+          root: Team28/Code28
           paths:
             - build
 
