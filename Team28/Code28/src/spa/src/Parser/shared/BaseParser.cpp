@@ -4,10 +4,10 @@
 
 using namespace Parser;
 
-BaseParser::BaseParser(std::shared_ptr<TokenList> tokens) : tokens(tokens) {}
+BaseParser::BaseParser(std::shared_ptr<BaseLexer> lexer) : lexer(std::move(lexer)) {}
 
 std::shared_ptr<Token> BaseParser::expect_token(TokenType expected_type) {
-    auto token = tokens->pop_front();
+    auto token = lexer->pop_token();
     if (!is_token_type(token, expected_type)) {
         throw std::runtime_error("Expected token type " + Parser::to_string(expected_type) +
                                  ", received " + Parser::to_string(token->get_type()));
@@ -16,7 +16,7 @@ std::shared_ptr<Token> BaseParser::expect_token(TokenType expected_type) {
 }
 
 std::shared_ptr<Token> BaseParser::expect_token(const std::vector<TokenType>& expected_types) {
-    auto token = tokens->pop_front();
+    auto token = lexer->pop_token();
     for (auto const& expected_type : expected_types) {
         if (is_token_type(token, expected_type)) {
             return token;
@@ -27,7 +27,7 @@ std::shared_ptr<Token> BaseParser::expect_token(const std::vector<TokenType>& ex
 }
 
 std::shared_ptr<Token> BaseParser::expect_word(const std::string& expected_value) {
-    auto token = tokens->pop_front();
+    auto token = lexer->pop_token();
     if (!is_word(token, expected_value)) {
         throw std::runtime_error("Expected word token with value '" + expected_value +
                                  "', received '" + token->get_value() + "'");
@@ -36,7 +36,7 @@ std::shared_ptr<Token> BaseParser::expect_word(const std::string& expected_value
 }
 
 std::shared_ptr<Token> BaseParser::expect_name(const std::string& identifier) {
-    auto token = tokens->pop_front();
+    auto token = lexer->pop_token();
     if (!is_name(token)) {
         throw std::runtime_error("Expected name token " + identifier + ", received '" +
                                  token->get_value() + "'");
@@ -45,7 +45,7 @@ std::shared_ptr<Token> BaseParser::expect_name(const std::string& identifier) {
 }
 
 std::shared_ptr<Token> BaseParser::expect_integer(const std::string& identifier) {
-    auto token = tokens->pop_front();
+    auto token = lexer->pop_token();
     if (!is_integer(token)) {
         throw std::runtime_error("Expected integer token " + identifier + ", received '" +
                                  token->get_value() + "'");

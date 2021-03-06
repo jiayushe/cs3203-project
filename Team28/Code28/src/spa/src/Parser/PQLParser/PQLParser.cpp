@@ -4,10 +4,13 @@
 #include "DesignEntity.h"
 #include "PQLParser.h"
 #include "Parser/SimpleParser/SimpleParser.h"
+#include "PQLLexer.h"
 
 using namespace Parser;
 
-PQLParser::PQLParser(BaseLexer& lexer) : BaseParser(lexer.tokens()) {}
+PQLParser::PQLParser(std::shared_ptr<Source> source) :
+    BaseParser(std::make_shared<PQLLexer>(source)),
+    source(source) {}
 
 // Parse token string and store it as a QueryObject
 QueryObject PQLParser::parse_query() {
@@ -225,7 +228,7 @@ ExpressionSpec PQLParser::process_expression_spec() {
             [&]() {
                 expect_token(TokenType::UNDERSCORE);
                 expect_token(TokenType::DOUBLE_QUOTE);
-                auto simple_node = SimpleParser(tokens).parse_expr();
+                auto simple_node = SimpleParser(source).parse_expr();
                 expect_token(TokenType::DOUBLE_QUOTE);
                 expect_token(TokenType::UNDERSCORE);
                 expression_spec.set_pattern(simple_node);
@@ -244,13 +247,13 @@ ExpressionSpec PQLParser::process_expression_spec() {
 // match
 void PQLParser::choice(const std::vector<std::function<void()>>& parse_funcs,
                        std::string error_message) {
-    auto saved_pos = tokens->current_pos();
+    auto saved_pos = source->current_pos();
     for (const auto& parse_func : parse_funcs) {
         try {
             parse_func();
             return;
         } catch (...) {
-            tokens->reset_pos(saved_pos);
+            source->reset_pos(saved_pos);
         }
     }
     throw std::runtime_error(error_message);
@@ -258,14 +261,14 @@ void PQLParser::choice(const std::vector<std::function<void()>>& parse_funcs,
 
 // atomic, repeatedly running the parse_func until it fails
 void PQLParser::repeat(const std::function<void()>& parse_func) {
-    auto saved_pos = tokens->current_pos();
+    auto saved_pos = source->current_pos();
     try {
         while (true) {
             parse_func();
-            saved_pos = tokens->current_pos();
+            saved_pos = source->current_pos();
         }
     } catch (...) {
-        tokens->reset_pos(saved_pos);
+        source->reset_pos(saved_pos);
     }
 }
 

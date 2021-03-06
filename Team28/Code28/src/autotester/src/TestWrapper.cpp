@@ -18,8 +18,8 @@ TestWrapper::TestWrapper() {}
 // method for parsing the SIMPLE source
 void TestWrapper::parse(std::string filename) {
     try {
-        Parser::SimpleFileLexer lexer(filename);
-        Parser::SimpleParser parser(lexer);
+        auto source = std::make_shared<Parser::Source>(filename, true);
+        Parser::SimpleParser parser(source);
         auto root_node = parser.parse_program();
 
         pkb = std::make_shared<KnowledgeBase::PKB>(root_node);
@@ -36,8 +36,8 @@ void TestWrapper::parse(std::string filename) {
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
     try {
-        Parser::PQLStringLexer lexer(query);
-        Parser::PQLParser parser(lexer);
+        auto source = std::make_shared<Parser::Source>(query);
+        Parser::PQLParser parser(source);
         auto query_object = parser.parse_query();
 
         QueryEvaluator::BruteForceEvaluator::evaluate(pkb, query_object, results);

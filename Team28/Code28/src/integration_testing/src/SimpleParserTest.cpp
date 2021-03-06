@@ -1,7 +1,6 @@
 #include "catch.hpp"
 
 #include "Parser/SimpleParser/SimpleParser.h"
-#include "Parser/SimpleParser/SimpleStringLexer.h"
 #include <iterator>
 #include <string>
 
@@ -10,8 +9,8 @@ using namespace Parser;
 TEST_CASE("Parser::SimpleParser") {
     SECTION("read") {
         std::string source = "read varname123;";
-        SimpleStringLexer lexer(source);
-        SimpleParser parser(lexer);
+        auto base_source = std::make_shared<Parser::Source>(source);
+        Parser::SimpleParser parser(base_source);
 
         auto read_node = parser.parse_read();
         REQUIRE(read_node->get_type() == SimpleNodeType::READ);
@@ -26,8 +25,8 @@ TEST_CASE("Parser::SimpleParser") {
 
     SECTION("print") {
         std::string source = "print var123name;";
-        SimpleStringLexer lexer(source);
-        SimpleParser parser(lexer);
+        auto base_source = std::make_shared<Parser::Source>(source);
+        Parser::SimpleParser parser(base_source);
 
         auto print_node = parser.parse_print();
         REQUIRE(print_node->get_type() == SimpleNodeType::PRINT);
@@ -42,8 +41,8 @@ TEST_CASE("Parser::SimpleParser") {
 
     SECTION("call") {
         std::string source = "call Proc123Name456;";
-        SimpleStringLexer lexer(source);
-        SimpleParser parser(lexer);
+        auto base_source = std::make_shared<Parser::Source>(source);
+        Parser::SimpleParser parser(base_source);
 
         auto call_node = parser.parse_call();
         REQUIRE(call_node->get_type() == SimpleNodeType::CALL);
@@ -59,8 +58,8 @@ TEST_CASE("Parser::SimpleParser") {
     SECTION("assign") {
         SECTION("assign to variable") {
             std::string source = "var123name = anothervar123;";
-            SimpleStringLexer lexer(source);
-            SimpleParser parser(lexer);
+            auto base_source = std::make_shared<Parser::Source>(source);
+            Parser::SimpleParser parser(base_source);
 
             auto assign_node = parser.parse_assign();
             REQUIRE(assign_node->get_type() == SimpleNodeType::ASSIGN);
@@ -80,8 +79,8 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("assign to constant") {
             std::string source = "var123name = 123456;";
-            SimpleStringLexer lexer(source);
-            SimpleParser parser(lexer);
+            auto base_source = std::make_shared<Parser::Source>(source);
+            Parser::SimpleParser parser(base_source);
 
             auto assign_node = parser.parse_assign();
             REQUIRE(assign_node->get_type() == SimpleNodeType::ASSIGN);
@@ -101,8 +100,8 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("assign to arithmetic operation") {
             std::string source = "var123name = anothervar123 + 123456;";
-            SimpleStringLexer lexer(source);
-            SimpleParser parser(lexer);
+            auto base_source = std::make_shared<Parser::Source>(source);
+            Parser::SimpleParser parser(base_source);
 
             auto assign_node = parser.parse_assign();
             REQUIRE(assign_node->get_type() == SimpleNodeType::ASSIGN);
@@ -124,8 +123,8 @@ TEST_CASE("Parser::SimpleParser") {
         source += "while (x > 5) {";
         source += "  print varname123;";
         source += "}";
-        SimpleStringLexer lexer(source);
-        SimpleParser parser(lexer);
+        auto base_source = std::make_shared<Parser::Source>(source);
+        Parser::SimpleParser parser(base_source);
 
         auto while_node = parser.parse_while();
         REQUIRE(while_node->get_type() == SimpleNodeType::WHILE);
@@ -144,8 +143,8 @@ TEST_CASE("Parser::SimpleParser") {
         source += "} else {";
         source += "  read varname123;";
         source += "}";
-        SimpleStringLexer lexer(source);
-        SimpleParser parser(lexer);
+        auto base_source = std::make_shared<Parser::Source>(source);
+        Parser::SimpleParser parser(base_source);
 
         auto if_node = parser.parse_if();
         REQUIRE(if_node->get_type() == SimpleNodeType::IF);
@@ -173,8 +172,8 @@ TEST_CASE("Parser::SimpleParser") {
             std::string op = GENERATE("+", "-", "*", "/", "%");
 
             std::string source = "x " + op + " 5";
-            SimpleStringLexer lexer(source);
-            SimpleParser parser(lexer);
+            auto base_source = std::make_shared<Parser::Source>(source);
+            Parser::SimpleParser parser(base_source);
 
             auto arith_node = parser.parse_expr();
             REQUIRE(arith_node->get_type() == SimpleNodeType::ARITHMETIC);
@@ -194,8 +193,8 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("left-associative") {
             std::string source = "x + z + 5";
-            SimpleStringLexer lexer(source);
-            SimpleParser parser(lexer);
+            auto base_source = std::make_shared<Parser::Source>(source);
+            Parser::SimpleParser parser(base_source);
 
             auto arith_node = parser.parse_expr();
             REQUIRE(arith_node->get_type() == SimpleNodeType::ARITHMETIC);
@@ -225,8 +224,8 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("*, /, and % have higher precedence than + and -") {
             std::string source = "x + z * 5";
-            SimpleStringLexer lexer(source);
-            SimpleParser parser(lexer);
+            auto base_source = std::make_shared<Parser::Source>(source);
+            Parser::SimpleParser parser(base_source);
 
             auto arith_node = parser.parse_expr();
             REQUIRE(arith_node->get_type() == SimpleNodeType::ARITHMETIC);
@@ -256,8 +255,8 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("(...) has higher precedence than *, /, and %") {
             std::string source = "(x + z) * 5";
-            SimpleStringLexer lexer(source);
-            SimpleParser parser(lexer);
+            auto base_source = std::make_shared<Parser::Source>(source);
+            Parser::SimpleParser parser(base_source);
 
             auto arith_node = parser.parse_expr();
             REQUIRE(arith_node->get_type() == SimpleNodeType::ARITHMETIC);
@@ -291,8 +290,8 @@ TEST_CASE("Parser::SimpleParser") {
             std::string op = GENERATE(">", ">=", "<", "<=", "==", "!=");
 
             std::string source = "x " + op + " 5";
-            SimpleStringLexer lexer(source);
-            SimpleParser parser(lexer);
+            auto base_source = std::make_shared<Parser::Source>(source);
+            Parser::SimpleParser parser(base_source);
 
             auto cond_node = parser.parse_cond_expr();
             REQUIRE(cond_node->get_type() == SimpleNodeType::CONDITIONAL);
@@ -312,8 +311,8 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("negation") {
             std::string source = "!(x > 5)";
-            SimpleStringLexer lexer(source);
-            SimpleParser parser(lexer);
+            auto base_source = std::make_shared<Parser::Source>(source);
+            Parser::SimpleParser parser(base_source);
 
             auto cond_node = parser.parse_cond_expr();
             REQUIRE(cond_node->get_type() == SimpleNodeType::CONDITIONAL);
@@ -332,8 +331,8 @@ TEST_CASE("Parser::SimpleParser") {
             std::string op = GENERATE("&&", "||");
 
             std::string source = "(x > 5) " + op + " (6 <= y)";
-            SimpleStringLexer lexer(source);
-            SimpleParser parser(lexer);
+            auto base_source = std::make_shared<Parser::Source>(source);
+            Parser::SimpleParser parser(base_source);
 
             auto cond_node = parser.parse_cond_expr();
             REQUIRE(cond_node->get_type() == SimpleNodeType::CONDITIONAL);
@@ -357,8 +356,8 @@ TEST_CASE("Parser::SimpleParser") {
 
         SECTION("deeply nested") {
             std::string source = "(!(x + 5 < (x * 7))) || (x > 0)";
-            SimpleStringLexer lexer(source);
-            SimpleParser parser(lexer);
+            auto base_source = std::make_shared<Parser::Source>(source);
+            Parser::SimpleParser parser(base_source);
 
             auto cond_node = parser.parse_cond_expr();
             REQUIRE(cond_node->get_type() == SimpleNodeType::CONDITIONAL);
@@ -416,8 +415,8 @@ TEST_CASE("Parser::SimpleParser") {
         source += "  read c;";
         source += "}";
         source += "z = 10 ;";
-        SimpleStringLexer lexer(source);
-        SimpleParser parser(lexer);
+        auto base_source = std::make_shared<Parser::Source>(source);
+        Parser::SimpleParser parser(base_source);
 
         auto stmt_lst_node = parser.parse_stmt_lst();
         REQUIRE(stmt_lst_node->get_type() == SimpleNodeType::STMT_LST);
@@ -441,8 +440,8 @@ TEST_CASE("Parser::SimpleParser") {
         source += "procedure procname123 {";
         source += "  read x;";
         source += "}";
-        SimpleStringLexer lexer(source);
-        SimpleParser parser(lexer);
+        auto base_source = std::make_shared<Parser::Source>(source);
+        Parser::SimpleParser parser(base_source);
 
         auto procedure_node = parser.parse_procedure();
         REQUIRE(procedure_node->get_type() == SimpleNodeType::PROCEDURE);
@@ -462,8 +461,8 @@ TEST_CASE("Parser::SimpleParser") {
         source += "procedure procname123 {";
         source += "  read x;";
         source += "}";
-        SimpleStringLexer lexer(source);
-        SimpleParser parser(lexer);
+        auto base_source = std::make_shared<Parser::Source>(source);
+        Parser::SimpleParser parser(base_source);
 
         auto program_node = parser.parse_program();
         REQUIRE(program_node->get_type() == SimpleNodeType::PROGRAM);

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Parser/shared/BaseLexer.h"
+#include "Parser/shared/Source.h"
 #include "Parser/shared/BaseParser.h"
 #include "Parser/shared/Token.h"
-#include "Parser/shared/TokenList.h"
 #include "QueryObject.h"
+#include "PQLLexer.h"
 #include <functional>
 #include <map>
 #include <vector>
@@ -12,11 +12,12 @@
 namespace Parser {
 class PQLParser : public BaseParser {
 public:
-    explicit PQLParser(BaseLexer& lexer);
+    explicit PQLParser(std::shared_ptr<Source> source);
 
     QueryObject parse_query();
 
 private:
+    std::shared_ptr<Source> source;
     QueryObject query_object;
 
     // Parsing logic

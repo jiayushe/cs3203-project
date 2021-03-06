@@ -2,7 +2,7 @@
 
 #include "Parser/PQLParser/DesignEntity.h"
 #include "Parser/shared/Token.h"
-#include "Parser/shared/TokenList.h"
+#include "Parser/shared/BaseLexer.h"
 #include <memory>
 #include <vector>
 
@@ -12,11 +12,11 @@ namespace Parser {
 // which parsers for both PQL and SIMPLE should find useful.
 class BaseParser {
 protected:
-    std::shared_ptr<TokenList> tokens;
+    std::shared_ptr<BaseLexer> lexer;
 
     // Construct a BaseParser instance.
     // Caller is responsible for cleaning up the memory for the supplied token list.
-    BaseParser(std::shared_ptr<TokenList> tokens);
+    BaseParser(std::shared_ptr<BaseLexer> lexer);
 
     // Registers that the next token should be of the expected type.
     // Throws if the expectation is not fulfilled.

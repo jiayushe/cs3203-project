@@ -1,15 +1,15 @@
 #include "SimpleParser.h"
+#include "SimpleLexer.h"
 #include <algorithm>
 #include <stdexcept>
 #include <string>
 
 using namespace Parser;
 
-SimpleParser::SimpleParser(BaseLexer& lexer)
-    : BaseParser(lexer.tokens()), next_statement_id(1), should_delete_token_list(true) {}
-
-SimpleParser::SimpleParser(std::shared_ptr<TokenList> tokens)
-    : BaseParser(tokens), next_statement_id(1), should_delete_token_list(false) {}
+SimpleParser::SimpleParser(std::shared_ptr<Source> source)
+    : BaseParser(std::make_shared<SimpleLexer>(source)),
+      source(source),
+      next_statement_id(1) {}
 
 std::shared_ptr<SimpleNode> SimpleParser::parse_program() {
     auto procedure_node = parse_procedure();
@@ -68,7 +68,7 @@ std::shared_ptr<SimpleNode> SimpleParser::parse_stmt() {
                       // stmt: assign
                       [this]() { return parse_assign(); },
                   },
-                  "Expected stmt, received '" + tokens->front()->get_value() + "'");
+                  "Expected stmt, received '" + lexer->peek_token()->get_value() + "'");
 }
 
 std::shared_ptr<SimpleNode> SimpleParser::parse_read() {
@@ -203,7 +203,7 @@ std::shared_ptr<SimpleNode> SimpleParser::parse_cond_expr() {
 
                    // cond_expr: rel_expr
                    [this]() { return parse_rel_expr(); }},
-                  "Expected cond_expr, received '" + tokens->front()->get_value() + "'");
+                  "Expected cond_expr, received '" + lexer->peek_token()->get_value() + "'");
 }
 
 std::shared_ptr<SimpleNode> SimpleParser::parse_rel_expr() {
@@ -229,7 +229,7 @@ std::shared_ptr<SimpleNode> SimpleParser::parse_rel_factor() {
 
                    // rel_factor: const_value
                    [this]() { return parse_const_value(); }},
-                  "Expected rel_factor, received '" + tokens->front()->get_value() + "'");
+                  "Expected rel_factor, received '" + lexer->peek_token()->get_value() + "'");
 }
 
 // expr: term (('+' | '-') term)*
@@ -285,7 +285,7 @@ std::shared_ptr<SimpleNode> SimpleParser::parse_factor() {
                           return expr_node;
                       },
                   },
-                  "Expected parse_factor, received '" + tokens->front()->get_value() + "'");
+                  "Expected parse_factor, received '" + lexer->peek_token()->get_value() + "'");
 }
 
 std::shared_ptr<SimpleNode> SimpleParser::parse_var_name() {
@@ -307,13 +307,13 @@ std::shared_ptr<SimpleNode> SimpleParser::parse_const_value() {
 std::shared_ptr<SimpleNode>
 SimpleParser::choice(const std::vector<std::function<std::shared_ptr<SimpleNode>()>>& parse_funcs,
                      std::string error_message) {
-    auto saved_pos = tokens->current_pos();
+    auto saved_pos = source->current_pos();
     auto saved_next_statement_id = next_statement_id;
     for (const auto& parse_func : parse_funcs) {
         try {
             return parse_func();
         } catch (...) {
-            tokens->reset_pos(saved_pos);
+            source->reset_pos(saved_pos);
             next_statement_id = saved_next_statement_id;
         }
     }
@@ -324,17 +324,17 @@ std::shared_ptr<SimpleNode> SimpleParser::repeat(
     const std::function<std::shared_ptr<SimpleNode>(std::shared_ptr<SimpleNode>)>& parse_func,
     std::shared_ptr<SimpleNode> initial_node) {
     auto node = initial_node;
-    auto saved_pos = tokens->current_pos();
+    auto saved_pos = source->current_pos();
     auto saved_next_statement_id = next_statement_id;
     try {
         // Given a valid SIMPLE source, this loop should eventually terminate.
         while (true) {
             node = parse_func(node);
-            saved_pos = tokens->current_pos();
+            saved_pos = source->current_pos();
             saved_next_statement_id = next_statement_id;
         }
     } catch (...) {
-        tokens->reset_pos(saved_pos);
+        source->reset_pos(saved_pos);
         next_statement_id = saved_next_statement_id;
     }
     return node;

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Parser/shared/BaseLexer.h"
+#include "Parser/shared/Source.h"
 #include "Parser/shared/BaseParser.h"
 #include "Parser/shared/Token.h"
-#include "Parser/shared/TokenList.h"
 #include "SimpleNode.h"
+#include "SimpleLexer.h"
 #include <functional>
 #include <memory>
 
@@ -14,11 +14,7 @@ namespace Parser {
 class SimpleParser : public BaseParser {
 public:
     // Create a SimpleParser instance from the given lexer instance.
-    explicit SimpleParser(BaseLexer& lexer);
-
-    // Create a SimpleParser instance from the given token list.
-    // Caller is responsible for cleaning up the memory for the supplied token list.
-    explicit SimpleParser(std::shared_ptr<TokenList> tokens);
+    explicit SimpleParser(std::shared_ptr<Source> source);
 
     // The methods below correspond 1-to-1 to the grammar rule for the SIMPLE language.
     // For example, parse_stmt is called when we're parsing a SIMPLE "stmt".
@@ -64,8 +60,8 @@ public:
     std::shared_ptr<SimpleNode> parse_const_value();
 
 private:
+    std::shared_ptr<Source> source;
     int next_statement_id;
-    bool should_delete_token_list;
 
     // Helper for choosing one valid parser from parse_funcs.
     // Validity is decided based on whether the chosen parser throws an error.

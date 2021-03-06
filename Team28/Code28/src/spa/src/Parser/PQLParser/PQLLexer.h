@@ -5,9 +5,9 @@
 #include <memory>
 
 namespace Parser {
-    class SimpleLexer : public BaseLexer {
+    class PQLLexer : public BaseLexer {
     public:
-        explicit SimpleLexer(std::shared_ptr<Source> source);
+        explicit PQLLexer(std::shared_ptr<Source> source);
 
         std::shared_ptr<Token> peek_token() override;
 

@@ -1,19 +1,24 @@
 #include "SimpleLexer.h"
-#include "Parser/shared/TokenList.h"
-#include <cctype>
-#include <stdexcept>
-#include <string>
 
 using namespace Parser;
 
-std::shared_ptr<Token> SimpleLexer::next_token() {
-    if (!has_more()) {
+SimpleLexer::SimpleLexer(std::shared_ptr<Source> source) : source(std::move(source)) {}
+
+std::shared_ptr<Token> SimpleLexer::peek_token() {
+    auto pos = source->current_pos();
+    auto temp_token = pop_token();
+    source->reset_pos(pos);
+    return temp_token;
+}
+
+std::shared_ptr<Token> SimpleLexer::pop_token() {
+    if (!source->has_more()) {
         return std::make_shared<Token>(TokenType::END, "END");
     }
 
-    int next = pop_char();
+    int next = source->pop_char();
     if (isspace(next)) {
-        return next_token();
+        return pop_token();
     }
 
     switch (next) {
@@ -26,26 +31,26 @@ std::shared_ptr<Token> SimpleLexer::next_token() {
     case ')':
         return std::make_shared<Token>(TokenType::RPAREN, ")");
     case '>':
-        if (has_more() && peek_char() == '=') {
-            pop_char();
+        if (source->has_more() && source->peek_char() == '=') {
+            source->pop_char();
             return std::make_shared<Token>(TokenType::GTE, ">=");
         }
         return std::make_shared<Token>(TokenType::GT, ">");
     case '<':
-        if (has_more() && peek_char() == '=') {
-            pop_char();
+        if (source->has_more() && source->peek_char() == '=') {
+            source->pop_char();
             return std::make_shared<Token>(TokenType::LTE, "<=");
         }
         return std::make_shared<Token>(TokenType::LT, "<");
     case '=':
-        if (has_more() && peek_char() == '=') {
-            pop_char();
+        if (source->has_more() && source->peek_char() == '=') {
+            source->pop_char();
             return std::make_shared<Token>(TokenType::DEQUAL, "==");
         }
         return std::make_shared<Token>(TokenType::EQUAL, "=");
     case '!':
-        if (has_more() && peek_char() == '=') {
-            pop_char();
+        if (source->has_more() && source->peek_char() == '=') {
+            source->pop_char();
             return std::make_shared<Token>(TokenType::NEQUAL, "!=");
         }
         return std::make_shared<Token>(TokenType::NOT, "!");
@@ -66,21 +71,21 @@ std::shared_ptr<Token> SimpleLexer::next_token() {
         break;
     }
 
-    if (next == '&' && has_more() && peek_char() == '&') {
-        pop_char();
+    if (next == '&' && source->has_more() && source->peek_char() == '&') {
+        source->pop_char();
         return std::make_shared<Token>(TokenType::AND, "&&");
     }
 
-    if (next == '|' && has_more() && peek_char() == '|') {
-        pop_char();
+    if (next == '|' && source->has_more() && source->peek_char() == '|') {
+        source->pop_char();
         return std::make_shared<Token>(TokenType::OR, "||");
     }
 
     if (isalnum(next)) {
         std::string value;
         value.push_back(next);
-        while (has_more() && isalnum(peek_char())) {
-            value.push_back(pop_char());
+        while (source->has_more() && isalnum(source->peek_char())) {
+            value.push_back(source->pop_char());
         }
 
         return std::make_shared<Token>(TokenType::WORD, value);
