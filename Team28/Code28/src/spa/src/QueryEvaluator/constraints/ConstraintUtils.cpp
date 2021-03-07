@@ -1,5 +1,4 @@
 #include "ConstraintUtils.h"
-#include <stdexcept>
 
 using namespace QueryEvaluator;
 
@@ -8,8 +7,7 @@ ConstraintUtils::get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
                                  Parser::QueryObject& query_object) {
     std::vector<std::shared_ptr<BaseConstraint>> constraints;
 
-    if (query_object.has_such_that()) {
-        auto such_that = query_object.get_such_that();
+    for (auto const& such_that : query_object.get_all_such_that()) {
         auto left_ref = such_that.get_left_ref();
         auto right_ref = such_that.get_right_ref();
 
@@ -43,8 +41,8 @@ ConstraintUtils::get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
         }
     }
 
-    if (query_object.has_pattern()) {
-        constraints.push_back(std::make_shared<PatternConstraint>(pkb, query_object.get_pattern()));
+    for (auto const& pattern : query_object.get_all_pattern()) {
+        constraints.push_back(std::make_shared<PatternConstraint>(pkb, pattern));
     }
 
     return constraints;

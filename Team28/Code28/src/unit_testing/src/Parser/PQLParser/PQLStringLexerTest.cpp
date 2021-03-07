@@ -11,7 +11,7 @@ TEST_CASE("Parser::PQLLexer") {
         std::string op = GENERATE("Follows*", "Parent*");
         auto source = std::make_shared<Parser::Source>(op);
         PQLLexer lexer(source);
-        
+
         auto first = lexer.pop_token();
         REQUIRE(first->get_type() == TokenType::WORD);
         REQUIRE(first->get_value() == op);

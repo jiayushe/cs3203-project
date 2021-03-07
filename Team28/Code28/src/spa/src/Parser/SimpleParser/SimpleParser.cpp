@@ -7,9 +7,7 @@
 using namespace Parser;
 
 SimpleParser::SimpleParser(std::shared_ptr<Source> source)
-    : BaseParser(std::make_shared<SimpleLexer>(source)),
-      source(source),
-      next_statement_id(1) {}
+    : BaseParser(std::make_shared<SimpleLexer>(source)), source(source), next_statement_id(1) {}
 
 std::shared_ptr<SimpleNode> SimpleParser::parse_program() {
     auto procedure_node = parse_procedure();

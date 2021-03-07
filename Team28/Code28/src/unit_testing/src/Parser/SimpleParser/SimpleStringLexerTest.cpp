@@ -1,8 +1,8 @@
 #include "catch.hpp"
 
+#include "Parser/SimpleParser/SimpleLexer.h"
 #include <memory>
 #include <string>
-#include "Parser/SimpleParser/SimpleLexer.h"
 
 using namespace Parser;
 
@@ -144,7 +144,6 @@ TEST_CASE("Parser::SimpleLexer") {
         std::string source = ";";
         auto base_source = std::make_shared<Parser::Source>(source);
         SimpleLexer lexer(base_source);
-
 
         auto first = lexer.pop_token();
         REQUIRE(first->get_type() == TokenType::SEMICOLON);

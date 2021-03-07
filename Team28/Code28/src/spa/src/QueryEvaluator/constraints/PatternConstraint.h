@@ -9,6 +9,7 @@
 #include "Parser/PQLParser/StatementRef.h"
 #include "QueryEvaluator/Assignment.h"
 #include <memory>
+#include <stdexcept>
 
 namespace QueryEvaluator {
 

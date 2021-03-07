@@ -2,15 +2,14 @@
 #include <string>
 
 #include "DesignEntity.h"
+#include "PQLLexer.h"
 #include "PQLParser.h"
 #include "Parser/SimpleParser/SimpleParser.h"
-#include "PQLLexer.h"
 
 using namespace Parser;
 
-PQLParser::PQLParser(std::shared_ptr<Source> source) :
-    BaseParser(std::make_shared<PQLLexer>(source)),
-    source(source) {}
+PQLParser::PQLParser(std::shared_ptr<Source> source)
+    : BaseParser(std::make_shared<PQLLexer>(source)), source(source) {}
 
 // Parse token string and store it as a QueryObject
 QueryObject PQLParser::parse_query() {
@@ -80,18 +79,22 @@ void PQLParser::process_declaration_synonym(DesignEntityType design_entity_type)
 
 void PQLParser::process_selection() {
     expect_word("Select");
-    auto token = expect_name("select_synonym");
-    query_object.set_selection(token->get_value());
+    auto token = expect_name("result_synonym");
+
+    Result result;
+    result.set_type(ResultType::TUPLE);
+    result.set_tuple({Elem(token->get_value())});
+    query_object.set_result(result);
 
     choice({[&]() {
-                process_such_that_cl();
-                process_pattern_cl();
+                process_such_that();
+                process_pattern();
             },
-            [&]() { process_such_that_cl(); }, [&]() { process_pattern_cl(); }, [&]() {}},
+            [&]() { process_such_that(); }, [&]() { process_pattern(); }, [&]() {}},
            "Should not throw anything in process_selection");
 }
 
-void PQLParser::process_such_that_cl() {
+void PQLParser::process_such_that() {
     expect_word("such that");
 
     choice({[&]() {
@@ -123,45 +126,47 @@ void PQLParser::process_such_that_cl() {
 
 // Parse content of the such_that type
 void PQLParser::process_such_that_body(SuchThatType such_that_type) {
-    SuchThat such_that_obj;
+    SuchThat such_that;
 
-    such_that_obj.set_type(such_that_type);
+    such_that.set_type(such_that_type);
     expect_token(TokenType::LPAREN);
     auto left_statement_ref = process_statement_ref();
-    such_that_obj.set_left_ref(Ref(left_statement_ref));
+    such_that.set_left_ref(SuchThatRef(left_statement_ref));
     expect_token(TokenType::COMMA);
 
     if (such_that_type == SuchThatType::MODIFIES_S || such_that_type == SuchThatType::USES_S) {
         auto right_entity_ref = process_entity_ref();
-        such_that_obj.set_right_ref(Ref(right_entity_ref));
+        such_that.set_right_ref(SuchThatRef(right_entity_ref));
     } else {
         auto right_statement_ref = process_statement_ref();
-        such_that_obj.set_right_ref(Ref(right_statement_ref));
+        such_that.set_right_ref(SuchThatRef(right_statement_ref));
     }
 
     expect_token(TokenType::RPAREN);
-    query_object.set_such_that(such_that_obj);
-    query_object.set_has_such_that(true);
+    query_object.add_such_that(such_that);
 }
 
-void PQLParser::process_pattern_cl() {
-    Pattern pattern_obj;
+void PQLParser::process_pattern() {
+    // TODO: Handle the case for if and while patterns
+    PatternAssign pattern_assign;
 
     expect_word("pattern");
 
     auto token = expect_name("pattern_synonym");
-    pattern_obj.set_assigned_synonym(token->get_value());
+    pattern_assign.set_assign_synonym(token->get_value());
 
     expect_token(TokenType::LPAREN);
     auto entity_ref = process_entity_ref();
     expect_token(TokenType::COMMA);
     auto expression_spec = process_expression_spec();
     expect_token(TokenType::RPAREN);
-    pattern_obj.set_entity_ref(entity_ref);
-    pattern_obj.set_expression_spec(expression_spec);
+    pattern_assign.set_entity_ref(entity_ref);
+    pattern_assign.set_expression_spec(expression_spec);
 
-    query_object.set_pattern(pattern_obj);
-    query_object.set_has_pattern(true);
+    Pattern pattern;
+    pattern.set_type(PatternType::ASSIGN);
+    pattern.set_pattern_assign(pattern_assign);
+    query_object.add_pattern(pattern);
 }
 
 StatementRef PQLParser::process_statement_ref() {
@@ -273,16 +278,30 @@ void PQLParser::repeat(const std::function<void()>& parse_func) {
 }
 
 void PQLParser::validate_query() {
-    expect_declaration(query_object.get_selection());
-    if (query_object.has_such_that()) {
-        validate_such_that_cl(query_object.get_such_that());
+    validate_result(query_object.get_result());
+    for (auto const& such_that : query_object.get_all_such_that()) {
+        validate_such_that(such_that);
     }
-    if (query_object.has_pattern()) {
-        validate_pattern_cl(query_object.get_pattern());
+    for (auto const& pattern : query_object.get_all_pattern()) {
+        validate_pattern(pattern);
     }
 }
 
-void PQLParser::validate_such_that_cl(const SuchThat& such_that) {
+void PQLParser::validate_result(const Result& result) {
+    switch (result.get_type()) {
+    case ResultType::TUPLE: {
+        auto tuple = result.get_tuple();
+        for (auto const& elem : tuple) {
+            validate_elem(elem);
+        }
+        break;
+    }
+    default:
+        throw std::runtime_error("Unhandled result type");
+    }
+}
+
+void PQLParser::validate_such_that(const SuchThat& such_that) {
     auto left_ref = such_that.get_left_ref();
     auto right_ref = such_that.get_right_ref();
 
@@ -321,14 +340,33 @@ void PQLParser::validate_such_that_cl(const SuchThat& such_that) {
     }
 }
 
-void PQLParser::validate_pattern_cl(const Pattern& pattern) {
-    // Pattern synonym must be ASSIGN
-    auto synonym = pattern.get_assigned_synonym();
-    expect_declaration(synonym, {DesignEntityType::ASSIGN});
+void PQLParser::validate_pattern(const Pattern& pattern) {
+    switch (pattern.get_type()) {
+    case PatternType::ASSIGN: {
+        auto pattern_assign = pattern.get_pattern_assign();
 
-    // LHS must be VARIABLE
-    auto left_entity_ref = pattern.get_entity_ref();
-    validate_entity_ref(left_entity_ref, {DesignEntityType::VARIABLE});
+        // PatternAssign synonym must be ASSIGN
+        auto synonym = pattern_assign.get_assign_synonym();
+        expect_declaration(synonym, {DesignEntityType::ASSIGN});
+
+        // LHS must be VARIABLE
+        auto left_entity_ref = pattern_assign.get_entity_ref();
+        validate_entity_ref(left_entity_ref, {DesignEntityType::VARIABLE});
+        break;
+    }
+    default:
+        throw std::runtime_error("Unhandled pattern type");
+    }
+}
+
+void PQLParser::validate_elem(const Elem& elem) {
+    switch (elem.get_type()) {
+    case ElemType::SYNONYM:
+        expect_declaration(elem.get_synonym());
+        break;
+    default:
+        throw std::runtime_error("Unhandled elem type");
+    }
 }
 
 void PQLParser::validate_statement_ref(const StatementRef& statement_ref) {

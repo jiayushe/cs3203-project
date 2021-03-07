@@ -11,6 +11,7 @@
 #include "QueryEvaluator/constraints/PatternConstraint.h"
 #include "QueryEvaluator/constraints/UsesConstraint.h"
 #include <memory>
+#include <stdexcept>
 #include <vector>
 
 namespace QueryEvaluator {

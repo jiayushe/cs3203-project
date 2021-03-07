@@ -46,7 +46,8 @@ void BruteForceEvaluator::evaluate(std::shared_ptr<KnowledgeBase::PKB> pkb,
     }
 
     // Find the assignment group containing the selection synonym
-    auto selection_synonym = query_object.get_selection();
+    // FIXME: Handle all types of results
+    auto selection_synonym = query_object.get_result().get_tuple()[0].get_synonym();
     auto selection_assignment_group =
         std::find_if(constrained_assignment_groups.begin(), constrained_assignment_groups.end(),
                      [&](std::pair<std::unordered_set<std::string>, std::vector<AssignmentMap>>
@@ -158,13 +159,12 @@ BruteForceEvaluator::get_design_entities(Parser::QueryObject& query_object) {
 
     std::unordered_map<std::string, Parser::DesignEntity> design_entities;
 
-    auto selection_synonym = query_object.get_selection();
+    // FIXME: Handle all types of results
+    auto selection_synonym = query_object.get_result().get_tuple()[0].get_synonym();
     auto selection_design_entity = declarations.get(selection_synonym);
     design_entities[selection_synonym] = selection_design_entity;
 
-    if (query_object.has_such_that()) {
-        auto such_that = query_object.get_such_that();
-
+    for (auto const& such_that : query_object.get_all_such_that()) {
         auto left_ref = such_that.get_left_ref();
         if (has_synonym(left_ref)) {
             auto left_ref_synonym = get_synonym(left_ref);
@@ -180,14 +180,15 @@ BruteForceEvaluator::get_design_entities(Parser::QueryObject& query_object) {
         }
     }
 
-    if (query_object.has_pattern()) {
-        auto pattern = query_object.get_pattern();
+    for (auto const& pattern : query_object.get_all_pattern()) {
+        // FIXME: Handle all types of patterns
+        auto pattern_assign = pattern.get_pattern_assign();
 
-        auto assign_synonym = pattern.get_assigned_synonym();
+        auto assign_synonym = pattern_assign.get_assign_synonym();
         auto assign_design_entity = declarations.get(assign_synonym);
         design_entities[assign_synonym] = assign_design_entity;
 
-        auto entity_ref = pattern.get_entity_ref();
+        auto entity_ref = pattern_assign.get_entity_ref();
         if (has_synonym(entity_ref)) {
             auto entity_ref_synonym = get_synonym(entity_ref);
             auto entity_ref_design_entity = declarations.get(entity_ref_synonym);
@@ -202,8 +203,7 @@ std::unordered_map<std::string, std::vector<std::string>>
 BruteForceEvaluator::get_dependencies(Parser::QueryObject& query_object) {
     std::unordered_map<std::string, std::vector<std::string>> dependencies;
 
-    if (query_object.has_such_that()) {
-        auto such_that = query_object.get_such_that();
+    for (auto const& such_that : query_object.get_all_such_that()) {
         auto left_ref = such_that.get_left_ref();
         auto right_ref = such_that.get_right_ref();
         if (has_synonym(left_ref) && has_synonym(right_ref)) {
@@ -214,10 +214,11 @@ BruteForceEvaluator::get_dependencies(Parser::QueryObject& query_object) {
         }
     }
 
-    if (query_object.has_pattern()) {
-        auto pattern = query_object.get_pattern();
-        auto assign_synonym = pattern.get_assigned_synonym();
-        auto entity_ref = pattern.get_entity_ref();
+    for (auto const& pattern : query_object.get_all_pattern()) {
+        // FIXME: Handle all types of patterns
+        auto pattern_assign = pattern.get_pattern_assign();
+        auto assign_synonym = pattern_assign.get_assign_synonym();
+        auto entity_ref = pattern_assign.get_entity_ref();
         if (has_synonym(entity_ref)) {
             auto entity_ref_synonym = get_synonym(entity_ref);
             dependencies[assign_synonym].push_back(entity_ref_synonym);
@@ -228,13 +229,13 @@ BruteForceEvaluator::get_dependencies(Parser::QueryObject& query_object) {
     return dependencies;
 }
 
-bool BruteForceEvaluator::has_synonym(Parser::Ref& ref) {
+bool BruteForceEvaluator::has_synonym(Parser::SuchThatRef& ref) {
     switch (ref.get_type()) {
-    case Parser::RefType::ENTITY: {
+    case Parser::SuchThatRefType::ENTITY: {
         auto entity_ref = ref.get_entity_ref();
         return has_synonym(entity_ref);
     }
-    case Parser::RefType::STATEMENT: {
+    case Parser::SuchThatRefType::STATEMENT: {
         auto statement_ref = ref.get_statement_ref();
         return has_synonym(statement_ref);
     }
@@ -251,13 +252,13 @@ bool BruteForceEvaluator::has_synonym(Parser::StatementRef& statement_ref) {
     return statement_ref.get_type() == Parser::StatementRefType::SYNONYM;
 }
 
-std::string BruteForceEvaluator::get_synonym(Parser::Ref& ref) {
+std::string BruteForceEvaluator::get_synonym(Parser::SuchThatRef& ref) {
     switch (ref.get_type()) {
-    case Parser::RefType::ENTITY: {
+    case Parser::SuchThatRefType::ENTITY: {
         auto entity_ref = ref.get_entity_ref();
         return get_synonym(entity_ref);
     }
-    case Parser::RefType::STATEMENT: {
+    case Parser::SuchThatRefType::STATEMENT: {
         auto statement_ref = ref.get_statement_ref();
         return get_synonym(statement_ref);
     }

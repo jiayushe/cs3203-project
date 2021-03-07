@@ -8,7 +8,7 @@ namespace Parser {
 // Source for PQL + SIMPLE (converts string to tokens).
 class Source {
 public:
-    Source(const std::string& value, bool is_filename=false);
+    Source(const std::string& value, bool is_filename = false);
 
     std::string pop_string(int n);
 

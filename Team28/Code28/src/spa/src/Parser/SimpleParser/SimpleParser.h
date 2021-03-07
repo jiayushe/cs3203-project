@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Parser/shared/Source.h"
 #include "Parser/shared/BaseParser.h"
+#include "Parser/shared/Source.h"
 #include "Parser/shared/Token.h"
-#include "SimpleNode.h"
 #include "SimpleLexer.h"
+#include "SimpleNode.h"
 #include <functional>
 #include <memory>
 

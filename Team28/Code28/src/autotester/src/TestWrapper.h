@@ -9,12 +9,12 @@
 // include your other headers here
 #include "AbstractWrapper.h"
 #include "KnowledgeBase/PKB.h"
-#include "Parser/PQLParser/PQLParser.h"
 #include "Parser/PQLParser/PQLLexer.h"
+#include "Parser/PQLParser/PQLParser.h"
 #include "Parser/PQLParser/QueryObject.h"
-#include "Parser/shared/Source.h"
-#include "Parser/SimpleParser/SimpleParser.h"
 #include "Parser/SimpleParser/SimpleLexer.h"
+#include "Parser/SimpleParser/SimpleParser.h"
+#include "Parser/shared/Source.h"
 #include "QueryEvaluator/BruteForceEvaluator.h"
 #include "SimpleExtractor/DesignExtractor.h"
 

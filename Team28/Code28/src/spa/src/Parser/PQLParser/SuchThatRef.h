@@ -4,24 +4,25 @@
 #include "StatementRef.h"
 
 namespace Parser {
-enum class RefType {
+
+enum class SuchThatRefType {
     INVALID,
     ENTITY,
     STATEMENT,
 };
 
-class Ref {
+class SuchThatRef {
 public:
-    RefType get_type() const;
+    SuchThatRefType get_type() const;
     EntityRef get_entity_ref() const;
     StatementRef get_statement_ref() const;
 
-    Ref();
-    explicit Ref(EntityRef entity_ref);
-    explicit Ref(StatementRef statement_ref);
+    SuchThatRef();
+    explicit SuchThatRef(EntityRef entity_ref);
+    explicit SuchThatRef(StatementRef statement_ref);
 
 private:
-    RefType type;
+    SuchThatRefType type;
     EntityRef entity_ref;
     StatementRef statement_ref;
 };

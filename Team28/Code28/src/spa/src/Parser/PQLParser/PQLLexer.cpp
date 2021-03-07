@@ -55,7 +55,8 @@ std::shared_ptr<Token> PQLLexer::pop_token() {
         }
 
         // Handle "Parent*" and "Follows*" keywords
-        if ((value == "Parent" || value == "Follows") && source->has_more() && source->peek_char() == '*') {
+        if ((value == "Parent" || value == "Follows") && source->has_more() &&
+            source->peek_char() == '*') {
             value.push_back(source->pop_char());
         }
 

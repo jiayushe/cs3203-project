@@ -1,17 +1,17 @@
 #include "catch.hpp"
 
-#include "Parser/PQLParser/Ref.h"
+#include "Parser/PQLParser/SuchThatRef.h"
 #include <string>
 
 using namespace Parser;
 
-TEST_CASE("PQLParser::Ref") {
+TEST_CASE("PQLParser::SuchThatRef") {
     SECTION("check accessibility of method") {
         EntityRef entity_ref;
         StatementRef statement_ref;
 
-        Ref ref_ent(entity_ref);
-        Ref ref_stmt(statement_ref);
+        SuchThatRef ref_ent(entity_ref);
+        SuchThatRef ref_stmt(statement_ref);
 
         REQUIRE(ref_ent.get_type() == RefType::ENTITY);
         REQUIRE_NOTHROW(ref_ent.get_entity_ref());

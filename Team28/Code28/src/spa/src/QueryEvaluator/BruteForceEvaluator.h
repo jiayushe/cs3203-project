@@ -55,11 +55,11 @@ private:
     static std::unordered_map<std::string, std::vector<std::string>>
     get_dependencies(Parser::QueryObject& query_object);
 
-    static bool has_synonym(Parser::Ref& ref);
+    static bool has_synonym(Parser::SuchThatRef& ref);
     static bool has_synonym(Parser::EntityRef& entity_ref);
     static bool has_synonym(Parser::StatementRef& entity_ref);
 
-    static std::string get_synonym(Parser::Ref& ref);
+    static std::string get_synonym(Parser::SuchThatRef& ref);
     static std::string get_synonym(Parser::EntityRef& ref);
     static std::string get_synonym(Parser::StatementRef& ref);
 };

@@ -1,24 +1,23 @@
 #include "Source.h"
-#include <string>
-#include <sstream>
 #include <fstream>
+#include <sstream>
+#include <string>
 
 using namespace Parser;
 
 Source::Source(const std::string& value, bool is_filename) : pos(0) {
     if (is_filename) {
         std::ifstream inFile;
-        inFile.open(value); //open the input file
+        inFile.open(value); // open the input file
 
         std::stringstream strStream;
-        strStream << inFile.rdbuf(); //read the file
-        std::string query_str = strStream.str(); //str holds the content of the file
+        strStream << inFile.rdbuf();             // read the file
+        std::string query_str = strStream.str(); // str holds the content of the file
         this->value = query_str + "$";
     } else {
         this->value = value + "$";
     }
 }
-
 
 std::string Source::pop_string(int n) {
     std::string str = peek_string(n);
@@ -57,9 +56,7 @@ int Source::peek_char() {
     return value[pos];
 }
 
-int Source::current_pos() {
-    return pos;
-}
+int Source::current_pos() { return pos; }
 
 void Source::reset_pos(int new_pos) {
     if (new_pos < 0 || new_pos >= value.size()) {

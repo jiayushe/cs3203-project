@@ -1,25 +1,37 @@
 #pragma once
 
-#include "EntityRef.h"
-#include "ExpressionSpec.h"
+#include "PatternAssign.h"
+#include "PatternIf.h"
+#include "PatternWhile.h"
 
 namespace Parser {
+
+enum class PatternType {
+    INVALID,
+    ASSIGN,
+    WHILE,
+    IF,
+};
+
 class Pattern {
 public:
-    std::string get_assigned_synonym() const;
-    EntityRef get_entity_ref() const;
-    ExpressionSpec get_expression_spec() const;
-
     Pattern();
 
-    void set_assigned_synonym(const std::string& assigned_synonym);
-    void set_entity_ref(const EntityRef& entity_ref);
-    void set_expression_spec(const ExpressionSpec& expression_spec);
+    PatternType get_type() const;
+    PatternAssign get_pattern_assign() const;
+    PatternWhile get_pattern_while() const;
+    PatternIf get_pattern_if() const;
+
+    void set_type(PatternType type);
+    void set_pattern_assign(const PatternAssign& pattern_assign);
+    void set_pattern_while(const PatternWhile& pattern_while);
+    void set_pattern_if(const PatternIf& pattern_if);
 
 private:
-    std::string assigned_synonym;
-    EntityRef entity_ref;
-    ExpressionSpec expression_spec;
+    PatternType type;
+    PatternAssign pattern_assign;
+    PatternWhile pattern_while;
+    PatternIf pattern_if;
 };
 
 } // namespace Parser

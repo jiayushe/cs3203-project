@@ -3,41 +3,42 @@
 #include "DeclarationMap.h"
 #include "DesignEntity.h"
 #include "Pattern.h"
+#include "Result.h"
 #include "SuchThat.h"
+#include "With.h"
+#include <string>
+#include <vector>
 
 namespace Parser {
-// AST node for the SIMPLE language.
+
 class QueryObject {
 public:
     QueryObject();
 
     // getters
-    std::string get_selection() const;
     DeclarationMap get_declarations() const;
-    bool has_such_that() const;
-    bool has_pattern() const;
-    SuchThat get_such_that() const;
-    Pattern get_pattern() const;
+    Result get_result() const;
+    std::vector<SuchThat> get_all_such_that() const;
+    std::vector<Pattern> get_all_pattern() const;
+    std::vector<With> get_all_with() const;
 
     // setters
-    void set_selection(const std::string& selection);
     void add_declaration(const std::string& synonym, const DesignEntity& design_entity);
-    void set_has_such_that(bool has_such_that);
-    void set_has_pattern(bool has_pattern);
-    void set_such_that(const SuchThat& such_that_cl);
-    void set_pattern(const Pattern& pattern_cl);
+    void set_result(const Result& result);
+    void add_such_that(const SuchThat& such_that);
+    void add_pattern(const Pattern& pattern);
+    void add_with(const With& with);
 
     // this is just for view purpose
-    std::string to_string();
+    std::string to_string() const;
 
 private:
     DeclarationMap declarations;
-    std::string selection;
+    Result result;
 
-    bool has_such_that_cl;
-    bool has_pattern_cl;
-
-    SuchThat such_that_obj;
-    Pattern pattern_obj;
+    std::vector<SuchThat> all_such_that;
+    std::vector<Pattern> all_pattern;
+    std::vector<With> all_with;
 };
+
 } // namespace Parser

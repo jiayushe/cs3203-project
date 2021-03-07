@@ -4,53 +4,39 @@
 
 using namespace Parser;
 
-QueryObject::QueryObject() : has_such_that_cl(false), has_pattern_cl(false) {}
+QueryObject::QueryObject() = default;
 
 DeclarationMap QueryObject::get_declarations() const { return declarations; }
 
-std::string QueryObject::get_selection() const { return selection; }
+Result QueryObject::get_result() const { return result; }
 
-bool QueryObject::has_such_that() const { return has_such_that_cl; }
+std::vector<SuchThat> QueryObject::get_all_such_that() const { return all_such_that; }
 
-bool QueryObject::has_pattern() const { return has_pattern_cl; }
+std::vector<Pattern> QueryObject::get_all_pattern() const { return all_pattern; }
 
-SuchThat QueryObject::get_such_that() const {
-    if (!has_such_that_cl) {
-        throw std::runtime_error("Query object doesn't have a such that clause");
-    }
-    return such_that_obj;
-}
-
-Pattern QueryObject::get_pattern() const {
-    if (!has_pattern_cl) {
-        throw std::runtime_error("Query object doesn't have a pattern clause");
-    }
-    return pattern_obj;
-}
-
-void QueryObject::set_selection(const std::string& new_selection) { selection = new_selection; }
+std::vector<With> QueryObject::get_all_with() const { return all_with; }
 
 void QueryObject::add_declaration(const std::string& synonym, const DesignEntity& design_entity) {
     declarations.add(synonym, design_entity);
 }
 
-void QueryObject::set_has_such_that(bool new_has_such_that) {
-    has_such_that_cl = new_has_such_that;
+void QueryObject::set_result(const Result& new_result) { result = new_result; }
+
+void QueryObject::add_such_that(const SuchThat& new_such_that) {
+    all_such_that.push_back(new_such_that);
 }
 
-void QueryObject::set_has_pattern(bool new_has_pattern) { has_pattern_cl = new_has_pattern; }
+void QueryObject::add_pattern(const Pattern& new_pattern) { all_pattern.push_back(new_pattern); }
 
-void QueryObject::set_such_that(const SuchThat& new_such_that_cl) {
-    such_that_obj = new_such_that_cl;
-}
+void QueryObject::add_with(const With& new_with) { all_with.push_back(new_with); }
 
-void QueryObject::set_pattern(const Pattern& new_pattern_cl) { pattern_obj = new_pattern_cl; }
-
-std::string QueryObject::to_string() {
+std::string QueryObject::to_string() const {
     std::string output;
     output += "QueryObject(declaration.size=" + std::to_string(declarations.size());
-    output += ", has_such_that=" + (has_such_that_cl ? std::string("TRUE") : std::string("FALSE"));
-    output += ", has_pattern= " + (has_pattern_cl ? std::string("TRUE") : std::string("FALSE"));
-    output += ", selection=" + selection + ")";
+    output +=
+        ", has_such_that=" + (all_such_that.empty() ? std::string("TRUE") : std::string("FALSE"));
+    output +=
+        ", has_pattern= " + (all_pattern.empty() ? std::string("TRUE") : std::string("FALSE"));
+    output += ", has_with= " + (all_with.empty() ? std::string("TRUE") : std::string("FALSE"));
     return output;
 }

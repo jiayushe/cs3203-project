@@ -3,6 +3,7 @@
 #include <string>
 
 namespace Parser {
+
 enum class StatementRefType {
     INVALID,
     ANY,

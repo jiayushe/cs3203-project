@@ -3,17 +3,18 @@
 #include "Parser/shared/BaseLexer.h"
 #include "Parser/shared/Source.h"
 #include <memory>
+#include <stdexcept>
 
 namespace Parser {
-    class SimpleLexer : public BaseLexer {
-    public:
-        explicit SimpleLexer(std::shared_ptr<Source> source);
+class SimpleLexer : public BaseLexer {
+public:
+    explicit SimpleLexer(std::shared_ptr<Source> source);
 
-        std::shared_ptr<Token> peek_token() override;
+    std::shared_ptr<Token> peek_token() override;
 
-        std::shared_ptr<Token> pop_token() override;
+    std::shared_ptr<Token> pop_token() override;
 
-    private:
-        std::shared_ptr<Source> source;
-    };
+private:
+    std::shared_ptr<Source> source;
+};
 } // namespace Parser

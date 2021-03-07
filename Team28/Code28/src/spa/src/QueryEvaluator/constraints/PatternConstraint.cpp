@@ -1,23 +1,26 @@
 #include "PatternConstraint.h"
-#include <stdexcept>
 
 using namespace QueryEvaluator;
 
 PatternConstraint::PatternConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
                                      const Parser::Pattern& pattern)
     : pkb(std::move(pkb)), pattern(pattern) {
-    synonyms.insert(pattern.get_assigned_synonym());
-
-    auto entity_ref = pattern.get_entity_ref();
+    // FIXME: Handle all types of patterns
+    auto pattern_assign = pattern.get_pattern_assign();
+    synonyms.insert(pattern_assign.get_assign_synonym());
+    auto entity_ref = pattern_assign.get_entity_ref();
     if (entity_ref.get_type() == Parser::EntityRefType::SYNONYM) {
         synonyms.insert(entity_ref.get_synonym());
     }
 }
 
 bool PatternConstraint::is_valid(const AssignmentMap& assignments) {
-    auto lhs = pattern.get_entity_ref();
-    auto rhs = pattern.get_expression_spec();
-    auto syn = pattern.get_assigned_synonym();
+    // FIXME: Handle all types of patterns
+    auto pattern_assign = pattern.get_pattern_assign();
+
+    auto lhs = pattern_assign.get_entity_ref();
+    auto rhs = pattern_assign.get_expression_spec();
+    auto syn = pattern_assign.get_assign_synonym();
 
     auto statement_id = assignments.at(syn).get_int_value();
     auto assigned_statement = pkb->get_statement_by_id(statement_id);

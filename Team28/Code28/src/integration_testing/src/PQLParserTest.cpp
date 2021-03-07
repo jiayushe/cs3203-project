@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
-#include "Parser/PQLParser/PQLParser.h"
 #include "Parser/PQLParser/PQLLexer.h"
+#include "Parser/PQLParser/PQLParser.h"
 #include "Parser/SimpleParser/SimpleParser.h"
 #include <iterator>
 #include <string>
@@ -40,8 +40,8 @@ TEST_CASE("Parser::PQLParser") {
             std::string selection = query_object.get_selection();
             REQUIRE(selection == "s");
 
-            bool has_such_that_cl = query_object.has_such_that();
-            bool has_pattern_cl = query_object.has_pattern();
+            bool has_such_that_cl = !query_object.get_such_that().empty();
+            bool has_pattern_cl = !query_object.get_pattern().empty();
             REQUIRE_FALSE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
         }
@@ -67,8 +67,8 @@ TEST_CASE("Parser::PQLParser") {
             std::string selection = query_object.get_selection();
             REQUIRE(selection == "s");
 
-            bool has_such_that_cl = query_object.has_such_that();
-            bool has_pattern_cl = query_object.has_pattern();
+            bool has_such_that_cl = !query_object.get_such_that().empty();
+            bool has_pattern_cl = !query_object.get_pattern().empty();
             REQUIRE_FALSE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
         }
@@ -94,8 +94,8 @@ TEST_CASE("Parser::PQLParser") {
             std::string selection = query_object.get_selection();
             REQUIRE(selection == "w");
 
-            bool has_such_that_cl = query_object.has_such_that();
-            bool has_pattern_cl = query_object.has_pattern();
+            bool has_such_that_cl = !query_object.get_such_that().empty();
+            bool has_pattern_cl = !query_object.get_pattern().empty();
             REQUIRE_FALSE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
         }
@@ -125,8 +125,8 @@ TEST_CASE("Parser::PQLParser") {
             std::string selection = query_object.get_selection();
             REQUIRE(selection == "var1");
 
-            bool has_such_that_cl = query_object.has_such_that();
-            bool has_pattern_cl = query_object.has_pattern();
+            bool has_such_that_cl = !query_object.get_such_that().empty();
+            bool has_pattern_cl = !query_object.get_pattern().empty();
             REQUIRE_FALSE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
         }
@@ -154,16 +154,17 @@ TEST_CASE("Parser::PQLParser") {
             std::string selection = query_object.get_selection();
             REQUIRE(selection == "w");
 
-            bool has_such_that_cl = query_object.has_such_that();
-            bool has_pattern_cl = query_object.has_pattern();
+            bool has_such_that_cl = !query_object.get_such_that().empty();
+            bool has_pattern_cl = !query_object.get_pattern().empty();
             REQUIRE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
 
-            SuchThat such_that_obj = query_object.get_such_that();
+            std::vector<SuchThat> such_that_vector = query_object.get_such_that();
+            SuchThat such_that_obj = such_that_vector.front();
             REQUIRE(such_that_obj.get_type() == such_that_map[op]);
 
-            Ref left_ref = such_that_obj.get_left_ref();
-            Ref right_ref = such_that_obj.get_right_ref();
+            SuchThatRef left_ref = such_that_obj.get_left_ref();
+            SuchThatRef right_ref = such_that_obj.get_right_ref();
             REQUIRE(left_ref.get_type() == RefType::STATEMENT);
             REQUIRE(right_ref.get_type() == RefType::STATEMENT);
 
@@ -190,16 +191,17 @@ TEST_CASE("Parser::PQLParser") {
             std::string selection = query_object.get_selection();
             REQUIRE(selection == "s");
 
-            bool has_such_that_cl = query_object.has_such_that();
-            bool has_pattern_cl = query_object.has_pattern();
+            bool has_such_that_cl = !query_object.get_such_that().empty();
+            bool has_pattern_cl = !query_object.get_pattern().empty();
             REQUIRE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
 
-            SuchThat such_that_obj = query_object.get_such_that();
+            std::vector<SuchThat> such_that_vector = query_object.get_such_that();
+            SuchThat such_that_obj = such_that_vector.front();
             REQUIRE(such_that_obj.get_type() == such_that_map[op]);
 
-            Ref left_ref = such_that_obj.get_left_ref();
-            Ref right_ref = such_that_obj.get_right_ref();
+            SuchThatRef left_ref = such_that_obj.get_left_ref();
+            SuchThatRef right_ref = such_that_obj.get_right_ref();
             REQUIRE(left_ref.get_type() == RefType::STATEMENT);
             REQUIRE(right_ref.get_type() == RefType::ENTITY);
 
@@ -224,16 +226,17 @@ TEST_CASE("Parser::PQLParser") {
             std::string selection = query_object.get_selection();
             REQUIRE(selection == "such");
 
-            bool has_such_that_cl = query_object.has_such_that();
-            bool has_pattern_cl = query_object.has_pattern();
+            bool has_such_that_cl = !query_object.get_such_that().empty();
+            bool has_pattern_cl = !query_object.get_pattern().empty();
             REQUIRE(has_such_that_cl);
             REQUIRE_FALSE(has_pattern_cl);
 
-            SuchThat such_that_obj = query_object.get_such_that();
+            std::vector<SuchThat> such_that_vector = query_object.get_such_that();
+            SuchThat such_that_obj = such_that_vector.front();
             REQUIRE(such_that_obj.get_type() == such_that_map["Modifies"]);
 
-            Ref left_ref = such_that_obj.get_left_ref();
-            Ref right_ref = such_that_obj.get_right_ref();
+            SuchThatRef left_ref = such_that_obj.get_left_ref();
+            SuchThatRef right_ref = such_that_obj.get_right_ref();
             REQUIRE(left_ref.get_type() == RefType::STATEMENT);
             REQUIRE(right_ref.get_type() == RefType::ENTITY);
 
@@ -259,15 +262,18 @@ TEST_CASE("Parser::PQLParser") {
             auto query_object_2 = parser_2.parse_query();
             auto query_object_3 = parser_3.parse_query();
 
-            SuchThat such_that_obj_1 = query_object_1.get_such_that();
-            SuchThat such_that_obj_2 = query_object_2.get_such_that();
-            SuchThat such_that_obj_3 = query_object_3.get_such_that();
-            Ref left_ref_1 = such_that_obj_1.get_left_ref();
-            Ref right_ref_1 = such_that_obj_1.get_right_ref();
-            Ref left_ref_2 = such_that_obj_2.get_left_ref();
-            Ref right_ref_2 = such_that_obj_2.get_right_ref();
-            Ref left_ref_3 = such_that_obj_3.get_left_ref();
-            Ref right_ref_3 = such_that_obj_3.get_right_ref();
+            std::vector<SuchThat> such_that_vector_1 = query_object_1.get_such_that();
+            SuchThat such_that_obj_1 = such_that_vector_1.front();
+            std::vector<SuchThat> such_that_vector_2 = query_object_2.get_such_that();
+            SuchThat such_that_obj_2 = such_that_vector_2.front();
+            std::vector<SuchThat> such_that_vector_3 = query_object_3.get_such_that();
+            SuchThat such_that_obj_3 = such_that_vector_3.front();
+            SuchThatRef left_ref_1 = such_that_obj_1.get_left_ref();
+            SuchThatRef right_ref_1 = such_that_obj_1.get_right_ref();
+            SuchThatRef left_ref_2 = such_that_obj_2.get_left_ref();
+            SuchThatRef right_ref_2 = such_that_obj_2.get_right_ref();
+            SuchThatRef left_ref_3 = such_that_obj_3.get_left_ref();
+            SuchThatRef right_ref_3 = such_that_obj_3.get_right_ref();
 
             StatementRef left_statement_ref_1 = left_ref_1.get_statement_ref();
             EntityRef right_entity_ref_1 = right_ref_1.get_entity_ref();
@@ -290,7 +296,7 @@ TEST_CASE("Parser::PQLParser") {
         }
     }
 
-    SECTION("One Pattern clause") {
+    SECTION("One PatternAssign clause") {
         SECTION("General pattern test") {
             std::string query = "assign a; Select a pattern a(_, _\"x\"_)";
             auto source = std::make_shared<Parser::Source>(query);
@@ -307,12 +313,13 @@ TEST_CASE("Parser::PQLParser") {
             std::string selection = query_object.get_selection();
             REQUIRE(selection == "a");
 
-            bool has_such_that_cl = query_object.has_such_that();
-            bool has_pattern_cl = query_object.has_pattern();
+            bool has_such_that_cl = !query_object.get_such_that().empty();
+            bool has_pattern_cl = !query_object.get_pattern().empty();
             REQUIRE_FALSE(has_such_that_cl);
             REQUIRE(has_pattern_cl);
 
-            Pattern pattern_obj = query_object.get_pattern();
+            std::vector<PatternAssign> pattern_vector = query_object.get_pattern();
+            PatternAssign pattern_obj = pattern_vector.front();
             std::string assigned_synonym = pattern_obj.get_assigned_synonym();
             REQUIRE(assigned_synonym == "a");
 
@@ -336,24 +343,25 @@ TEST_CASE("Parser::PQLParser") {
             auto declarations = query_object.get_declarations();
             REQUIRE(declarations.size() == 2);
             REQUIRE(declarations.has("pattern"));
-            REQUIRE(declarations.has("Pattern"));
+            REQUIRE(declarations.has("PatternAssign"));
 
             std::string selection = query_object.get_selection();
             REQUIRE(selection == "pattern");
 
-            bool has_such_that_cl = query_object.has_such_that();
-            bool has_pattern_cl = query_object.has_pattern();
+            bool has_such_that_cl = !query_object.get_such_that().empty();
+            bool has_pattern_cl = !query_object.get_pattern().empty();
             REQUIRE_FALSE(has_such_that_cl);
             REQUIRE(has_pattern_cl);
 
-            Pattern pattern_obj = query_object.get_pattern();
+            std::vector<PatternAssign> pattern_vector = query_object.get_pattern();
+            PatternAssign pattern_obj = pattern_vector.front();
             std::string assigned_synonym = pattern_obj.get_assigned_synonym();
             REQUIRE(assigned_synonym == "pattern");
 
             EntityRef entity_ref = pattern_obj.get_entity_ref();
             ExpressionSpec expression_spec = pattern_obj.get_expression_spec();
             REQUIRE(entity_ref.get_type() == EntityRefType::SYNONYM);
-            REQUIRE(entity_ref.get_synonym() == "Pattern");
+            REQUIRE(entity_ref.get_synonym() == "PatternAssign");
             REQUIRE(expression_spec.get_type() == ExpressionSpecType::PATTERN);
             REQUIRE(expression_spec.get_pattern()->is_equal(pattern_node));
         }
@@ -363,13 +371,14 @@ TEST_CASE("Parser::PQLParser") {
             auto source = std::make_shared<Parser::Source>(query);
             Parser::PQLParser parser(source);
             auto query_object = parser.parse_query();
-            Pattern pattern_obj = query_object.get_pattern();
+            std::vector<PatternAssign> pattern_vector = query_object.get_pattern();
+            PatternAssign pattern_obj = pattern_vector.front();
             ExpressionSpec expression_spec = pattern_obj.get_expression_spec();
             REQUIRE(expression_spec.get_type() == ExpressionSpecType::ANY);
         }
     }
 
-    SECTION("One Such That clause, One Pattern clause") {
+    SECTION("One Such That clause, One PatternAssign clause") {
         std::string query =
             "variable v; assign a; while w; Select w such that Uses(a, v) pattern a(v, _\"z\"_)";
         auto source = std::make_shared<Parser::Source>(query);
@@ -391,16 +400,17 @@ TEST_CASE("Parser::PQLParser") {
         std::string selection = query_object.get_selection();
         REQUIRE(selection == "w");
 
-        bool has_such_that_cl = query_object.has_such_that();
-        bool has_pattern_cl = query_object.has_pattern();
+        bool has_such_that_cl = !query_object.get_such_that().empty();
+        bool has_pattern_cl = !query_object.get_pattern().empty();
         REQUIRE(has_such_that_cl);
         REQUIRE(has_pattern_cl);
 
-        SuchThat such_that_obj = query_object.get_such_that();
+        std::vector<SuchThat> such_that_vector = query_object.get_such_that();
+        SuchThat such_that_obj = such_that_vector.front();
         REQUIRE(such_that_obj.get_type() == SuchThatType::USES_S);
 
-        Ref left_ref = such_that_obj.get_left_ref();
-        Ref right_ref = such_that_obj.get_right_ref();
+        SuchThatRef left_ref = such_that_obj.get_left_ref();
+        SuchThatRef right_ref = such_that_obj.get_right_ref();
         REQUIRE(left_ref.get_type() == RefType::STATEMENT);
         REQUIRE(right_ref.get_type() == RefType::ENTITY);
 
@@ -411,7 +421,8 @@ TEST_CASE("Parser::PQLParser") {
         REQUIRE(right_entity_ref.get_type() == EntityRefType::SYNONYM);
         REQUIRE(right_entity_ref.get_synonym() == "v");
 
-        Pattern pattern_obj = query_object.get_pattern();
+        std::vector<PatternAssign> pattern_vector = query_object.get_pattern();
+        PatternAssign pattern_obj = pattern_vector.front();
         std::string assigned_synonym = pattern_obj.get_assigned_synonym();
         REQUIRE(assigned_synonym == "a");
 
@@ -476,14 +487,14 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE_THROWS(parser_5.parse_query());
         }
 
-        SECTION("Pattern synonym must be assign") {
+        SECTION("PatternAssign synonym must be assign") {
             std::string query = "stmt s; Select s pattern s(_, _)";
             auto source = std::make_shared<Parser::Source>(query);
             Parser::PQLParser parser(source);
             REQUIRE_THROWS(parser.parse_query());
         }
 
-        SECTION("Pattern LHS must be variable") {
+        SECTION("PatternAssign LHS must be variable") {
             std::string query = "assign a; stmt s; Select a pattern a(s, _)";
             auto source = std::make_shared<Parser::Source>(query);
             Parser::PQLParser parser(source);
