@@ -9,6 +9,8 @@ PKB::~PKB() {}
 
 std::shared_ptr<Parser::SimpleNode> PKB::get_ast() { return ast; }
 
+std::unordered_map<int, std::unordered_set<int>> PKB::get_cfg() { return cfg; }
+
 std::vector<std::shared_ptr<Procedure>> PKB::get_procedures() {
     std::vector<std::shared_ptr<Procedure>> res;
     for (auto kv : procedures) {
@@ -113,6 +115,8 @@ std::shared_ptr<Constant> PKB::get_constant_by_value(int value) {
     }
     return constants.at(value);
 }
+
+void PKB::set_cfg(std::unordered_map<int, std::unordered_set<int>> input_cfg) { cfg = input_cfg; }
 
 std::shared_ptr<Constant> PKB::add_constant(int value) {
     auto it = constants.find(value);

@@ -20,6 +20,9 @@ public:
     // Gets the base AST.
     std::shared_ptr<Parser::SimpleNode> get_ast();
 
+    // Gets the control flow graph
+    std::unordered_map<int, std::unordered_set<int>> get_cfg();
+
     // Gets the list of all procedures.
     std::vector<std::shared_ptr<Procedure>> get_procedures();
 
@@ -73,6 +76,8 @@ public:
     // Adds a parent-child relationship between two statement ids.
     void add_parent_relationship(int parent_id, int child_id);
 
+    void set_cfg(std::unordered_map<int, std::unordered_set<int>> cfg);
+
 private:
     // Base AST
     std::shared_ptr<Parser::SimpleNode> ast;
@@ -84,6 +89,9 @@ private:
     std::unordered_map<std::string, std::shared_ptr<Variable>> variables;
     // Constant table which maps values to constants
     std::unordered_map<int, std::shared_ptr<Constant>> constants;
+    // Control Flow Graph, stored as an adjacency list (map) from prog_line/stmt_id to a set of
+    // prog_lines/stmt_ids
+    std::unordered_map<int, std::unordered_set<int>> cfg;
 };
 
 } // namespace KnowledgeBase

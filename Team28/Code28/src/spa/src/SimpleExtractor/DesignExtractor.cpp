@@ -294,6 +294,87 @@ void SimpleExtractor::DesignExtractor::extract_parent_relationship_from_stmt(
     }
 }
 
+void SimpleExtractor::DesignExtractor::extract_cfg(std::shared_ptr<KnowledgeBase::PKB> pkb) {
+    auto ast = assert_node_type(pkb->get_ast(), Parser::SimpleNodeType::PROGRAM);
+    int num_proc = ast->get_children().size();
+    std::unordered_map<int, std::unordered_set<int>> cfg;
+    for (int i = 0; i < num_proc; i++) {
+        auto proc_node = assert_node_type(ast->get_child(i), Parser::SimpleNodeType::PROCEDURE);
+        auto stmt_list_node =
+            assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
+        extract_cfg_from_stmt_list(cfg, stmt_list_node);
+    }
+    pkb->set_cfg(cfg);
+}
+
+void SimpleExtractor::DesignExtractor::extract_cfg_from_stmt_list(
+    std::unordered_map<int, std::unordered_set<int>> cfg,
+    std::shared_ptr<Parser::SimpleNode> stmt_list) {
+    auto stmts = stmt_list->get_children();
+    int num_stmt = stmts.size();
+    for (int i = 0; i < num_stmt; i++) {
+        std::shared_ptr<Parser::SimpleNode> curr_stmt_node = stmts.at(i);
+
+        int next_stmt_id = i == num_stmt - 1 ? -1 : stmts.at(i + 1)->get_statement_id();
+        extract_cfg_from_stmt(cfg, curr_stmt_node, next_stmt_id);
+    }
+}
+
+void SimpleExtractor::DesignExtractor::extract_cfg_from_stmt(
+    std::unordered_map<int, std::unordered_set<int>> cfg, std::shared_ptr<Parser::SimpleNode> stmt,
+    int next_stmt_id) {
+    int curr_stmt_id = stmt->get_statement_id();
+
+    switch (stmt->get_type()) {
+    case Parser::SimpleNodeType::WHILE:
+        if (next_stmt_id != -1) {
+            cfg[curr_stmt_id].insert(next_stmt_id);
+        }
+        extract_cfg_from_while_stmt(cfg, stmt);
+        break;
+    case Parser::SimpleNodeType::IF:
+        extract_cfg_from_if_stmt(cfg, stmt, next_stmt_id);
+        break;
+    default:
+        if (next_stmt_id != -1) {
+            cfg[curr_stmt_id].insert(next_stmt_id);
+        }
+        break;
+    }
+}
+
+void SimpleExtractor::DesignExtractor::extract_cfg_from_while_stmt(
+    std::unordered_map<int, std::unordered_set<int>> cfg,
+    std::shared_ptr<Parser::SimpleNode> while_stmt) {
+    int parent_stmt_id = while_stmt->get_statement_id();
+    auto child_stmt_list = while_stmt->get_child(1);
+    int first_stmt_id = child_stmt_list->get_child(0)->get_statement_id();
+    cfg[parent_stmt_id].insert(first_stmt_id);
+
+    extract_cfg_from_stmt_list(cfg, child_stmt_list);
+
+    int child_stmt_list_size = child_stmt_list->get_children().size();
+    auto last_stmt = child_stmt_list->get_child(child_stmt_list_size - 1);
+    extract_cfg_from_stmt(cfg, last_stmt, parent_stmt_id);
+}
+
+void SimpleExtractor::DesignExtractor::extract_cfg_from_if_stmt(
+    std::unordered_map<int, std::unordered_set<int>> cfg,
+    std::shared_ptr<Parser::SimpleNode> if_stmt, int next_block_stmt_id) {
+    int parent_stmt_id = if_stmt->get_statement_id();
+    for (int i = 1; i <= 2; i++) {
+        auto branch_stmt_list = if_stmt->get_child(i);
+        int first_stmt_id = branch_stmt_list->get_child(0)->get_statement_id();
+        cfg[parent_stmt_id].insert(first_stmt_id);
+
+        extract_cfg_from_stmt_list(cfg, branch_stmt_list);
+
+        int branch_stmt_list_size = branch_stmt_list->get_children().size();
+        auto last_stmt = branch_stmt_list->get_child(branch_stmt_list_size - 1);
+        extract_cfg_from_stmt(cfg, last_stmt, next_block_stmt_id);
+    }
+}
+
 std::shared_ptr<KnowledgeBase::Procedure>
 DesignExtractor::extract_procedure(std::shared_ptr<KnowledgeBase::PKB> pkb,
                                    std::shared_ptr<Parser::SimpleNode> proc_node) {
