@@ -5,8 +5,14 @@
 #include "Parser/shared/Token.h"
 #include "SimpleLexer.h"
 #include "SimpleNode.h"
+#include <algorithm>
 #include <functional>
 #include <memory>
+#include <queue>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace Parser {
 
@@ -20,43 +26,24 @@ public:
     // For example, parse_stmt is called when we're parsing a SIMPLE "stmt".
     // See
     // https://github.com/nus-cs3203/project-wiki/wiki/Project-Iteration-1#21-implement-the-almost-full-specification-of-simple
-
     std::shared_ptr<SimpleNode> parse_program();
-
     std::shared_ptr<SimpleNode> parse_procedure();
-
     std::shared_ptr<SimpleNode> parse_stmt_lst();
-
     std::shared_ptr<SimpleNode> parse_stmt();
-
     std::shared_ptr<SimpleNode> parse_read();
-
     std::shared_ptr<SimpleNode> parse_print();
-
     std::shared_ptr<SimpleNode> parse_while();
-
     std::shared_ptr<SimpleNode> parse_if();
-
     std::shared_ptr<SimpleNode> parse_call();
-
     std::shared_ptr<SimpleNode> parse_assign();
-
     std::shared_ptr<SimpleNode> parse_cond_expr();
-
     std::shared_ptr<SimpleNode> parse_rel_expr();
-
     std::shared_ptr<SimpleNode> parse_rel_factor();
-
     std::shared_ptr<SimpleNode> parse_expr();
-
     std::shared_ptr<SimpleNode> parse_term();
-
     std::shared_ptr<SimpleNode> parse_factor();
-
     std::shared_ptr<SimpleNode> parse_var_name();
-
     std::shared_ptr<SimpleNode> parse_proc_name();
-
     std::shared_ptr<SimpleNode> parse_const_value();
 
 private:
@@ -75,6 +62,15 @@ private:
     std::shared_ptr<SimpleNode> repeat(
         const std::function<std::shared_ptr<SimpleNode>(std::shared_ptr<SimpleNode>)>& parse_func,
         std::shared_ptr<SimpleNode> initial_node);
+
+    // Validation logic
+    void validate_program(std::shared_ptr<SimpleNode> program_node);
+    void validate_no_duplicate_proc_name(std::shared_ptr<SimpleNode> program_node);
+    void validate_no_call_missing_proc(std::shared_ptr<SimpleNode> program_node);
+    void validate_no_call_cycle(std::shared_ptr<SimpleNode> program_node);
+    std::unordered_map<std::string, std::unordered_set<std::string>>
+    get_call_map(std::shared_ptr<SimpleNode> program_node);
+    std::unordered_set<std::string> get_procs_called(std::shared_ptr<SimpleNode> node);
 };
 
 } // namespace Parser

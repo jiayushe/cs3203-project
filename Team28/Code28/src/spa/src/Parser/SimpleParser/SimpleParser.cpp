@@ -1,8 +1,4 @@
 #include "SimpleParser.h"
-#include "SimpleLexer.h"
-#include <algorithm>
-#include <stdexcept>
-#include <string>
 
 using namespace Parser;
 
@@ -10,11 +6,19 @@ SimpleParser::SimpleParser(std::shared_ptr<Source> source)
     : BaseParser(std::make_shared<SimpleLexer>(source)), source(source), next_statement_id(1) {}
 
 std::shared_ptr<SimpleNode> SimpleParser::parse_program() {
-    auto procedure_node = parse_procedure();
+    auto program_node = std::make_shared<SimpleNode>(SimpleNodeType::PROGRAM);
+    auto first_procedure_node = parse_procedure();
+    program_node->add_child(first_procedure_node);
+    repeat(
+        [&](std::shared_ptr<SimpleNode> program_node) {
+            auto next_procedure_node = parse_procedure();
+            program_node->add_child(next_procedure_node);
+            return program_node;
+        },
+        program_node);
     expect_token(TokenType::END);
 
-    auto program_node = std::make_shared<SimpleNode>(SimpleNodeType::PROGRAM);
-    program_node->add_child(procedure_node);
+    validate_program(program_node);
 
     return program_node;
 }
@@ -34,8 +38,8 @@ std::shared_ptr<SimpleNode> SimpleParser::parse_procedure() {
 }
 
 std::shared_ptr<SimpleNode> SimpleParser::parse_stmt_lst() {
-    auto first_stmt_node = parse_stmt();
     auto stmt_lst_node = std::make_shared<SimpleNode>(SimpleNodeType::STMT_LST);
+    auto first_stmt_node = parse_stmt();
     stmt_lst_node->add_child(first_stmt_node);
     return repeat(
         [&](std::shared_ptr<SimpleNode> stmt_lst_node) {
@@ -336,4 +340,81 @@ std::shared_ptr<SimpleNode> SimpleParser::repeat(
         next_statement_id = saved_next_statement_id;
     }
     return node;
+}
+
+void SimpleParser::validate_program(std::shared_ptr<SimpleNode> program_node) {
+    validate_no_duplicate_proc_name(program_node);
+    validate_no_call_missing_proc(program_node);
+    validate_no_call_cycle(program_node);
+}
+
+void SimpleParser::validate_no_duplicate_proc_name(std::shared_ptr<SimpleNode> program_node) {
+    std::unordered_set<std::string> used_proc_names;
+    for (auto const& procedure_node : program_node->get_children()) {
+        auto proc_name = procedure_node->get_child(0)->get_value();
+        if (used_proc_names.find(proc_name) != used_proc_names.end()) {
+            throw std::runtime_error("Encountered duplicate procedure names");
+        }
+        used_proc_names.insert(proc_name);
+    }
+}
+
+void SimpleParser::validate_no_call_missing_proc(std::shared_ptr<SimpleNode> program_node) {
+    auto call_map = get_call_map(program_node);
+    for (auto const& entry : call_map) {
+        auto proc_name = entry.first;
+        auto procs_called = entry.second;
+        for (auto const& proc_called : procs_called) {
+            if (call_map.find(proc_called) == call_map.end()) {
+                throw std::runtime_error("Encountered call to a missing procedure");
+            }
+        }
+    }
+}
+
+void SimpleParser::validate_no_call_cycle(std::shared_ptr<SimpleNode> program_node) {
+    auto call_map = get_call_map(program_node);
+
+    for (auto const& entry : call_map) {
+        std::unordered_set<std::string> visited;
+        std::queue<std::string> queue;
+        queue.push(entry.first);
+        while (!queue.empty()) {
+            auto curr = queue.front();
+            queue.pop();
+
+            if (visited.find(curr) != visited.end()) {
+                throw std::runtime_error("Encountered call cycle");
+            }
+            visited.insert(curr);
+
+            for (auto const& next : call_map[curr]) {
+                queue.push(next);
+            }
+        }
+    }
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>>
+SimpleParser::get_call_map(std::shared_ptr<SimpleNode> program_node) {
+    std::unordered_map<std::string, std::unordered_set<std::string>> call_map;
+    for (auto const& procedure_node : program_node->get_children()) {
+        auto proc_name = procedure_node->get_child(0)->get_value();
+        call_map[proc_name] = get_procs_called(procedure_node);
+    }
+    return call_map;
+}
+
+std::unordered_set<std::string> SimpleParser::get_procs_called(std::shared_ptr<SimpleNode> node) {
+    std::unordered_set<std::string> procs_called;
+    for (auto const& child : node->get_children()) {
+        if (node->get_type() == SimpleNodeType::CALL) {
+            auto proc_name = node->get_child(0)->get_value();
+            procs_called.insert(proc_name);
+        } else {
+            auto child_procs_called = get_procs_called(child);
+            procs_called.insert(child_procs_called.begin(), child_procs_called.end());
+        }
+    }
+    return procs_called;
 }
