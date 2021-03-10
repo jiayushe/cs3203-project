@@ -1,10 +1,9 @@
-#include "QueryEvaluator/constraints/FollowsConstraint.h"
+#include "QueryEvaluator/constraints/FollowsConstraintLogic.h"
 #include "KnowledgeBase/PKB.h"
 #include "Parser/PQLParser/StatementRef.h"
 #include "Parser/SimpleParser/SimpleNode.h"
 #include "QueryEvaluator/Assignment.h"
-#include "QueryEvaluator/constraints/FollowsTConstraint.h"
-#include "SimpleExtractor/DesignExtractor.h"
+#include "QueryEvaluator/constraints/FollowsTConstraintLogic.h"
 #include "catch.hpp"
 #include <memory>
 
@@ -12,7 +11,7 @@ using namespace QueryEvaluator;
 using namespace Parser;
 using namespace KnowledgeBase;
 
-TEST_CASE("FollowsConstraint and FollowsTConstraint") {
+TEST_CASE("FollowsConstraintLogic and FollowsTConstraintLogic") {
     AssignmentMap assign_mappings;
 
     auto ast = std::make_shared<SimpleNode>(SimpleNodeType::PROGRAM);
@@ -58,70 +57,73 @@ TEST_CASE("FollowsConstraint and FollowsTConstraint") {
         assign_mappings["a"] = Assignment(2);
 
         SECTION("both any") {
-            auto follows_constraint = FollowsConstraint(pkb, statement_any, statement_any);
+            auto follows_constraint = FollowsConstraintLogic(pkb, statement_any, statement_any);
             REQUIRE_FALSE(follows_constraint.is_valid(assign_mappings));
 
-            auto followsT_constraint = FollowsTConstraint(pkb, statement_any, statement_any);
+            auto followsT_constraint = FollowsTConstraintLogic(pkb, statement_any, statement_any);
             REQUIRE_FALSE(followsT_constraint.is_valid(assign_mappings));
         }
 
         SECTION("rhs any") {
             statement_synonym.set_synonym("w");
-            auto follows_constraint = FollowsConstraint(pkb, statement_synonym, statement_any);
+            auto follows_constraint = FollowsConstraintLogic(pkb, statement_synonym, statement_any);
             REQUIRE_FALSE(follows_constraint.is_valid(assign_mappings));
 
-            auto followsT_constraint = FollowsTConstraint(pkb, statement_synonym, statement_any);
+            auto followsT_constraint =
+                FollowsTConstraintLogic(pkb, statement_synonym, statement_any);
             REQUIRE_FALSE(followsT_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(1);
-            follows_constraint = FollowsConstraint(pkb, statement_id, statement_any);
+            follows_constraint = FollowsConstraintLogic(pkb, statement_id, statement_any);
             REQUIRE_FALSE(follows_constraint.is_valid(assign_mappings));
 
-            followsT_constraint = FollowsTConstraint(pkb, statement_id, statement_any);
+            followsT_constraint = FollowsTConstraintLogic(pkb, statement_id, statement_any);
             REQUIRE_FALSE(followsT_constraint.is_valid(assign_mappings));
         }
 
         SECTION("lhs any") {
             statement_synonym.set_synonym("w");
-            auto follows_constraint = FollowsConstraint(pkb, statement_any, statement_synonym);
+            auto follows_constraint = FollowsConstraintLogic(pkb, statement_any, statement_synonym);
             REQUIRE_FALSE(follows_constraint.is_valid(assign_mappings));
 
-            auto followsT_constraint = FollowsTConstraint(pkb, statement_any, statement_synonym);
+            auto followsT_constraint =
+                FollowsTConstraintLogic(pkb, statement_any, statement_synonym);
             REQUIRE_FALSE(followsT_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(1);
-            follows_constraint = FollowsConstraint(pkb, statement_any, statement_id);
+            follows_constraint = FollowsConstraintLogic(pkb, statement_any, statement_id);
             REQUIRE_FALSE(follows_constraint.is_valid(assign_mappings));
 
-            followsT_constraint = FollowsTConstraint(pkb, statement_any, statement_id);
+            followsT_constraint = FollowsTConstraintLogic(pkb, statement_any, statement_id);
             REQUIRE_FALSE(followsT_constraint.is_valid(assign_mappings));
         }
 
         SECTION("synonym or id not found") {
             statement_synonym.set_synonym("ifs");
-            auto follows_constraint = FollowsConstraint(pkb, statement_synonym, statement_any);
+            auto follows_constraint = FollowsConstraintLogic(pkb, statement_synonym, statement_any);
             REQUIRE_THROWS(follows_constraint.is_valid(assign_mappings));
 
-            follows_constraint = FollowsConstraint(pkb, statement_any, statement_synonym);
+            follows_constraint = FollowsConstraintLogic(pkb, statement_any, statement_synonym);
             REQUIRE_THROWS(follows_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(3);
-            follows_constraint = FollowsConstraint(pkb, statement_id, statement_any);
+            follows_constraint = FollowsConstraintLogic(pkb, statement_id, statement_any);
             REQUIRE_THROWS(follows_constraint.is_valid(assign_mappings));
 
-            follows_constraint = FollowsConstraint(pkb, statement_any, statement_id);
+            follows_constraint = FollowsConstraintLogic(pkb, statement_any, statement_id);
             REQUIRE_THROWS(follows_constraint.is_valid(assign_mappings));
 
-            auto followsT_constraint = FollowsTConstraint(pkb, statement_synonym, statement_any);
+            auto followsT_constraint =
+                FollowsTConstraintLogic(pkb, statement_synonym, statement_any);
             REQUIRE_THROWS(followsT_constraint.is_valid(assign_mappings));
 
-            followsT_constraint = FollowsTConstraint(pkb, statement_id, statement_any);
+            followsT_constraint = FollowsTConstraintLogic(pkb, statement_id, statement_any);
             REQUIRE_THROWS(followsT_constraint.is_valid(assign_mappings));
 
-            followsT_constraint = FollowsTConstraint(pkb, statement_any, statement_synonym);
+            followsT_constraint = FollowsTConstraintLogic(pkb, statement_any, statement_synonym);
             REQUIRE_THROWS(followsT_constraint.is_valid(assign_mappings));
 
-            followsT_constraint = FollowsTConstraint(pkb, statement_any, statement_id);
+            followsT_constraint = FollowsTConstraintLogic(pkb, statement_any, statement_id);
             REQUIRE_THROWS(followsT_constraint.is_valid(assign_mappings));
         }
 
@@ -129,19 +131,19 @@ TEST_CASE("FollowsConstraint and FollowsTConstraint") {
             statement_synonym.set_synonym("w");
             statement_synonym_dup.set_synonym("a");
             auto follows_constraint =
-                FollowsConstraint(pkb, statement_synonym, statement_synonym_dup);
+                FollowsConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
             REQUIRE_FALSE(follows_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(1);
             statement_id_dup.set_statement_id(2);
-            follows_constraint = FollowsConstraint(pkb, statement_id, statement_id_dup);
+            follows_constraint = FollowsConstraintLogic(pkb, statement_id, statement_id_dup);
             REQUIRE_FALSE(follows_constraint.is_valid(assign_mappings));
 
             auto followsT_constraint =
-                FollowsTConstraint(pkb, statement_synonym, statement_synonym_dup);
+                FollowsTConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
             REQUIRE_FALSE(followsT_constraint.is_valid(assign_mappings));
 
-            followsT_constraint = FollowsTConstraint(pkb, statement_id, statement_id_dup);
+            followsT_constraint = FollowsTConstraintLogic(pkb, statement_id, statement_id_dup);
             REQUIRE_FALSE(followsT_constraint.is_valid(assign_mappings));
         }
     }
@@ -157,42 +159,44 @@ TEST_CASE("FollowsConstraint and FollowsTConstraint") {
         assign_mappings["a"] = Assignment(3);
 
         SECTION("both any") {
-            auto follows_constraint = FollowsConstraint(pkb, statement_any, statement_any);
+            auto follows_constraint = FollowsConstraintLogic(pkb, statement_any, statement_any);
             REQUIRE(follows_constraint.is_valid(assign_mappings));
 
-            auto followsT_constraint = FollowsTConstraint(pkb, statement_any, statement_any);
+            auto followsT_constraint = FollowsTConstraintLogic(pkb, statement_any, statement_any);
             REQUIRE(followsT_constraint.is_valid(assign_mappings));
         }
 
         SECTION("rhs any") {
             statement_synonym.set_synonym("w");
-            auto follows_constraint = FollowsConstraint(pkb, statement_synonym, statement_any);
+            auto follows_constraint = FollowsConstraintLogic(pkb, statement_synonym, statement_any);
             REQUIRE(follows_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(1);
-            follows_constraint = FollowsConstraint(pkb, statement_id, statement_any);
+            follows_constraint = FollowsConstraintLogic(pkb, statement_id, statement_any);
             REQUIRE(follows_constraint.is_valid(assign_mappings));
 
-            auto followsT_constraint = FollowsTConstraint(pkb, statement_synonym, statement_any);
+            auto followsT_constraint =
+                FollowsTConstraintLogic(pkb, statement_synonym, statement_any);
             REQUIRE(followsT_constraint.is_valid(assign_mappings));
 
-            followsT_constraint = FollowsTConstraint(pkb, statement_id, statement_any);
+            followsT_constraint = FollowsTConstraintLogic(pkb, statement_id, statement_any);
             REQUIRE(followsT_constraint.is_valid(assign_mappings));
         }
 
         SECTION("lhs any") {
             statement_synonym.set_synonym("a");
-            auto follows_constraint = FollowsConstraint(pkb, statement_any, statement_synonym);
+            auto follows_constraint = FollowsConstraintLogic(pkb, statement_any, statement_synonym);
             REQUIRE(follows_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(3);
-            follows_constraint = FollowsConstraint(pkb, statement_any, statement_id);
+            follows_constraint = FollowsConstraintLogic(pkb, statement_any, statement_id);
             REQUIRE(follows_constraint.is_valid(assign_mappings));
 
-            auto followsT_constraint = FollowsTConstraint(pkb, statement_any, statement_synonym);
+            auto followsT_constraint =
+                FollowsTConstraintLogic(pkb, statement_any, statement_synonym);
             REQUIRE(followsT_constraint.is_valid(assign_mappings));
 
-            followsT_constraint = FollowsTConstraint(pkb, statement_any, statement_id);
+            followsT_constraint = FollowsTConstraintLogic(pkb, statement_any, statement_id);
             REQUIRE(followsT_constraint.is_valid(assign_mappings));
         }
 
@@ -200,27 +204,29 @@ TEST_CASE("FollowsConstraint and FollowsTConstraint") {
             statement_synonym.set_synonym("w");
             statement_synonym_dup.set_synonym("a");
             auto follows_constraint =
-                FollowsConstraint(pkb, statement_synonym, statement_synonym_dup);
+                FollowsConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
             REQUIRE(follows_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(1);
             statement_id_dup.set_statement_id(3);
-            follows_constraint = FollowsConstraint(pkb, statement_id, statement_id_dup);
+            follows_constraint = FollowsConstraintLogic(pkb, statement_id, statement_id_dup);
             REQUIRE(follows_constraint.is_valid(assign_mappings));
 
             auto followsT_constraint =
-                FollowsTConstraint(pkb, statement_synonym, statement_synonym_dup);
+                FollowsTConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
             REQUIRE(followsT_constraint.is_valid(assign_mappings));
 
-            followsT_constraint = FollowsTConstraint(pkb, statement_id, statement_id_dup);
+            followsT_constraint = FollowsTConstraintLogic(pkb, statement_id, statement_id_dup);
             REQUIRE(followsT_constraint.is_valid(assign_mappings));
 
             statement_synonym.set_synonym("a");
             statement_synonym_dup.set_synonym("w");
-            follows_constraint = FollowsConstraint(pkb, statement_synonym, statement_synonym_dup);
+            follows_constraint =
+                FollowsConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
             REQUIRE_FALSE(follows_constraint.is_valid(assign_mappings));
 
-            followsT_constraint = FollowsTConstraint(pkb, statement_synonym, statement_synonym_dup);
+            followsT_constraint =
+                FollowsTConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
             REQUIRE_FALSE(followsT_constraint.is_valid(assign_mappings));
         }
     }
@@ -243,18 +249,19 @@ TEST_CASE("FollowsConstraint and FollowsTConstraint") {
         statement_synonym.set_synonym("w");
         statement_synonym_dup.set_synonym("r");
 
-        auto follows_constraint = FollowsConstraint(pkb, statement_synonym, statement_synonym_dup);
+        auto follows_constraint =
+            FollowsConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
         REQUIRE_FALSE(follows_constraint.is_valid(assign_mappings));
         auto followsT_constraint =
-            FollowsTConstraint(pkb, statement_synonym, statement_synonym_dup);
+            FollowsTConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
         REQUIRE(followsT_constraint.is_valid(assign_mappings));
 
         statement_id.set_statement_id(1);
         statement_id_dup.set_statement_id(4);
 
-        follows_constraint = FollowsConstraint(pkb, statement_id, statement_id_dup);
+        follows_constraint = FollowsConstraintLogic(pkb, statement_id, statement_id_dup);
         REQUIRE_FALSE(follows_constraint.is_valid(assign_mappings));
-        followsT_constraint = FollowsTConstraint(pkb, statement_id, statement_id_dup);
+        followsT_constraint = FollowsTConstraintLogic(pkb, statement_id, statement_id_dup);
         REQUIRE(followsT_constraint.is_valid(assign_mappings));
     }
 }

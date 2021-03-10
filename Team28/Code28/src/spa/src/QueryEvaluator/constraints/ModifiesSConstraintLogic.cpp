@@ -1,11 +1,11 @@
-#include "ModifiesConstraint.h"
+#include "ModifiesSConstraintLogic.h"
 #include <stdexcept>
 
 using namespace QueryEvaluator;
 
-ModifiesConstraint::ModifiesConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
-                                       const Parser::StatementRef& lhs,
-                                       const Parser::EntityRef& rhs)
+ModifiesSConstraintLogic::ModifiesSConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                                   const Parser::StatementRef& lhs,
+                                                   const Parser::EntityRef& rhs)
     : pkb(std::move(pkb)), lhs(lhs), rhs(rhs) {
     if (lhs.get_type() == Parser::StatementRefType::SYNONYM) {
         synonyms.insert(lhs.get_synonym());
@@ -15,7 +15,7 @@ ModifiesConstraint::ModifiesConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
     }
 }
 
-bool ModifiesConstraint::is_valid(const AssignmentMap& assignments) {
+bool ModifiesSConstraintLogic::is_valid(const AssignmentMap& assignments) const {
     if (lhs.get_type() == Parser::StatementRefType::ANY) {
         return false;
     }
@@ -58,4 +58,4 @@ bool ModifiesConstraint::is_valid(const AssignmentMap& assignments) {
     }
 }
 
-std::unordered_set<std::string> ModifiesConstraint::get_synonyms() const { return synonyms; }
+std::unordered_set<std::string> ModifiesSConstraintLogic::get_synonyms() const { return synonyms; }

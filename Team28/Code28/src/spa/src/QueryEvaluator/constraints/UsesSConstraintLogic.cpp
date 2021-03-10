@@ -1,10 +1,11 @@
-#include "UsesConstraint.h"
+#include "UsesSConstraintLogic.h"
 #include <stdexcept>
 
 using namespace QueryEvaluator;
 
-UsesConstraint::UsesConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
-                               const Parser::StatementRef& lhs, const Parser::EntityRef& rhs)
+UsesSConstraintLogic::UsesSConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                           const Parser::StatementRef& lhs,
+                                           const Parser::EntityRef& rhs)
     : pkb(std::move(pkb)), lhs(lhs), rhs(rhs) {
     if (lhs.get_type() == Parser::StatementRefType::SYNONYM) {
         synonyms.insert(lhs.get_synonym());
@@ -14,7 +15,7 @@ UsesConstraint::UsesConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
     }
 }
 
-bool UsesConstraint::is_valid(const AssignmentMap& assignments) {
+bool UsesSConstraintLogic::is_valid(const AssignmentMap& assignments) const {
     if (lhs.get_type() == Parser::StatementRefType::ANY) {
         return false;
     }
@@ -57,4 +58,4 @@ bool UsesConstraint::is_valid(const AssignmentMap& assignments) {
     }
 }
 
-std::unordered_set<std::string> UsesConstraint::get_synonyms() const { return synonyms; }
+std::unordered_set<std::string> UsesSConstraintLogic::get_synonyms() const { return synonyms; }

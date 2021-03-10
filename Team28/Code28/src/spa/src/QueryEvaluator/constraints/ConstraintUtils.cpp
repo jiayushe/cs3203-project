@@ -2,10 +2,58 @@
 
 using namespace QueryEvaluator;
 
-std::vector<std::shared_ptr<BaseConstraint>>
+std::vector<EmptyConstraint>
+ConstraintUtils::get_empty_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                       const Parser::QueryObject& query_object) {
+
+    std::vector<EmptyConstraint> empty_constraints;
+
+    auto constraint_logics = get_constraint_logics(pkb, query_object);
+    for (auto const& constraint_logic : constraint_logics) {
+        auto logic_synonyms = constraint_logic->get_synonyms();
+        if (logic_synonyms.empty()) {
+            empty_constraints.emplace_back(constraint_logic);
+        }
+    }
+
+    return empty_constraints;
+}
+
+std::pair<std::vector<UnaryConstraint>, std::vector<BinaryConstraint>>
 ConstraintUtils::get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
-                                 Parser::QueryObject& query_object) {
-    std::vector<std::shared_ptr<BaseConstraint>> constraints;
+                                 const Parser::QueryObject& query_object,
+                                 const std::unordered_set<std::string>& synonyms) {
+
+    std::vector<UnaryConstraint> unary_constraints;
+    std::vector<BinaryConstraint> binary_constraints;
+
+    auto constraint_logics = get_constraint_logics(pkb, query_object);
+    for (auto const& constraint_logic : constraint_logics) {
+        auto logic_synonyms = constraint_logic->get_synonyms();
+        if (is_subset(logic_synonyms, synonyms)) {
+            switch (logic_synonyms.size()) {
+            case 0:
+                break;
+            case 1:
+                unary_constraints.emplace_back(constraint_logic);
+                break;
+            case 2:
+                binary_constraints.emplace_back(constraint_logic);
+                break;
+            default:
+                throw std::runtime_error("Unhandled constraint logic synonym size");
+            }
+        }
+    }
+
+    return std::make_pair(unary_constraints, binary_constraints);
+}
+
+std::vector<std::shared_ptr<BaseConstraintLogic>>
+ConstraintUtils::get_constraint_logics(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                       const Parser::QueryObject& query_object) {
+
+    std::vector<std::shared_ptr<BaseConstraintLogic>> constraint_logics;
 
     for (auto const& such_that : query_object.get_all_such_that()) {
         auto left_ref = such_that.get_left_ref();
@@ -13,27 +61,27 @@ ConstraintUtils::get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
 
         switch (such_that.get_type()) {
         case Parser::SuchThatType::MODIFIES_S:
-            constraints.push_back(std::make_shared<ModifiesConstraint>(
+            constraint_logics.push_back(std::make_shared<ModifiesSConstraintLogic>(
                 pkb, left_ref.get_statement_ref(), right_ref.get_entity_ref()));
             break;
         case Parser::SuchThatType::USES_S:
-            constraints.push_back(std::make_shared<UsesConstraint>(
+            constraint_logics.push_back(std::make_shared<UsesSConstraintLogic>(
                 pkb, left_ref.get_statement_ref(), right_ref.get_entity_ref()));
             break;
         case Parser::SuchThatType::PARENT:
-            constraints.push_back(std::make_shared<ParentConstraint>(
+            constraint_logics.push_back(std::make_shared<ParentConstraintLogic>(
                 pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
         case Parser::SuchThatType::PARENT_T:
-            constraints.push_back(std::make_shared<ParentTConstraint>(
+            constraint_logics.push_back(std::make_shared<ParentTConstraintLogic>(
                 pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
         case Parser::SuchThatType::FOLLOWS:
-            constraints.push_back(std::make_shared<FollowsConstraint>(
+            constraint_logics.push_back(std::make_shared<FollowsConstraintLogic>(
                 pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
         case Parser::SuchThatType::FOLLOWS_T:
-            constraints.push_back(std::make_shared<FollowsTConstraint>(
+            constraint_logics.push_back(std::make_shared<FollowsTConstraintLogic>(
                 pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
         default:
@@ -42,8 +90,21 @@ ConstraintUtils::get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
     }
 
     for (auto const& pattern : query_object.get_all_pattern()) {
-        constraints.push_back(std::make_shared<PatternConstraint>(pkb, pattern));
+        constraint_logics.push_back(std::make_shared<PatternConstraintLogic>(pkb, pattern));
     }
 
-    return constraints;
+    return constraint_logics;
+}
+
+bool ConstraintUtils::is_subset(const std::unordered_set<std::string>& subset,
+                                const std::unordered_set<std::string>& superset) {
+    if (subset.size() > superset.size()) {
+        return false;
+    }
+    for (auto const& element : subset) {
+        if (superset.find(element) == superset.end()) {
+            return false;
+        }
+    }
+    return true;
 }

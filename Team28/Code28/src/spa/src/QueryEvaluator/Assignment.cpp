@@ -1,5 +1,4 @@
 #include "Assignment.h"
-#include <stdexcept>
 
 using namespace QueryEvaluator;
 
@@ -41,4 +40,12 @@ std::string Assignment::value_as_string() const {
     default:
         throw std::runtime_error("Unknown assignment type");
     }
+}
+
+bool Assignment::operator==(const Assignment& other) const {
+    return type == other.type && string_value == other.string_value && int_value == other.int_value;
+}
+
+std::size_t AssignmentHash::operator()(const Assignment& assignment) const {
+    return std::hash<std::string>()(assignment.value_as_string());
 }

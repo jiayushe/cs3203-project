@@ -1,10 +1,10 @@
-#include "FollowsTConstraint.h"
+#include "FollowsTConstraintLogic.h"
 
 using namespace QueryEvaluator;
 
-FollowsTConstraint::FollowsTConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
-                                       const Parser::StatementRef& lhs,
-                                       const Parser::StatementRef& rhs)
+FollowsTConstraintLogic::FollowsTConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                                 const Parser::StatementRef& lhs,
+                                                 const Parser::StatementRef& rhs)
     : pkb(std::move(pkb)), lhs(lhs), rhs(rhs) {
     if (lhs.get_type() == Parser::StatementRefType::SYNONYM) {
         synonyms.insert(lhs.get_synonym());
@@ -14,7 +14,7 @@ FollowsTConstraint::FollowsTConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
     }
 }
 
-bool FollowsTConstraint::is_valid(const AssignmentMap& assignments) {
+bool FollowsTConstraintLogic::is_valid(const AssignmentMap& assignments) const {
     if (lhs.get_type() == Parser::StatementRefType::ANY &&
         rhs.get_type() == Parser::StatementRefType::ANY) {
         auto statements = pkb->get_statements();
@@ -47,4 +47,4 @@ bool FollowsTConstraint::is_valid(const AssignmentMap& assignments) {
     return lhs_statement_followers.find(rhs_statement_id) != lhs_statement_followers.end();
 }
 
-std::unordered_set<std::string> FollowsTConstraint::get_synonyms() const { return synonyms; }
+std::unordered_set<std::string> FollowsTConstraintLogic::get_synonyms() const { return synonyms; }

@@ -1,10 +1,9 @@
-#include "QueryEvaluator/constraints/UsesConstraint.h"
 #include "KnowledgeBase/PKB.h"
 #include "Parser/PQLParser/EntityRef.h"
 #include "Parser/PQLParser/StatementRef.h"
 #include "Parser/SimpleParser/SimpleNode.h"
 #include "QueryEvaluator/Assignment.h"
-#include "SimpleExtractor/DesignExtractor.h"
+#include "QueryEvaluator/constraints/UsesSConstraintLogic.h"
 #include "catch.hpp"
 #include <memory>
 
@@ -12,7 +11,7 @@ using namespace QueryEvaluator;
 using namespace Parser;
 using namespace KnowledgeBase;
 
-TEST_CASE("UsesConstraint") {
+TEST_CASE("UsesSConstraintLogic") {
     AssignmentMap assign_mappings;
 
     auto ast = std::make_shared<SimpleNode>(SimpleNodeType::PROGRAM);
@@ -44,7 +43,7 @@ TEST_CASE("UsesConstraint") {
         pkb->add_statement(StatementType::WHILE, 1, "main", while_stmt_node);
 
         assign_mappings["w"] = Assignment(1);
-        auto uses_constraint = UsesConstraint(pkb, statement_any, entity_any);
+        auto uses_constraint = UsesSConstraintLogic(pkb, statement_any, entity_any);
         REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
     }
 
@@ -66,48 +65,48 @@ TEST_CASE("UsesConstraint") {
 
         SECTION("while const value stmt") {
             statement_synonym.set_synonym("w");
-            auto uses_constraint = UsesConstraint(pkb, statement_synonym, entity_any);
+            auto uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_any);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
             entity_synonym.set_synonym("v");
-            uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
             entity_name.set_name("a");
-            uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(1);
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_any);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_any);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
         }
 
         SECTION("read stmt") {
             statement_synonym.set_synonym("r");
-            auto uses_constraint = UsesConstraint(pkb, statement_synonym, entity_any);
+            auto uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_any);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
             entity_synonym.set_synonym("v");
-            uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
-            uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(2);
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_any);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_any);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
         }
     }
@@ -135,21 +134,21 @@ TEST_CASE("UsesConstraint") {
 
             statement_synonym.set_synonym("w");
             entity_synonym.set_synonym("v");
-            auto uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+            auto uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
             entity_name.set_name("x");
-            uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(1);
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_any);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_any);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
         }
 
@@ -158,21 +157,21 @@ TEST_CASE("UsesConstraint") {
 
             statement_synonym.set_synonym("w");
             entity_synonym.set_synonym("v");
-            auto uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+            auto uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
             entity_name.set_name("b");
-            uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(1);
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_any);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_any);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
         }
 
@@ -181,38 +180,38 @@ TEST_CASE("UsesConstraint") {
 
             statement_synonym.set_synonym("p");
             entity_synonym.set_synonym("v");
-            auto uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+            auto uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
             entity_name.set_name("b");
-            uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(2);
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_any);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_any);
             REQUIRE(uses_constraint.is_valid(assign_mappings));
 
             assign_mappings["p"] = Assignment(2);
             assign_mappings["v"] = Assignment("x");
 
-            uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
             entity_name.set_name("x");
-            uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(2);
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
-            uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+            uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
             REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
         }
 
@@ -251,18 +250,18 @@ TEST_CASE("UsesConstraint") {
             SECTION("while stmt and if cond variable") {
                 statement_synonym.set_synonym("w");
                 entity_synonym.set_synonym("v");
-                auto uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+                auto uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
                 entity_name.set_name("y");
-                uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
                 statement_id.set_statement_id(1);
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
             }
 
@@ -270,18 +269,18 @@ TEST_CASE("UsesConstraint") {
                 statement_synonym.set_synonym("w");
                 entity_synonym.set_synonym("v");
                 assign_mappings["v"] = Assignment("z");
-                auto uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+                auto uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
                 entity_name.set_name("z");
-                uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
                 statement_id.set_statement_id(1);
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
             }
 
@@ -289,18 +288,18 @@ TEST_CASE("UsesConstraint") {
                 statement_synonym.set_synonym("w");
                 entity_synonym.set_synonym("v");
                 assign_mappings["v"] = Assignment("a");
-                auto uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+                auto uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
                 REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
                 entity_name.set_name("a");
-                uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
                 REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
                 statement_id.set_statement_id(1);
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
                 REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
                 REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
             }
 
@@ -310,24 +309,24 @@ TEST_CASE("UsesConstraint") {
                 assign_mappings["v"] = Assignment("y");
 
                 statement_synonym.set_synonym("ifs");
-                auto uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+                auto uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
                 entity_name.set_name("y");
-                uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_synonym, entity_any);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_any);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
                 statement_id.set_statement_id(3);
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_any);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_any);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
             }
 
@@ -336,24 +335,24 @@ TEST_CASE("UsesConstraint") {
                 entity_synonym.set_synonym("v");
 
                 assign_mappings["v"] = Assignment("z");
-                auto uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+                auto uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
                 entity_name.set_name("z");
-                uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_synonym, entity_any);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_any);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
                 statement_id.set_statement_id(3);
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_any);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_any);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
             }
 
@@ -363,40 +362,40 @@ TEST_CASE("UsesConstraint") {
 
                 assign_mappings["v"] = Assignment("z");
 
-                auto uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+                auto uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
                 entity_name.set_name("z");
-                uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_synonym, entity_any);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_any);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
                 statement_id.set_statement_id(4);
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_any);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_any);
                 REQUIRE(uses_constraint.is_valid(assign_mappings));
 
                 assign_mappings["v"] = Assignment("result");
 
-                uses_constraint = UsesConstraint(pkb, statement_synonym, entity_synonym);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_synonym);
                 REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
                 entity_name.set_name("result");
-                uses_constraint = UsesConstraint(pkb, statement_synonym, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_synonym, entity_name);
                 REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
                 statement_id.set_statement_id(4);
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_synonym);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_synonym);
                 REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
 
-                uses_constraint = UsesConstraint(pkb, statement_id, entity_name);
+                uses_constraint = UsesSConstraintLogic(pkb, statement_id, entity_name);
                 REQUIRE_FALSE(uses_constraint.is_valid(assign_mappings));
             }
         }

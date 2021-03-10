@@ -1,22 +1,23 @@
 #pragma once
 
-#include "BaseConstraint.h"
+#include "BaseConstraintLogic.h"
 #include "KnowledgeBase/PKB.h"
+#include "KnowledgeBase/Statement.h"
 #include "Parser/PQLParser/DeclarationMap.h"
 #include "Parser/PQLParser/EntityRef.h"
 #include "Parser/PQLParser/StatementRef.h"
-#include "QueryEvaluator/Assignment.h"
+#include "QueryEvaluator/Common.h"
 #include <memory>
 
 namespace QueryEvaluator {
 
-// Constraint for describing/enforcing a Modifies relationship.
-class ModifiesConstraint : public BaseConstraint {
+// Constraint logic for describing/enforcing a UsesS relationship.
+class UsesSConstraintLogic : public BaseConstraintLogic {
 public:
-    ModifiesConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb, const Parser::StatementRef& lhs,
-                       const Parser::EntityRef& rhs);
+    UsesSConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb, const Parser::StatementRef& lhs,
+                         const Parser::EntityRef& rhs);
 
-    bool is_valid(const AssignmentMap& assignment) override;
+    bool is_valid(const AssignmentMap& assignment) const override;
     std::unordered_set<std::string> get_synonyms() const override;
 
 private:

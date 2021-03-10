@@ -1,22 +1,23 @@
 #pragma once
 
-#include "BaseConstraint.h"
+#include "BaseConstraintLogic.h"
 #include "KnowledgeBase/PKB.h"
 #include "KnowledgeBase/Statement.h"
 #include "Parser/PQLParser/DeclarationMap.h"
 #include "Parser/PQLParser/StatementRef.h"
-#include "QueryEvaluator/Assignment.h"
+#include "QueryEvaluator/Common.h"
 #include <memory>
+#include <stdexcept>
 
 namespace QueryEvaluator {
 
-// Constraint for describing/enforcing a Parent* relationship.
-class ParentTConstraint : public BaseConstraint {
+// Constraint logic for describing/enforcing a Parent* relationship.
+class ParentTConstraintLogic : public BaseConstraintLogic {
 public:
-    ParentTConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb, const Parser::StatementRef& lhs,
-                      const Parser::StatementRef& rhs);
+    ParentTConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb, const Parser::StatementRef& lhs,
+                           const Parser::StatementRef& rhs);
 
-    bool is_valid(const AssignmentMap& assignment) override;
+    bool is_valid(const AssignmentMap& assignment) const override;
     std::unordered_set<std::string> get_synonyms() const override;
 
 private:

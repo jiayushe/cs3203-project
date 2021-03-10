@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 
@@ -38,32 +40,17 @@ public:
 
     std::string value_as_string() const;
 
+    bool operator==(const Assignment& other) const;
+
 private:
     AssignmentType type;
-    std::string synonym;
     std::string string_value;
     int int_value;
 };
 
-// Denotes a group of assignments, i.e. synonym -> Assignment.
-//
-// For example, given the source:
-// ```
-// procedure proc {
-//   read x;
-//   x = x + 1;
-// }
-// ```
-//
-// And the query:
-// ```
-// stmt s; assign a;
-// Select s pattern a(_, _)
-// ```
-//
-// Some possible assignment maps include:
-// - {"s" -> 1, "a" -> 2}
-// - {"s" -> 2, "a" -> 2}
-typedef std::unordered_map<std::string, Assignment> AssignmentMap;
+class AssignmentHash {
+public:
+    std::size_t operator()(const Assignment& assignment) const;
+};
 
 } // namespace QueryEvaluator

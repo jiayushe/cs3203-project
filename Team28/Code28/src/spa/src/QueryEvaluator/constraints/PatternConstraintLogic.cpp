@@ -1,9 +1,9 @@
-#include "PatternConstraint.h"
+#include "PatternConstraintLogic.h"
 
 using namespace QueryEvaluator;
 
-PatternConstraint::PatternConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
-                                     const Parser::Pattern& pattern)
+PatternConstraintLogic::PatternConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                               const Parser::Pattern& pattern)
     : pkb(std::move(pkb)), pattern(pattern) {
     // FIXME: Handle all types of patterns
     auto pattern_assign = pattern.get_pattern_assign();
@@ -14,7 +14,7 @@ PatternConstraint::PatternConstraint(std::shared_ptr<KnowledgeBase::PKB> pkb,
     }
 }
 
-bool PatternConstraint::is_valid(const AssignmentMap& assignments) {
+bool PatternConstraintLogic::is_valid(const AssignmentMap& assignments) const {
     // FIXME: Handle all types of patterns
     auto pattern_assign = pattern.get_pattern_assign();
 
@@ -55,4 +55,4 @@ bool PatternConstraint::is_valid(const AssignmentMap& assignments) {
     }
 }
 
-std::unordered_set<std::string> PatternConstraint::get_synonyms() const { return synonyms; }
+std::unordered_set<std::string> PatternConstraintLogic::get_synonyms() const { return synonyms; }

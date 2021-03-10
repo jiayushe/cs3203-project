@@ -1,10 +1,9 @@
-#include "QueryEvaluator/constraints/ParentConstraint.h"
+#include "QueryEvaluator/constraints/ParentConstraintLogic.h"
 #include "KnowledgeBase/PKB.h"
 #include "Parser/PQLParser/StatementRef.h"
 #include "Parser/SimpleParser/SimpleNode.h"
 #include "QueryEvaluator/Assignment.h"
-#include "QueryEvaluator/constraints/ParentTConstraint.h"
-#include "SimpleExtractor/DesignExtractor.h"
+#include "QueryEvaluator/constraints/ParentTConstraintLogic.h"
 #include "catch.hpp"
 #include <memory>
 
@@ -12,7 +11,7 @@ using namespace QueryEvaluator;
 using namespace Parser;
 using namespace KnowledgeBase;
 
-TEST_CASE("ParentConstraint and ParentTConstraint") {
+TEST_CASE("ParentConstraintLogic and ParentTConstraintLogic") {
     AssignmentMap assign_mappings;
 
     auto ast = std::make_shared<SimpleNode>(SimpleNodeType::PROGRAM);
@@ -53,70 +52,70 @@ TEST_CASE("ParentConstraint and ParentTConstraint") {
         assign_mappings["p"] = Assignment(3);
 
         SECTION("both any") {
-            auto parent_constraint = ParentConstraint(pkb, statement_any, statement_any);
+            auto parent_constraint = ParentConstraintLogic(pkb, statement_any, statement_any);
             REQUIRE_FALSE(parent_constraint.is_valid(assign_mappings));
 
-            auto parentT_constraint = ParentConstraint(pkb, statement_any, statement_any);
+            auto parentT_constraint = ParentConstraintLogic(pkb, statement_any, statement_any);
             REQUIRE_FALSE(parentT_constraint.is_valid(assign_mappings));
         }
 
         SECTION("rhs any") {
             statement_synonym.set_synonym("a");
-            auto parent_constraint = ParentConstraint(pkb, statement_synonym, statement_any);
+            auto parent_constraint = ParentConstraintLogic(pkb, statement_synonym, statement_any);
             REQUIRE_FALSE(parent_constraint.is_valid(assign_mappings));
 
-            auto parentT_constraint = ParentTConstraint(pkb, statement_synonym, statement_any);
+            auto parentT_constraint = ParentTConstraintLogic(pkb, statement_synonym, statement_any);
             REQUIRE_FALSE(parentT_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(1);
-            parent_constraint = ParentConstraint(pkb, statement_id, statement_any);
+            parent_constraint = ParentConstraintLogic(pkb, statement_id, statement_any);
             REQUIRE_FALSE(parent_constraint.is_valid(assign_mappings));
 
-            parentT_constraint = ParentTConstraint(pkb, statement_id, statement_any);
+            parentT_constraint = ParentTConstraintLogic(pkb, statement_id, statement_any);
             REQUIRE_FALSE(parentT_constraint.is_valid(assign_mappings));
         }
 
         SECTION("lhs any") {
             statement_synonym.set_synonym("a");
-            auto parent_constraint = ParentConstraint(pkb, statement_any, statement_synonym);
+            auto parent_constraint = ParentConstraintLogic(pkb, statement_any, statement_synonym);
             REQUIRE_FALSE(parent_constraint.is_valid(assign_mappings));
 
-            auto parentT_constraint = ParentTConstraint(pkb, statement_any, statement_synonym);
+            auto parentT_constraint = ParentTConstraintLogic(pkb, statement_any, statement_synonym);
             REQUIRE_FALSE(parentT_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(1);
-            parent_constraint = ParentConstraint(pkb, statement_any, statement_id);
+            parent_constraint = ParentConstraintLogic(pkb, statement_any, statement_id);
             REQUIRE_FALSE(parent_constraint.is_valid(assign_mappings));
 
-            parentT_constraint = ParentTConstraint(pkb, statement_any, statement_id);
+            parentT_constraint = ParentTConstraintLogic(pkb, statement_any, statement_id);
             REQUIRE_FALSE(parentT_constraint.is_valid(assign_mappings));
         }
 
         SECTION("synonym or id not found") {
             statement_synonym.set_synonym("ifs");
-            auto parent_constraint = ParentConstraint(pkb, statement_synonym, statement_any);
+            auto parent_constraint = ParentConstraintLogic(pkb, statement_synonym, statement_any);
             REQUIRE_THROWS(parent_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(4);
-            parent_constraint = ParentConstraint(pkb, statement_id, statement_any);
+            parent_constraint = ParentConstraintLogic(pkb, statement_id, statement_any);
             REQUIRE_THROWS(parent_constraint.is_valid(assign_mappings));
 
-            auto parentT_constraint = ParentTConstraint(pkb, statement_synonym, statement_any);
+            auto parentT_constraint = ParentTConstraintLogic(pkb, statement_synonym, statement_any);
             REQUIRE_THROWS(parentT_constraint.is_valid(assign_mappings));
 
-            parentT_constraint = ParentTConstraint(pkb, statement_id, statement_any);
+            parentT_constraint = ParentTConstraintLogic(pkb, statement_id, statement_any);
             REQUIRE_THROWS(parentT_constraint.is_valid(assign_mappings));
 
-            parent_constraint = ParentConstraint(pkb, statement_any, statement_synonym);
+            parent_constraint = ParentConstraintLogic(pkb, statement_any, statement_synonym);
             REQUIRE_THROWS(parent_constraint.is_valid(assign_mappings));
 
-            parent_constraint = ParentConstraint(pkb, statement_any, statement_id);
+            parent_constraint = ParentConstraintLogic(pkb, statement_any, statement_id);
             REQUIRE_THROWS(parent_constraint.is_valid(assign_mappings));
 
-            parentT_constraint = ParentTConstraint(pkb, statement_any, statement_synonym);
+            parentT_constraint = ParentTConstraintLogic(pkb, statement_any, statement_synonym);
             REQUIRE_THROWS(parentT_constraint.is_valid(assign_mappings));
 
-            parentT_constraint = ParentTConstraint(pkb, statement_any, statement_id);
+            parentT_constraint = ParentTConstraintLogic(pkb, statement_any, statement_id);
             REQUIRE_THROWS(parentT_constraint.is_valid(assign_mappings));
         }
 
@@ -124,18 +123,19 @@ TEST_CASE("ParentConstraint and ParentTConstraint") {
             statement_synonym.set_synonym("a");
             statement_synonym_dup.set_synonym("r");
             auto parent_constraint =
-                ParentConstraint(pkb, statement_synonym, statement_synonym_dup);
+                ParentConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
             REQUIRE_FALSE(parent_constraint.is_valid(assign_mappings));
 
             statement_id.set_statement_id(1);
             statement_id_dup.set_statement_id(2);
-            parent_constraint = ParentConstraint(pkb, statement_id, statement_id_dup);
+            parent_constraint = ParentConstraintLogic(pkb, statement_id, statement_id_dup);
             REQUIRE_FALSE(parent_constraint.is_valid(assign_mappings));
 
-            auto parentT_constraint = ParentTConstraint(pkb, statement_any, statement_synonym_dup);
+            auto parentT_constraint =
+                ParentTConstraintLogic(pkb, statement_any, statement_synonym_dup);
             REQUIRE_FALSE(parentT_constraint.is_valid(assign_mappings));
 
-            parentT_constraint = ParentTConstraint(pkb, statement_id, statement_id_dup);
+            parentT_constraint = ParentTConstraintLogic(pkb, statement_id, statement_id_dup);
             REQUIRE_FALSE(parentT_constraint.is_valid(assign_mappings));
         }
     }
@@ -161,42 +161,46 @@ TEST_CASE("ParentConstraint and ParentTConstraint") {
             assign_mappings["a"] = Assignment(2);
 
             SECTION("both any") {
-                auto parent_constraint = ParentConstraint(pkb, statement_any, statement_any);
+                auto parent_constraint = ParentConstraintLogic(pkb, statement_any, statement_any);
                 REQUIRE(parent_constraint.is_valid(assign_mappings));
 
-                auto parentT_constraint = ParentTConstraint(pkb, statement_any, statement_any);
+                auto parentT_constraint = ParentTConstraintLogic(pkb, statement_any, statement_any);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
             }
 
             SECTION("rhs any") {
                 statement_synonym.set_synonym("w");
-                auto parent_constraint = ParentConstraint(pkb, statement_synonym, statement_any);
+                auto parent_constraint =
+                    ParentConstraintLogic(pkb, statement_synonym, statement_any);
                 REQUIRE(parent_constraint.is_valid(assign_mappings));
 
                 statement_id.set_statement_id(1);
-                parent_constraint = ParentConstraint(pkb, statement_id, statement_any);
+                parent_constraint = ParentConstraintLogic(pkb, statement_id, statement_any);
                 REQUIRE(parent_constraint.is_valid(assign_mappings));
 
-                auto parentT_constraint = ParentTConstraint(pkb, statement_synonym, statement_any);
+                auto parentT_constraint =
+                    ParentTConstraintLogic(pkb, statement_synonym, statement_any);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
 
-                parentT_constraint = ParentTConstraint(pkb, statement_id, statement_any);
+                parentT_constraint = ParentTConstraintLogic(pkb, statement_id, statement_any);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
             }
 
             SECTION("lhs any") {
                 statement_synonym.set_synonym("a");
-                auto parent_constraint = ParentConstraint(pkb, statement_any, statement_synonym);
+                auto parent_constraint =
+                    ParentConstraintLogic(pkb, statement_any, statement_synonym);
                 REQUIRE(parent_constraint.is_valid(assign_mappings));
 
                 statement_id.set_statement_id(2);
-                parent_constraint = ParentConstraint(pkb, statement_any, statement_id);
+                parent_constraint = ParentConstraintLogic(pkb, statement_any, statement_id);
                 REQUIRE(parent_constraint.is_valid(assign_mappings));
 
-                auto parentT_constraint = ParentTConstraint(pkb, statement_any, statement_synonym);
+                auto parentT_constraint =
+                    ParentTConstraintLogic(pkb, statement_any, statement_synonym);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
 
-                parentT_constraint = ParentTConstraint(pkb, statement_any, statement_id);
+                parentT_constraint = ParentTConstraintLogic(pkb, statement_any, statement_id);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
             }
 
@@ -204,19 +208,19 @@ TEST_CASE("ParentConstraint and ParentTConstraint") {
                 statement_synonym.set_synonym("w");
                 statement_synonym_dup.set_synonym("a");
                 auto parent_constraint =
-                    ParentConstraint(pkb, statement_synonym, statement_synonym_dup);
+                    ParentConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
                 REQUIRE(parent_constraint.is_valid(assign_mappings));
 
                 statement_id.set_statement_id(1);
                 statement_id_dup.set_statement_id(2);
-                parent_constraint = ParentConstraint(pkb, statement_id, statement_id_dup);
+                parent_constraint = ParentConstraintLogic(pkb, statement_id, statement_id_dup);
                 REQUIRE(parent_constraint.is_valid(assign_mappings));
 
                 auto parentT_constraint =
-                    ParentTConstraint(pkb, statement_synonym, statement_synonym_dup);
+                    ParentTConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
 
-                parentT_constraint = ParentTConstraint(pkb, statement_id, statement_id_dup);
+                parentT_constraint = ParentTConstraintLogic(pkb, statement_id, statement_id_dup);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
             }
         }
@@ -248,17 +252,19 @@ TEST_CASE("ParentConstraint and ParentTConstraint") {
 
             SECTION("rhs any") {
                 statement_synonym.set_synonym("ifs");
-                auto parent_constraint = ParentConstraint(pkb, statement_synonym, statement_any);
+                auto parent_constraint =
+                    ParentConstraintLogic(pkb, statement_synonym, statement_any);
                 REQUIRE(parent_constraint.is_valid(assign_mappings));
 
                 statement_id.set_statement_id(1);
-                parent_constraint = ParentConstraint(pkb, statement_id, statement_any);
+                parent_constraint = ParentConstraintLogic(pkb, statement_id, statement_any);
                 REQUIRE(parent_constraint.is_valid(assign_mappings));
 
-                auto parentT_constraint = ParentTConstraint(pkb, statement_synonym, statement_any);
+                auto parentT_constraint =
+                    ParentTConstraintLogic(pkb, statement_synonym, statement_any);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
 
-                parentT_constraint = ParentTConstraint(pkb, statement_id, statement_any);
+                parentT_constraint = ParentTConstraintLogic(pkb, statement_id, statement_any);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
             }
         }
@@ -298,32 +304,33 @@ TEST_CASE("ParentConstraint and ParentTConstraint") {
                 statement_synonym_dup.set_synonym("a");
 
                 auto parent_constraint =
-                    ParentConstraint(pkb, statement_synonym, statement_synonym_dup);
+                    ParentConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
                 REQUIRE_FALSE(parent_constraint.is_valid(assign_mappings));
                 auto parentT_constraint =
-                    ParentTConstraint(pkb, statement_synonym, statement_synonym_dup);
+                    ParentTConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
 
                 statement_id.set_statement_id(1);
                 statement_id_dup.set_statement_id(3);
 
-                parent_constraint = ParentConstraint(pkb, statement_id, statement_synonym_dup);
+                parent_constraint = ParentConstraintLogic(pkb, statement_id, statement_synonym_dup);
                 REQUIRE_FALSE(parent_constraint.is_valid(assign_mappings));
-                parentT_constraint = ParentTConstraint(pkb, statement_id, statement_id_dup);
+                parentT_constraint = ParentTConstraintLogic(pkb, statement_id, statement_id_dup);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
 
                 statement_synonym_dup.set_synonym("p");
 
-                parent_constraint = ParentConstraint(pkb, statement_synonym, statement_synonym_dup);
+                parent_constraint =
+                    ParentConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
                 REQUIRE_FALSE(parent_constraint.is_valid(assign_mappings));
                 parentT_constraint =
-                    ParentTConstraint(pkb, statement_synonym, statement_synonym_dup);
+                    ParentTConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
 
                 statement_id_dup.set_statement_id(4);
-                parent_constraint = ParentConstraint(pkb, statement_id, statement_synonym_dup);
+                parent_constraint = ParentConstraintLogic(pkb, statement_id, statement_synonym_dup);
                 REQUIRE_FALSE(parent_constraint.is_valid(assign_mappings));
-                parentT_constraint = ParentTConstraint(pkb, statement_id, statement_id_dup);
+                parentT_constraint = ParentTConstraintLogic(pkb, statement_id, statement_id_dup);
                 REQUIRE(parentT_constraint.is_valid(assign_mappings));
             }
         }

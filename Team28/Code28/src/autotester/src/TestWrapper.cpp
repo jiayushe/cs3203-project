@@ -41,7 +41,7 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
         Parser::PQLParser parser(source);
         auto query_object = parser.parse_query();
 
-        QueryEvaluator::BruteForceEvaluator::evaluate(pkb, query_object, results);
+        QueryEvaluator::Evaluator::evaluate(pkb, query_object, results);
     } catch (std::runtime_error& error) {
         std::cout << "Error: " << error.what() << std::endl;
         results.clear();

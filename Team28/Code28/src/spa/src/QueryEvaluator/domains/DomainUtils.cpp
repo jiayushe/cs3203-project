@@ -1,29 +1,29 @@
 #include "DomainUtils.h"
-#include <stdexcept>
 
 using namespace QueryEvaluator;
 
-std::vector<Assignment> DomainUtils::get_domain(std::shared_ptr<KnowledgeBase::PKB> pkb,
-                                                Parser::DesignEntityType design_entity_type) {
+Domain DomainUtils::get_domain(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                               Parser::DesignEntityType design_entity_type,
+                               const std::vector<UnaryConstraint>& constraints) {
     switch (design_entity_type) {
     case Parser::DesignEntityType::STMT:
-        return StatementDomain::get_domain(pkb);
+        return StatementDomain::get_domain(pkb, constraints);
     case Parser::DesignEntityType::READ:
-        return ReadDomain::get_domain(pkb);
+        return ReadDomain::get_domain(pkb, constraints);
     case Parser::DesignEntityType::PRINT:
-        return PrintDomain::get_domain(pkb);
+        return PrintDomain::get_domain(pkb, constraints);
     case Parser::DesignEntityType::WHILE:
-        return WhileDomain::get_domain(pkb);
+        return WhileDomain::get_domain(pkb, constraints);
     case Parser::DesignEntityType::IF:
-        return IfDomain::get_domain(pkb);
+        return IfDomain::get_domain(pkb, constraints);
     case Parser::DesignEntityType::ASSIGN:
-        return AssignDomain::get_domain(pkb);
+        return AssignDomain::get_domain(pkb, constraints);
     case Parser::DesignEntityType::VARIABLE:
-        return VariableDomain::get_domain(pkb);
+        return VariableDomain::get_domain(pkb, constraints);
     case Parser::DesignEntityType::CONSTANT:
-        return ConstantDomain::get_domain(pkb);
+        return ConstantDomain::get_domain(pkb, constraints);
     case Parser::DesignEntityType::PROCEDURE:
-        return ProcedureDomain::get_domain(pkb);
+        return ProcedureDomain::get_domain(pkb, constraints);
     /*case Parser::DesignEntityType::CALL:
         return CallDomain::get_domain(pkb);*/
     default:

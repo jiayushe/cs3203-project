@@ -15,7 +15,7 @@
 #include "Parser/SimpleParser/SimpleLexer.h"
 #include "Parser/SimpleParser/SimpleParser.h"
 #include "Parser/shared/Source.h"
-#include "QueryEvaluator/BruteForceEvaluator.h"
+#include "QueryEvaluator/Evaluator.h"
 #include "SimpleExtractor/DesignExtractor.h"
 
 class TestWrapper : public AbstractWrapper {

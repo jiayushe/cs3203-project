@@ -1,28 +1,50 @@
 #pragma once
 
+#include "BaseConstraintLogic.h"
+#include "BinaryConstraint.h"
+#include "EmptyConstraint.h"
+#include "FollowsConstraintLogic.h"
+#include "FollowsTConstraintLogic.h"
 #include "KnowledgeBase/PKB.h"
+#include "ModifiesSConstraintLogic.h"
+#include "ParentConstraintLogic.h"
+#include "ParentTConstraintLogic.h"
 #include "Parser/PQLParser/QueryObject.h"
-#include "QueryEvaluator/constraints/BaseConstraint.h"
-#include "QueryEvaluator/constraints/FollowsConstraint.h"
-#include "QueryEvaluator/constraints/FollowsTConstraint.h"
-#include "QueryEvaluator/constraints/ModifiesConstraint.h"
-#include "QueryEvaluator/constraints/ParentConstraint.h"
-#include "QueryEvaluator/constraints/ParentTConstraint.h"
-#include "QueryEvaluator/constraints/PatternConstraint.h"
-#include "QueryEvaluator/constraints/UsesConstraint.h"
+#include "PatternConstraintLogic.h"
+#include "UnaryConstraint.h"
+#include "UsesSConstraintLogic.h"
 #include <memory>
 #include <stdexcept>
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace QueryEvaluator {
 
 class ConstraintUtils {
 public:
-    // Get all constraints for a given query. For instance, the query
-    // `Select s such that Follows(..., ...) pattern a(..., ...)` would have
-    // two constraints associated with it, i.e. one for Follows and one for pattern.
-    static std::vector<std::shared_ptr<BaseConstraint>>
-    get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb, Parser::QueryObject& query_object);
+    // Get all empty constraints from the given query object.
+    static std::vector<EmptyConstraint>
+    get_empty_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                          const Parser::QueryObject& query_object);
+
+    // Get all unary and binary constraints from the given query object.
+    // The `synonyms` set is used to filter constraints such that only those
+    // which involve the synonyms from `synonyms` are included in the result.
+    static std::pair<std::vector<UnaryConstraint>, std::vector<BinaryConstraint>>
+    get_constraints(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                    const Parser::QueryObject& query_object,
+                    const std::unordered_set<std::string>& synonyms);
+
+private:
+    // Get all constraint logics from the given query object.
+    static std::vector<std::shared_ptr<BaseConstraintLogic>>
+    get_constraint_logics(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                          const Parser::QueryObject& query_object);
+
+    // Check whether a string set is a subset of another.
+    static bool is_subset(const std::unordered_set<std::string>& subset,
+                          const std::unordered_set<std::string>& superset);
 };
 
 } // namespace QueryEvaluator
