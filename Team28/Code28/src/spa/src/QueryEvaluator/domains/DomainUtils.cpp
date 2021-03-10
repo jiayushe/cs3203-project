@@ -24,6 +24,8 @@ std::vector<Assignment> DomainUtils::get_domain(std::shared_ptr<KnowledgeBase::P
         return ConstantDomain::get_domain(pkb);
     case Parser::DesignEntityType::PROCEDURE:
         return ProcedureDomain::get_domain(pkb);
+    /*case Parser::DesignEntityType::CALL:
+        return CallDomain::get_domain(pkb);*/
     default:
         throw std::runtime_error("Unknown design entity type");
     }

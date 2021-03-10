@@ -5,7 +5,7 @@
 
 namespace QueryEvaluator {
 
-enum class AssignmentType { INVALID, STRING, INTEGER };
+enum class AssignmentType { INVALID, STRING, INTEGER, BOTH };
 
 // Denotes a single assignment for a given synonym.
 //
@@ -30,6 +30,7 @@ public:
     Assignment();
     explicit Assignment(std::string value);
     explicit Assignment(int value);
+    explicit Assignment(int value, std::string string_value);
 
     AssignmentType get_type() const;
     std::string get_string_value() const;

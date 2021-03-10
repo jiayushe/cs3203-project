@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Parser/PQLParser/AttrRef.h"
 #include "Parser/PQLParser/EntityRef.h"
 #include "Parser/PQLParser/StatementRef.h"
 #include "QueryEvaluator/Assignment.h"
@@ -22,5 +23,11 @@ protected:
                                 Parser::StatementRef& statement_ref);
     static std::string get_variable_name(const AssignmentMap& assignments,
                                          Parser::EntityRef& entity_ref);
+    static int get_statement_id(const AssignmentMap& assignments, Parser::AttrRef& attr_ref);
+    static std::string get_variable_name(const AssignmentMap& assignments,
+                                         Parser::AttrRef& attr_ref);
+    static std::string get_procedure_name(const AssignmentMap& assignments,
+                                          Parser::AttrRef& attr_ref);
+    static int get_constant_value(const AssignmentMap& assignments, Parser::AttrRef& attr_ref);
 };
 } // namespace QueryEvaluator
