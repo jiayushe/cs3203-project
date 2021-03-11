@@ -90,7 +90,19 @@ ConstraintUtils::get_constraint_logics(std::shared_ptr<KnowledgeBase::PKB> pkb,
     }
 
     for (auto const& pattern : query_object.get_all_pattern()) {
-        constraint_logics.push_back(std::make_shared<PatternConstraintLogic>(pkb, pattern));
+        switch (pattern.get_type()) {
+        case Parser::PatternType::ASSIGN:
+            constraint_logics.push_back(std::make_shared<PatternLConstraintLogic>(pkb, pattern));
+            constraint_logics.push_back(
+                std::make_shared<PatternRConstraintLogic>(pkb, pattern.get_pattern_assign()));
+            break;
+        case Parser::PatternType::IF:
+        case Parser::PatternType::WHILE:
+            constraint_logics.push_back(std::make_shared<PatternLConstraintLogic>(pkb, pattern));
+            break;
+        default:
+            throw std::runtime_error("Unknown pattern type");
+        }
     }
 
     return constraint_logics;

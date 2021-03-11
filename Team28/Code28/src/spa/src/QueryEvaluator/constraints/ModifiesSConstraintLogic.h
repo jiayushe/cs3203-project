@@ -20,7 +20,6 @@ public:
     std::unordered_set<std::string> get_synonyms() const override;
 
 private:
-    std::shared_ptr<KnowledgeBase::PKB> pkb;
     Parser::StatementRef lhs;
     Parser::EntityRef rhs;
     std::unordered_set<std::string> synonyms;

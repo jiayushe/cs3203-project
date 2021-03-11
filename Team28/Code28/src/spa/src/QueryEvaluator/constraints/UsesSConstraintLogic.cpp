@@ -6,7 +6,7 @@ using namespace QueryEvaluator;
 UsesSConstraintLogic::UsesSConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb,
                                            const Parser::StatementRef& lhs,
                                            const Parser::EntityRef& rhs)
-    : pkb(std::move(pkb)), lhs(lhs), rhs(rhs) {
+    : BaseConstraintLogic(std::move(pkb)), lhs(lhs), rhs(rhs) {
     if (lhs.get_type() == Parser::StatementRefType::SYNONYM) {
         synonyms.insert(lhs.get_synonym());
     }
@@ -15,14 +15,13 @@ UsesSConstraintLogic::UsesSConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> p
     }
 }
 
-bool UsesSConstraintLogic::is_valid(const AssignmentMap& assignments) const {
+bool UsesSConstraintLogic::is_valid(const AssignmentMap& assignment_map) const {
     if (lhs.get_type() == Parser::StatementRefType::ANY) {
         return false;
     }
 
     if (rhs.get_type() == Parser::EntityRefType::ANY) {
-        auto lhs_statement_id = get_statement_id(assignments, lhs);
-        auto lhs_statement = pkb->get_statement_by_id(lhs_statement_id);
+        auto lhs_statement = get_statement(assignment_map, lhs);
 
         switch (lhs_statement->get_type()) {
         case KnowledgeBase::StatementType::WHILE:
@@ -38,9 +37,8 @@ bool UsesSConstraintLogic::is_valid(const AssignmentMap& assignments) const {
         }
     }
 
-    auto rhs_string = get_variable_name(assignments, rhs);
-    auto lhs_statement_id = get_statement_id(assignments, lhs);
-    auto lhs_statement = pkb->get_statement_by_id(lhs_statement_id);
+    auto rhs_variable_name = get_variable_name(assignment_map, rhs);
+    auto lhs_statement = get_statement(assignment_map, lhs);
 
     switch (lhs_statement->get_type()) {
     case KnowledgeBase::StatementType::WHILE:
@@ -48,7 +46,7 @@ bool UsesSConstraintLogic::is_valid(const AssignmentMap& assignments) const {
     case KnowledgeBase::StatementType::ASSIGN:
     case KnowledgeBase::StatementType::PRINT: {
         auto lhs_statement_uses = lhs_statement->get_uses();
-        return lhs_statement_uses.find(rhs_string) != lhs_statement_uses.end();
+        return lhs_statement_uses.find(rhs_variable_name) != lhs_statement_uses.end();
     }
     case KnowledgeBase::StatementType::READ:
     case KnowledgeBase::StatementType::CALL:

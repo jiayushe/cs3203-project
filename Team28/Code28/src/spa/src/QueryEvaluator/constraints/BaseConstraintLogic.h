@@ -1,10 +1,12 @@
 #pragma once
 
+#include "KnowledgeBase/PKB.h"
 #include "Parser/PQLParser/AttrRef.h"
 #include "Parser/PQLParser/EntityRef.h"
 #include "Parser/PQLParser/StatementRef.h"
 #include "QueryEvaluator/Assignment.h"
 #include "QueryEvaluator/Common.h"
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
@@ -20,19 +22,37 @@ public:
     virtual std::unordered_set<std::string> get_synonyms() const = 0;
 
 protected:
-    static int get_statement_id(const AssignmentMap& assignments,
-                                const Parser::StatementRef& statement_ref);
-    static std::string get_variable_name(const AssignmentMap& assignments,
-                                         const Parser::EntityRef& entity_ref);
-    static std::string get_procedure_name(const AssignmentMap& assignments,
-                                          const Parser::EntityRef& entity_ref);
+    std::shared_ptr<KnowledgeBase::PKB> pkb;
 
-    static int get_statement_id(const AssignmentMap& assignments, const Parser::AttrRef& attr_ref);
-    static int get_constant_value(const AssignmentMap& assignments,
+    explicit BaseConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb);
+
+    std::shared_ptr<KnowledgeBase::Statement> get_statement(const AssignmentMap& assignment_map,
+                                                            const std::string& synonym) const;
+    std::shared_ptr<KnowledgeBase::Statement>
+    get_statement(const AssignmentMap& assignment_map,
+                  const Parser::StatementRef& statement_ref) const;
+    std::shared_ptr<KnowledgeBase::Variable> get_variable(const AssignmentMap& assignment_map,
+                                                          const std::string& synonym) const;
+    std::shared_ptr<KnowledgeBase::Variable>
+    get_variable(const AssignmentMap& assignment_map, const Parser::EntityRef& entity_ref) const;
+    std::shared_ptr<KnowledgeBase::Procedure> get_procedure(const AssignmentMap& assignment_map,
+                                                            const std::string& synonym) const;
+    std::shared_ptr<KnowledgeBase::Procedure>
+    get_procedure(const AssignmentMap& assignment_map, const Parser::EntityRef& entity_ref) const;
+
+    static int get_statement_id(const AssignmentMap& assignment_map,
+                                const Parser::AttrRef& attr_ref);
+    static int get_statement_id(const AssignmentMap& assignment_map,
+                                const Parser::StatementRef& statement_ref);
+    static int get_constant_value(const AssignmentMap& assignment_map,
                                   const Parser::AttrRef& attr_ref);
-    static std::string get_variable_name(const AssignmentMap& assignments,
+    static std::string get_variable_name(const AssignmentMap& assignment_map,
+                                         const Parser::EntityRef& entity_ref);
+    static std::string get_variable_name(const AssignmentMap& assignment_map,
                                          const Parser::AttrRef& attr_ref);
-    static std::string get_procedure_name(const AssignmentMap& assignments,
+    static std::string get_procedure_name(const AssignmentMap& assignment_map,
+                                          const Parser::EntityRef& entity_ref);
+    static std::string get_procedure_name(const AssignmentMap& assignment_map,
                                           const Parser::AttrRef& attr_ref);
 };
 

@@ -10,7 +10,8 @@
 #include "ParentConstraintLogic.h"
 #include "ParentTConstraintLogic.h"
 #include "Parser/PQLParser/QueryObject.h"
-#include "PatternConstraintLogic.h"
+#include "PatternLConstraintLogic.h"
+#include "PatternRConstraintLogic.h"
 #include "UnaryConstraint.h"
 #include "UsesSConstraintLogic.h"
 #include <memory>

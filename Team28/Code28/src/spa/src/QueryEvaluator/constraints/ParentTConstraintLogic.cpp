@@ -5,7 +5,7 @@ using namespace QueryEvaluator;
 ParentTConstraintLogic::ParentTConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb,
                                                const Parser::StatementRef& lhs,
                                                const Parser::StatementRef& rhs)
-    : pkb(std::move(pkb)), lhs(lhs), rhs(rhs) {
+    : BaseConstraintLogic(std::move(pkb)), lhs(lhs), rhs(rhs) {
     if (lhs.get_type() == Parser::StatementRefType::SYNONYM) {
         synonyms.insert(lhs.get_synonym());
     }
@@ -28,8 +28,7 @@ bool ParentTConstraintLogic::is_valid(const AssignmentMap& assignments) const {
 
     if (lhs.get_type() != Parser::StatementRefType::ANY &&
         rhs.get_type() == Parser::StatementRefType::ANY) {
-        auto lhs_statement_id = get_statement_id(assignments, lhs);
-        auto lhs_statement = pkb->get_statement_by_id(lhs_statement_id);
+        auto lhs_statement = get_statement(assignments, lhs);
 
         switch (lhs_statement->get_type()) {
         case KnowledgeBase::StatementType::WHILE:
@@ -47,13 +46,11 @@ bool ParentTConstraintLogic::is_valid(const AssignmentMap& assignments) const {
 
     if (lhs.get_type() == Parser::StatementRefType::ANY &&
         rhs.get_type() != Parser::StatementRefType::ANY) {
-        auto rhs_statement_id = get_statement_id(assignments, rhs);
-        auto rhs_statement = pkb->get_statement_by_id(rhs_statement_id);
+        auto rhs_statement = get_statement(assignments, rhs);
         return !rhs_statement->get_ancestors().empty();
     }
 
-    auto rhs_statement_id = get_statement_id(assignments, rhs);
-    auto rhs_statement = pkb->get_statement_by_id(rhs_statement_id);
+    auto rhs_statement = get_statement(assignments, rhs);
     auto lhs_statement_id = get_statement_id(assignments, lhs);
     auto rhs_statement_ancestors = rhs_statement->get_ancestors();
     return rhs_statement_ancestors.find(lhs_statement_id) != rhs_statement_ancestors.end();

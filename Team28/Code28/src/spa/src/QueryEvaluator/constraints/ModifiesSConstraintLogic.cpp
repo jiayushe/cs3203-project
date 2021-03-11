@@ -6,7 +6,7 @@ using namespace QueryEvaluator;
 ModifiesSConstraintLogic::ModifiesSConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb,
                                                    const Parser::StatementRef& lhs,
                                                    const Parser::EntityRef& rhs)
-    : pkb(std::move(pkb)), lhs(lhs), rhs(rhs) {
+    : BaseConstraintLogic(std::move(pkb)), lhs(lhs), rhs(rhs) {
     if (lhs.get_type() == Parser::StatementRefType::SYNONYM) {
         synonyms.insert(lhs.get_synonym());
     }
@@ -21,8 +21,7 @@ bool ModifiesSConstraintLogic::is_valid(const AssignmentMap& assignments) const 
     }
 
     if (rhs.get_type() == Parser::EntityRefType::ANY) {
-        auto lhs_statement_id = get_statement_id(assignments, lhs);
-        auto lhs_statement = pkb->get_statement_by_id(lhs_statement_id);
+        auto lhs_statement = get_statement(assignments, lhs);
 
         switch (lhs_statement->get_type()) {
         case KnowledgeBase::StatementType::WHILE:
@@ -38,9 +37,8 @@ bool ModifiesSConstraintLogic::is_valid(const AssignmentMap& assignments) const 
         }
     }
 
-    auto rhs_string = get_variable_name(assignments, rhs);
-    auto lhs_statement_id = get_statement_id(assignments, lhs);
-    auto lhs_statement = pkb->get_statement_by_id(lhs_statement_id);
+    auto rhs_variable_name = get_variable_name(assignments, rhs);
+    auto lhs_statement = get_statement(assignments, lhs);
 
     switch (lhs_statement->get_type()) {
     case KnowledgeBase::StatementType::WHILE:
@@ -48,7 +46,7 @@ bool ModifiesSConstraintLogic::is_valid(const AssignmentMap& assignments) const 
     case KnowledgeBase::StatementType::ASSIGN:
     case KnowledgeBase::StatementType::READ: {
         auto lhs_statement_modifies = lhs_statement->get_modifies();
-        return lhs_statement_modifies.find(rhs_string) != lhs_statement_modifies.end();
+        return lhs_statement_modifies.find(rhs_variable_name) != lhs_statement_modifies.end();
     }
     case KnowledgeBase::StatementType::CALL:
     case KnowledgeBase::StatementType::PRINT:
