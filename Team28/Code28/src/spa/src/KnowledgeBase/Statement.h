@@ -85,6 +85,30 @@ public:
     // Add a subsequent statement via id.
     void add_follower(int follower_id);
 
+    // Gets the list of ids of the direct previous prog lines.
+    std::unordered_set<int> get_direct_previous();
+
+    // Adds a direct previous prog line via id.
+    void add_direct_previous(int previous_id);
+
+    // Gets the list of ids of the previous prog lines.
+    std::unordered_set<int> get_previous();
+
+    // Adds a previous prog line via id.
+    void add_previous(int previous_id);
+
+    // Gets the list of ids of the direct next prog lines.
+    std::unordered_set<int> get_direct_next();
+
+    // Adds a direct next prog line via id.
+    void add_direct_next(int next_id);
+
+    // Gets the list of ids of the next prog lines.
+    std::unordered_set<int> get_next();
+
+    // Adds a next prog line via id.
+    void add_next(int next_id);
+
     // Gets the list of names of variables that are directly modified.
     std::unordered_set<std::string> get_direct_modifies();
 
@@ -137,6 +161,10 @@ private:
     std::unordered_set<int> followings;
     int direct_follower;
     std::unordered_set<int> followers;
+    std::unordered_set<int> direct_previous;
+    std::unordered_set<int> previous;
+    std::unordered_set<int> direct_next;
+    std::unordered_set<int> next;
     std::unordered_set<std::string> direct_modifies;
     std::unordered_set<std::string> modifies;
     std::unordered_set<std::string> direct_uses;

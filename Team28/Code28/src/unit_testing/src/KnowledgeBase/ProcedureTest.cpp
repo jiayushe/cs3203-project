@@ -21,8 +21,8 @@ TEST_CASE("KnowledgeBase::Procedure") {
 
     SECTION("add_get_called_by") {
         int stmt_id = 10;
-        proc.add_called_by(stmt_id);
-        auto called_by_set = proc.get_called_by();
+        proc.add_called_by_statement(stmt_id);
+        auto called_by_set = proc.get_called_by_statements();
         REQUIRE(called_by_set.size() == 1);
         REQUIRE(called_by_set.count(stmt_id) == 1);
         REQUIRE(called_by_set.count(100) == 0);

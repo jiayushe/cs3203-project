@@ -48,7 +48,7 @@ int SimpleNode::get_statement_id() {
 std::vector<std::shared_ptr<SimpleNode>> SimpleNode::get_children() { return children; }
 
 std::shared_ptr<SimpleNode> SimpleNode::get_child(int i) {
-    if (i < 0 || i >= children.size()) {
+    if (i < 0 || i >= (int)children.size()) {
         throw std::runtime_error("Children with index " + to_string(i) + " doesn't exist");
     }
     return children[i];
@@ -79,7 +79,7 @@ bool SimpleNode::is_equal(std::shared_ptr<SimpleNode> node) {
         return false;
     }
 
-    for (int i = 0; i < children.size(); i++) {
+    for (int i = 0; i < (int)children.size(); i++) {
         if (!children[i]->is_equal(node->children[i])) {
             return false;
         }

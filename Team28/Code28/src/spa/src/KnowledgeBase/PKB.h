@@ -20,8 +20,11 @@ public:
     // Gets the base AST.
     std::shared_ptr<Parser::SimpleNode> get_ast();
 
-    // Gets the control flow graph
+    // Gets the control flow graph.
     std::unordered_map<int, std::unordered_set<int>> get_cfg();
+
+    // Sets the control flow graph.
+    void set_cfg(std::unordered_map<int, std::unordered_set<int>> cfg);
 
     // Gets the list of all procedures.
     std::vector<std::shared_ptr<Procedure>> get_procedures();
@@ -65,10 +68,10 @@ public:
     std::shared_ptr<Constant> add_constant(int value);
 
     // Adds a modify relationship between a statement id and a variable name.
-    void add_modify_relationship(int stmt_id, std::string var_name);
+    void add_modify_relationship(int stmt_id, std::string var_name, bool direct = true);
 
     // Adds a use relationship between a statement id and a variable name.
-    void add_use_relationship(int stmt_id, std::string var_name);
+    void add_use_relationship(int stmt_id, std::string var_name, bool direct = true);
 
     // Adds a follow relationship between two statement ids.
     void add_follow_relationship(int following_id, int follower_id);
@@ -76,7 +79,11 @@ public:
     // Adds a parent-child relationship between two statement ids.
     void add_parent_relationship(int parent_id, int child_id);
 
-    void set_cfg(std::unordered_map<int, std::unordered_set<int>> cfg);
+    // Adds a next relationship between two prog line ids.
+    void add_next_relationship(int prev_id, int next_id);
+
+    // Adds a call relationship between two procedure names.
+    void add_call_relationship(std::string caller_name, std::string callee_name);
 
 private:
     // Base AST

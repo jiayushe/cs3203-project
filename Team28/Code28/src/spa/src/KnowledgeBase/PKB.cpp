@@ -68,8 +68,14 @@ std::shared_ptr<Statement> PKB::add_statement(StatementType type, int id, std::s
     case KnowledgeBase::StatementType::CALL: {
         auto proc_called_name = stmt_node->get_child(0)->get_value();
         stmt->set_procedure_called(proc_called_name);
-        auto proc_called = this->get_procedure_by_name(proc_called_name);
-        proc_called->add_called_by(id);
+        std::shared_ptr<Procedure> proc_called;
+        try {
+            proc_called = this->get_procedure_by_name(proc_called_name);
+        } catch (std::runtime_error&) {
+            // Assume validation has been checked in simple parser.
+            proc_called = this->add_procedure(proc_called_name);
+        }
+        proc_called->add_called_by_statement(id);
         break;
     }
     }
@@ -128,12 +134,14 @@ std::shared_ptr<Constant> PKB::add_constant(int value) {
     return cst;
 }
 
-void PKB::add_modify_relationship(int stmt_id, std::string var_name) {
+void PKB::add_modify_relationship(int stmt_id, std::string var_name, bool direct) {
     auto stmt = this->get_statement_by_id(stmt_id);
     auto var = this->get_variable_by_name(var_name);
-    stmt->add_direct_modifies(var_name);
+    if (direct) {
+        stmt->add_direct_modifies(var_name);
+        var->add_direct_modified_by(stmt_id);
+    }
     stmt->add_modifies(var_name);
-    var->add_direct_modified_by(stmt_id);
     var->add_modified_by(stmt_id);
     // Extract ancestors of the current stmt.
     // Assume all parent-child relationships have been extracted and stored.
@@ -143,14 +151,35 @@ void PKB::add_modify_relationship(int stmt_id, std::string var_name) {
         curr_ancestor_stmt->add_modifies(var_name);
         var->add_modified_by(curr_ancestor_id);
     }
+    if (stmt->get_type() == KnowledgeBase::StatementType::CALL) {
+        // No need to backtrack procedures for CALL statements
+        return;
+    }
+    // Extract callers of the current procedure.
+    // Assume all call relationships have been extracted and stored.
+    std::string proc_name = stmt->get_procedure_name();
+    auto proc = this->get_procedure_by_name(proc_name);
+    std::unordered_set<std::string> caller_names = proc->get_callers();
+    caller_names.insert(proc_name);
+    for (const auto& curr_caller_name : caller_names) {
+        auto curr_caller_proc = this->get_procedure_by_name(curr_caller_name);
+        curr_caller_proc->add_modifies(var_name);
+        var->add_modified_by_procedure(curr_caller_name);
+        auto curr_called_by_ids = curr_caller_proc->get_called_by_statements();
+        for (const auto& curr_called_by_id : curr_called_by_ids) {
+            this->add_modify_relationship(curr_called_by_id, var_name, false);
+        }
+    }
 }
 
-void PKB::add_use_relationship(int stmt_id, std::string var_name) {
+void PKB::add_use_relationship(int stmt_id, std::string var_name, bool direct) {
     auto stmt = this->get_statement_by_id(stmt_id);
     auto var = this->get_variable_by_name(var_name);
-    stmt->add_direct_uses(var_name);
+    if (direct) {
+        stmt->add_direct_uses(var_name);
+        var->add_direct_used_by(stmt_id);
+    }
     stmt->add_uses(var_name);
-    var->add_direct_used_by(stmt_id);
     var->add_used_by(stmt_id);
     // Extract ancestors of the current stmt.
     // Assume all parent-child relationships have been extracted and stored.
@@ -159,6 +188,25 @@ void PKB::add_use_relationship(int stmt_id, std::string var_name) {
         auto curr_ancestor_stmt = this->get_statement_by_id(curr_ancestor_id);
         curr_ancestor_stmt->add_uses(var_name);
         var->add_used_by(curr_ancestor_id);
+    }
+    if (stmt->get_type() == KnowledgeBase::StatementType::CALL) {
+        // No need to backtrack procedures for CALL statements
+        return;
+    }
+    // Extract callers of the current procedure.
+    // Assume all call relationships have been extracted and stored.
+    std::string proc_name = stmt->get_procedure_name();
+    auto proc = this->get_procedure_by_name(proc_name);
+    std::unordered_set<std::string> caller_names = proc->get_callers();
+    caller_names.insert(proc_name);
+    for (const auto& curr_caller_name : caller_names) {
+        auto curr_caller_proc = this->get_procedure_by_name(curr_caller_name);
+        curr_caller_proc->add_uses(var_name);
+        var->add_used_by_procedure(curr_caller_name);
+        auto curr_called_by_ids = curr_caller_proc->get_called_by_statements();
+        for (const auto& curr_called_by_id : curr_called_by_ids) {
+            this->add_use_relationship(curr_called_by_id, var_name, false);
+        }
     }
 }
 
@@ -204,6 +252,46 @@ void PKB::add_parent_relationship(int parent_id, int child_id) {
             auto curr_descendant_stmt = this->get_statement_by_id(curr_descendant_id);
             curr_ancestor_stmt->add_descendant(curr_descendant_id);
             curr_descendant_stmt->add_ancestor(curr_ancestor_id);
+        }
+    }
+}
+
+void PKB::add_next_relationship(int prev_id, int next_id) {
+    auto prev_stmt = this->get_statement_by_id(prev_id);
+    auto next_stmt = this->get_statement_by_id(next_id);
+    prev_stmt->add_direct_next(next_id);
+    next_stmt->add_direct_previous(prev_id);
+    // Extract all previous and next.
+    std::unordered_set<int> prev_ids = prev_stmt->get_previous();
+    prev_ids.insert(prev_id);
+    std::unordered_set<int> next_ids = next_stmt->get_next();
+    next_ids.insert(next_id);
+    for (const auto& curr_prev_id : prev_ids) {
+        auto curr_prev_stmt = this->get_statement_by_id(curr_prev_id);
+        for (const auto& curr_next_id : next_ids) {
+            auto curr_next_stmt = this->get_statement_by_id(curr_next_id);
+            curr_prev_stmt->add_next(curr_next_id);
+            curr_next_stmt->add_previous(curr_prev_id);
+        }
+    }
+}
+
+void PKB::add_call_relationship(std::string caller_name, std::string callee_name) {
+    auto caller_proc = this->get_procedure_by_name(caller_name);
+    auto callee_proc = this->get_procedure_by_name(callee_name);
+    caller_proc->add_direct_callee(callee_name);
+    callee_proc->add_direct_caller(caller_name);
+    // Extract all callers and callees.
+    std::unordered_set<std::string> caller_names = caller_proc->get_callers();
+    caller_names.insert(caller_name);
+    std::unordered_set<std::string> callee_names = callee_proc->get_callees();
+    callee_names.insert(callee_name);
+    for (const auto& curr_caller_name : caller_names) {
+        auto curr_caller_proc = this->get_procedure_by_name(curr_caller_name);
+        for (const auto& curr_callee_name : callee_names) {
+            auto curr_callee_proc = this->get_procedure_by_name(curr_callee_name);
+            curr_caller_proc->add_callee(curr_callee_name);
+            curr_callee_proc->add_caller(curr_caller_name);
         }
     }
 }

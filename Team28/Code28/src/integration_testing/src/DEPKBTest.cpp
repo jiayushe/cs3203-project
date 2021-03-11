@@ -185,8 +185,8 @@ TEST_CASE("DEPKBIntegration") {
     REQUIRE(pkb->get_constants().size() == 3);
     // Call
     REQUIRE(pkb->get_procedure_by_name("main")->get_statements().size() == 8);
-    REQUIRE(pkb->get_procedure_by_name("other")->get_called_by().size() == 1);
-    REQUIRE(pkb->get_procedure_by_name("other")->get_called_by().count(2) == 1);
+    REQUIRE(pkb->get_procedure_by_name("other")->get_called_by_statements().size() == 1);
+    REQUIRE(pkb->get_procedure_by_name("other")->get_called_by_statements().count(2) == 1);
     REQUIRE(pkb->get_statement_by_id(2)->get_procedure_called() == "other");
     // Uses
     REQUIRE(pkb->get_statement_by_id(3)->get_direct_uses().size() == 1);

@@ -61,6 +61,22 @@ std::unordered_set<int> Statement::get_followers() { return followers; }
 
 void Statement::add_follower(int follower_id) { followers.insert(follower_id); }
 
+std::unordered_set<int> Statement::get_direct_previous() { return direct_previous; }
+
+void Statement::add_direct_previous(int previous_id) { direct_previous.insert(previous_id); }
+
+std::unordered_set<int> Statement::get_previous() { return previous; }
+
+void Statement::add_previous(int previous_id) { previous.insert(previous_id); }
+
+std::unordered_set<int> Statement::get_direct_next() { return direct_next; }
+
+void Statement::add_direct_next(int next_id) { direct_next.insert(next_id); }
+
+std::unordered_set<int> Statement::get_next() { return next; }
+
+void Statement::add_next(int next_id) { next.insert(next_id); }
+
 std::unordered_set<std::string> Statement::get_direct_modifies() { return direct_modifies; }
 
 void Statement::add_direct_modifies(std::string var_name) { direct_modifies.insert(var_name); }

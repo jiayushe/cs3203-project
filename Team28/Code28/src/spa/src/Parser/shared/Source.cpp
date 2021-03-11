@@ -39,9 +39,9 @@ std::string Source::peek_string(int n) {
     return str;
 }
 
-bool Source::has_more() { return pos < value.size() - 1; }
+bool Source::has_more() { return pos < (int)value.size() - 1; }
 
-bool Source::has_more(int n) { return pos + n - 2 < value.size(); }
+bool Source::has_more(int n) { return pos + n - 2 < (int)value.size(); }
 
 int Source::pop_char() {
     int result = peek_char();
@@ -59,7 +59,7 @@ int Source::peek_char() {
 int Source::current_pos() { return pos; }
 
 void Source::reset_pos(int new_pos) {
-    if (new_pos < 0 || new_pos >= value.size()) {
+    if (new_pos < 0 || new_pos >= (int)value.size()) {
         throw std::runtime_error("Invalid position supplied");
     }
     pos = new_pos;
