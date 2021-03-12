@@ -10,6 +10,8 @@
 #include "KnowledgeBase/PKB.h"
 #include "ModifiesSConstraintLogic.h"
 #include "ModifiesPConstraintLogic.h"
+#include "NextConstraintLogic.h"
+#include "NextTConstraintLogic.h"
 #include "ParentConstraintLogic.h"
 #include "ParentTConstraintLogic.h"
 #include "Parser/PQLParser/QueryObject.h"

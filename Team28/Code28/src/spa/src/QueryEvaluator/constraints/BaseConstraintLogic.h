@@ -18,7 +18,7 @@ namespace QueryEvaluator {
 // For instance, Follows(1, s) forms a UnaryConstraint which contains a FollowsConstraintLogic.
 class BaseConstraintLogic {
 public:
-    virtual bool is_valid(const AssignmentMap& assignment) const = 0;
+    virtual bool is_valid(const AssignmentMap& assignment_map) const = 0;
     virtual std::unordered_set<std::string> get_synonyms() const = 0;
 
 protected:
