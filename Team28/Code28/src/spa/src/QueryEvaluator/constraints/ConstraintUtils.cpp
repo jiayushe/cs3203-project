@@ -64,9 +64,17 @@ ConstraintUtils::get_constraint_logics(std::shared_ptr<KnowledgeBase::PKB> pkb,
             constraint_logics.push_back(std::make_shared<ModifiesSConstraintLogic>(
                 pkb, left_ref.get_statement_ref(), right_ref.get_entity_ref()));
             break;
+        case Parser::SuchThatType::MODIFIES_P:
+            constraint_logics.push_back(std::make_shared<ModifiesPConstraintLogic>(
+                pkb, left_ref.get_entity_ref(), right_ref.get_entity_ref()));
+            break;
         case Parser::SuchThatType::USES_S:
             constraint_logics.push_back(std::make_shared<UsesSConstraintLogic>(
                 pkb, left_ref.get_statement_ref(), right_ref.get_entity_ref()));
+            break;
+        case Parser::SuchThatType::USES_P:
+            constraint_logics.push_back(std::make_shared<UsesPConstraintLogic>(
+                pkb, left_ref.get_entity_ref(), right_ref.get_entity_ref()));
             break;
         case Parser::SuchThatType::PARENT:
             constraint_logics.push_back(std::make_shared<ParentConstraintLogic>(

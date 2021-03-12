@@ -7,6 +7,7 @@
 #include "FollowsTConstraintLogic.h"
 #include "KnowledgeBase/PKB.h"
 #include "ModifiesSConstraintLogic.h"
+#include "ModifiesPConstraintLogic.h"
 #include "ParentConstraintLogic.h"
 #include "ParentTConstraintLogic.h"
 #include "Parser/PQLParser/QueryObject.h"
@@ -14,6 +15,7 @@
 #include "PatternRConstraintLogic.h"
 #include "UnaryConstraint.h"
 #include "UsesSConstraintLogic.h"
+#include "UsesPConstraintLogic.h"
 #include <memory>
 #include <stdexcept>
 #include <string>

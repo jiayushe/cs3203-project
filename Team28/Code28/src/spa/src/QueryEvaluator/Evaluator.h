@@ -2,6 +2,7 @@
 
 #include "ForwardCheckingSolver.h"
 #include "KnowledgeBase/PKB.h"
+#include "Parser/PQLParser/Elem.h"
 #include "Parser/PQLParser/QueryObject.h"
 #include "QueryEvaluator/Assignment.h"
 #include "QueryEvaluator/Common.h"
