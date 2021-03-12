@@ -9,7 +9,7 @@ FollowsConstraintLogic::FollowsConstraintLogic(std::shared_ptr<KnowledgeBase::PK
     if (lhs.get_type() == Parser::StatementRefType::SYNONYM) {
         synonyms.insert(lhs.get_synonym());
     }
-    if (this->rhs.get_type() == Parser::StatementRefType::SYNONYM) {
+    if (rhs.get_type() == Parser::StatementRefType::SYNONYM) {
         synonyms.insert(rhs.get_synonym());
     }
 }

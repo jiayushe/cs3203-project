@@ -2,6 +2,8 @@
 
 #include "BaseConstraintLogic.h"
 #include "BinaryConstraint.h"
+#include "CallsConstraintLogic.h"
+#include "CallsTConstraintLogic.h"
 #include "EmptyConstraint.h"
 #include "FollowsConstraintLogic.h"
 #include "FollowsTConstraintLogic.h"
