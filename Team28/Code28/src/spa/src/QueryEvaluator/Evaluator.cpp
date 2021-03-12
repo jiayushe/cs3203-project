@@ -369,20 +369,20 @@ std::list<std::string> Evaluator::get_formatted_output(const Parser::Result& res
                 auto synonym = elem.get_synonym();
                 auto assignment = assignment_map.at(synonym);
                 std::string result;
-                
-                switch (elem.get_type()) { 
+
+                switch (elem.get_type()) {
                 case Parser::ElemType::ATTR_REF:
                     if (elem.get_attr_ref().get_attr_name() == "stmt#" ||
                         elem.get_attr_ref().get_attr_name() == "value") {
                         result = std::to_string(assignment.get_int_value());
                     } else if (elem.get_attr_ref().get_attr_name() == "procName" ||
-                        elem.get_attr_ref().get_attr_name() == "varName") {
+                               elem.get_attr_ref().get_attr_name() == "varName") {
                         result = assignment.get_string_value();
                     } else {
                         throw std::runtime_error("Unknown attribute name");
                     }
                     break;
-                case Parser::ElemType::SYNONYM : 
+                case Parser::ElemType::SYNONYM:
                     switch (assignment.get_type()) {
                     case AssignmentType::INTEGER:
                         result = std::to_string(assignment.get_int_value());

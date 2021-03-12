@@ -38,6 +38,7 @@ enum class TokenType {
     COMMA,        // ,
     DOUBLE_QUOTE, // "
     UNDERSCORE,   // _
+    DOT,          // .
 
     END, // EOF
 };

@@ -3,9 +3,13 @@
 
 using namespace Parser;
 
-Elem::Elem(std::string synonym) : type(ElemType::SYNONYM), synonym(std::move(synonym)) {}
+Elem::Elem() : type(ElemType::INVALID) {}
 
-Elem::Elem(AttrRef attr_ref) : type(ElemType::ATTR_REF), attr_ref(std::move(attr_ref)) {}
+void Elem::set_type(ElemType result_type) { this->type = result_type; }
+
+void Elem::set_synonym(std::string synonym) { this->synonym = synonym; }
+
+void Elem::set_attr_ref(AttrRef attr_ref) { this->attr_ref = attr_ref; }
 
 ElemType Elem::get_type() const { return type; }
 

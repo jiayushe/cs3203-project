@@ -37,6 +37,14 @@ std::shared_ptr<Token> PQLLexer::pop_token() {
         return std::make_shared<Token>(TokenType::UNDERSCORE, "_");
     case '\"':
         return std::make_shared<Token>(TokenType::DOUBLE_QUOTE, "\"");
+    case '<':
+        return std::make_shared<Token>(TokenType::LT, "<");
+    case '>':
+        return std::make_shared<Token>(TokenType::GT, ">");
+    case '.':
+        return std::make_shared<Token>(TokenType::DOT, ".");
+    case '=':
+        return std::make_shared<Token>(TokenType::EQUAL, "=");
     default:
         // Fall through - other cases are checked below
         break;
@@ -49,14 +57,25 @@ std::shared_ptr<Token> PQLLexer::pop_token() {
             value.push_back(source->pop_char());
         }
 
+        // Handle "prog_line" keyword
+        if (value == "prog" && source->has_more(5) && source->peek_string(5) == "_line") {
+            value += source->pop_string(5);
+        }
+
         // Handle "such that" keyword
         if (value == "such" && source->has_more(5) && source->peek_string(5) == " that") {
             value += source->pop_string(5);
         }
 
-        // Handle "Parent*" and "Follows*" keywords
-        if ((value == "Parent" || value == "Follows") && source->has_more() &&
-            source->peek_char() == '*') {
+        // Handle "stmt#" keyword
+        if (value == "stmt" && source->has_more(1) && source->peek_string(1) == "#") {
+            value += source->pop_string(1);
+        }
+
+        // Handle "Parent*", "Follows*", "Calls*", "Next*", and "Affects*" keywords
+        if ((value == "Parent" || value == "Follows" || value == "Calls" || value == "Next" ||
+             value == "Affects") &&
+            source->has_more() && source->peek_char() == '*') {
             value.push_back(source->pop_char());
         }
 

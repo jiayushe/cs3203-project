@@ -3,15 +3,13 @@
 
 using namespace Parser;
 
-WithRef::WithRef() : type(WithRefType::INVALID), statement_number(-1) {}
+WithRef::WithRef() : type(WithRefType::INVALID), statement_id(-1) {}
 
 void WithRef::set_type(WithRefType new_type) { type = new_type; }
 
 void WithRef::set_name(const std::string& new_name) { name = new_name; }
 
-void WithRef::set_statement_number(int new_statement_number) {
-    statement_number = new_statement_number;
-}
+void WithRef::set_statement_id(int new_statement_id) { statement_id = new_statement_id; }
 
 void WithRef::set_synonym(const std::string& new_synonym) { synonym = new_synonym; }
 
@@ -26,11 +24,11 @@ std::string WithRef::get_name() const {
     return name;
 }
 
-int WithRef::get_statement_number() const {
-    if (type != WithRefType::STATEMENT_NUMBER) {
-        throw std::runtime_error("WithRefType is not STATEMENT_NUMBER type");
+int WithRef::get_statement_id() const {
+    if (type != WithRefType::STATEMENT_ID) {
+        throw std::runtime_error("WithRefType is not STATEMENT_ID type");
     }
-    return statement_number;
+    return statement_id;
 }
 
 std::string WithRef::get_synonym() const {

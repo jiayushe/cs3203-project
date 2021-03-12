@@ -61,6 +61,8 @@ std::string Parser::to_string(TokenType token_type) {
         return "DOUBLE_QUOTE";
     case TokenType::UNDERSCORE:
         return "UNDERSCORE";
+    case TokenType::DOT:
+        return "DOT";
     case TokenType::END:
         return "END";
     default:

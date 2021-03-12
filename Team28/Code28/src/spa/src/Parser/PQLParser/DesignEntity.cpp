@@ -34,6 +34,10 @@ std::string Parser::to_string(DesignEntityType entity_type) {
         return "CONSTANT";
     case DesignEntityType::PROCEDURE:
         return "PROCEDURE";
+    case DesignEntityType::CALL:
+        return "CALL";
+    case DesignEntityType::PROG_LINE:
+        return "PROG_LINE";
     default:
         throw std::runtime_error("Unknown token type");
     }

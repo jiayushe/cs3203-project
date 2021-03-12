@@ -15,6 +15,8 @@ enum class DesignEntityType {
     VARIABLE,
     CONSTANT,
     PROCEDURE,
+    CALL,
+    PROG_LINE
 };
 
 std::string to_string(DesignEntityType entity_type);
