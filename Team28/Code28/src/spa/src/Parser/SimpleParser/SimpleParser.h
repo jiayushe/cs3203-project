@@ -68,6 +68,9 @@ private:
     void validate_no_duplicate_proc_name(std::shared_ptr<SimpleNode> program_node);
     void validate_no_call_missing_proc(std::shared_ptr<SimpleNode> program_node);
     void validate_no_call_cycle(std::shared_ptr<SimpleNode> program_node);
+    bool has_cycle(const std::string& start,
+                   std::unordered_map<std::string, std::unordered_set<std::string>>& call_map,
+                   std::unordered_map<std::string, int>& status);
     std::unordered_map<std::string, std::unordered_set<std::string>>
     get_call_map(std::shared_ptr<SimpleNode> program_node);
     std::unordered_set<std::string> get_procs_called(std::shared_ptr<SimpleNode> node);

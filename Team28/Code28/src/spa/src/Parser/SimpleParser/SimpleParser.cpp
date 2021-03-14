@@ -374,25 +374,36 @@ void SimpleParser::validate_no_call_missing_proc(std::shared_ptr<SimpleNode> pro
 
 void SimpleParser::validate_no_call_cycle(std::shared_ptr<SimpleNode> program_node) {
     auto call_map = get_call_map(program_node);
-
     for (auto const& entry : call_map) {
-        std::unordered_set<std::string> visited;
-        std::queue<std::string> queue;
-        queue.push(entry.first);
-        while (!queue.empty()) {
-            auto curr = queue.front();
-            queue.pop();
-
-            if (visited.find(curr) != visited.end()) {
-                throw std::runtime_error("Encountered call cycle");
-            }
-            visited.insert(curr);
-
-            for (auto const& next : call_map[curr]) {
-                queue.push(next);
-            }
+        std::unordered_map<std::string, int> status;
+        if (has_cycle(entry.first, call_map, status)) {
+            throw std::runtime_error("Encountered call cycle");
         }
     }
+}
+
+bool SimpleParser::has_cycle(
+    const std::string& start,
+    std::unordered_map<std::string, std::unordered_set<std::string>>& call_map,
+    std::unordered_map<std::string, int>& status) {
+
+    if (status[start] == 1) {
+        return true;
+    }
+    if (status[start] == 2) {
+        return false;
+    }
+
+    status[start] = 1;
+
+    for (auto const& next : call_map[start]) {
+        if (has_cycle(next, call_map, status)) {
+            return true;
+        }
+    }
+
+    status[start] = 2;
+    return false;
 }
 
 std::unordered_map<std::string, std::unordered_set<std::string>>
