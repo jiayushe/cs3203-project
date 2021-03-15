@@ -8,8 +8,8 @@
 #include "FollowsConstraintLogic.h"
 #include "FollowsTConstraintLogic.h"
 #include "KnowledgeBase/PKB.h"
-#include "ModifiesSConstraintLogic.h"
 #include "ModifiesPConstraintLogic.h"
+#include "ModifiesSConstraintLogic.h"
 #include "NextConstraintLogic.h"
 #include "NextTConstraintLogic.h"
 #include "ParentConstraintLogic.h"
@@ -18,8 +18,9 @@
 #include "PatternLConstraintLogic.h"
 #include "PatternRConstraintLogic.h"
 #include "UnaryConstraint.h"
-#include "UsesSConstraintLogic.h"
 #include "UsesPConstraintLogic.h"
+#include "UsesSConstraintLogic.h"
+#include "WithConstraintLogic.h"
 #include <memory>
 #include <stdexcept>
 #include <string>

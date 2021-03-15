@@ -128,6 +128,13 @@ ConstraintUtils::get_constraint_logics(std::shared_ptr<KnowledgeBase::PKB> pkb,
         }
     }
 
+    for (auto const& with : query_object.get_all_with()) {
+        auto left_ref = with.get_left_ref();
+        auto right_ref = with.get_right_ref();
+        constraint_logics.push_back(
+            std::make_shared<WithConstraintLogic>(pkb, left_ref, right_ref));
+    }
+
     return constraint_logics;
 }
 
