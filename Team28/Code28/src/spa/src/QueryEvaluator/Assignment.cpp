@@ -2,7 +2,7 @@
 
 using namespace QueryEvaluator;
 
-Assignment::Assignment() : type(AssignmentType::INVALID) {}
+Assignment::Assignment() : type(AssignmentType::INVALID), int_value(-1) {}
 
 Assignment::Assignment(int value) : type(AssignmentType::INTEGER), int_value(value) {}
 
@@ -28,24 +28,21 @@ int Assignment::get_int_value() const {
     return int_value;
 }
 
-std::string Assignment::value_as_string() const {
-    // FIXME: Don't use value_as_string anymore
-    switch (type) {
-    case AssignmentType::INTEGER:
-        return std::to_string(int_value);
-    case AssignmentType::STRING:
-        return string_value;
-    case AssignmentType::BOTH:
-        return std::to_string(int_value);
-    default:
-        throw std::runtime_error("Unknown assignment type");
-    }
-}
-
 bool Assignment::operator==(const Assignment& other) const {
     return type == other.type && string_value == other.string_value && int_value == other.int_value;
 }
 
 std::size_t AssignmentHash::operator()(const Assignment& assignment) const {
-    return std::hash<std::string>()(assignment.value_as_string());
+    // TODO: Verify the quality of this hash function
+    switch (assignment.get_type()) {
+    case AssignmentType::INTEGER:
+        return std::hash<int>()(assignment.get_int_value());
+    case AssignmentType::STRING:
+        return std::hash<std::string>()(assignment.get_string_value());
+    case AssignmentType::BOTH:
+        return std::hash<int>()(assignment.get_int_value()) ^
+               std::hash<std::string>()(assignment.get_string_value());
+    default:
+        throw std::runtime_error("Unhandled assignment type");
+    }
 }

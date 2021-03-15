@@ -38,8 +38,6 @@ public:
     std::string get_string_value() const;
     int get_int_value() const;
 
-    std::string value_as_string() const;
-
     bool operator==(const Assignment& other) const;
 
 private:
