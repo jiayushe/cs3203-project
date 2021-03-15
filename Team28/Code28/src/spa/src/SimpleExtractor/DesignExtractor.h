@@ -23,6 +23,10 @@ public:
     // Throws if the given PKB has an invalid AST.
     static void extract_parent_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb);
 
+    // Extracts call relationships from the given PKB.
+    // Throws if the given PKB has an invalid AST.
+    static void extract_call_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb);
+
     // Extracts control flow graph from the given PKB.
     // Throws if the given PKB has an invalid AST
     static void extract_cfg(std::shared_ptr<KnowledgeBase::PKB> pkb);
@@ -81,6 +85,15 @@ private:
                                                       std::string proc_name,
                                                       std::shared_ptr<Parser::SimpleNode> stmt,
                                                       int parent_stmt_id);
+
+    /* Call */
+    static void
+    extract_call_relationship_from_stmt_list(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                             std::string proc_name,
+                                             std::shared_ptr<Parser::SimpleNode> stmt_list);
+    static void extract_call_relationship_from_stmt(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                                    std::string proc_name,
+                                                    std::shared_ptr<Parser::SimpleNode> stmt);
 
     /* CFG */
     static void extract_cfg_from_stmt_list(std::unordered_map<int, std::unordered_set<int>> cfg,

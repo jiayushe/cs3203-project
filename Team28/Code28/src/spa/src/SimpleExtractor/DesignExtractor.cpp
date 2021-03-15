@@ -40,8 +40,7 @@ void DesignExtractor::extract_modify_relationship_from_stmt(
         // PRINT statements do not have modify relationship
         break;
     case KnowledgeBase::StatementType::CALL:
-        // CALL statements do not have direct modify relationship
-        // Assume no nested procedure calls
+        // Handled in PKB
         break;
     case KnowledgeBase::StatementType::WHILE:
         // WHILE statements do not have direct modify relationship
@@ -114,8 +113,7 @@ void DesignExtractor::extract_use_relationship_from_stmt(std::shared_ptr<Knowled
         extract_use_relationship_from_print_stmt(pkb, proc_name, stmt);
         break;
     case KnowledgeBase::StatementType::CALL:
-        // CALL statements do not have direct use relationship
-        // Assume no nested procedure calls
+        // Handled in PKB
         break;
     case KnowledgeBase::StatementType::WHILE:
         extract_use_relationship_from_arithmetic_or_conditional(
@@ -227,6 +225,11 @@ void SimpleExtractor::DesignExtractor::extract_follow_relationship_from_stmt(
     pkb->add_follow_relationship(prev_stmt_id, curr_stmt->get_id());
     std::shared_ptr<Parser::SimpleNode> stmt_list;
     switch (curr_stmt->get_type()) {
+    case KnowledgeBase::StatementType::ASSIGN:
+    case KnowledgeBase::StatementType::CALL:
+    case KnowledgeBase::StatementType::PRINT:
+    case KnowledgeBase::StatementType::READ:
+        break;
     case KnowledgeBase::StatementType::WHILE:
         // Process nested statements in WHILE
         stmt_list = stmt->get_child(1);
@@ -241,7 +244,7 @@ void SimpleExtractor::DesignExtractor::extract_follow_relationship_from_stmt(
         extract_follow_relationship_from_stmt_list(pkb, proc_name, stmt_list);
         break;
     default:
-        break;
+        throw std::runtime_error("Unhandled statement type");
     }
 }
 
@@ -276,6 +279,11 @@ void SimpleExtractor::DesignExtractor::extract_parent_relationship_from_stmt(
     pkb->add_parent_relationship(parent_stmt_id, curr_stmt_id);
     std::shared_ptr<Parser::SimpleNode> stmt_list;
     switch (curr_stmt->get_type()) {
+    case KnowledgeBase::StatementType::ASSIGN:
+    case KnowledgeBase::StatementType::CALL:
+    case KnowledgeBase::StatementType::PRINT:
+    case KnowledgeBase::StatementType::READ:
+        break;
     case KnowledgeBase::StatementType::WHILE:
         // Process nested statements in WHILE
         stmt_list = stmt->get_child(1);
@@ -290,7 +298,64 @@ void SimpleExtractor::DesignExtractor::extract_parent_relationship_from_stmt(
         extract_parent_relationship_from_stmt_list(pkb, proc_name, stmt_list, curr_stmt_id);
         break;
     default:
+        throw std::runtime_error("Unhandled statement type");
+    }
+}
+
+void SimpleExtractor::DesignExtractor::extract_call_relationship(
+    std::shared_ptr<KnowledgeBase::PKB> pkb) {
+    auto ast = assert_node_type(pkb->get_ast(), Parser::SimpleNodeType::PROGRAM);
+    int num_proc = ast->get_children().size();
+    for (int i = 0; i < num_proc; i++) {
+        auto proc_node = assert_node_type(ast->get_child(i), Parser::SimpleNodeType::PROCEDURE);
+        auto proc = extract_procedure(pkb, proc_node);
+        auto stmt_list_node =
+            assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
+        extract_call_relationship_from_stmt_list(pkb, proc->get_name(), stmt_list_node);
+    }
+}
+
+void SimpleExtractor::DesignExtractor::extract_call_relationship_from_stmt_list(
+    std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
+    std::shared_ptr<Parser::SimpleNode> stmt_list) {
+    auto stmts = stmt_list->get_children();
+    int num_stmt = stmts.size();
+    for (int i = 0; i < num_stmt; i++) {
+        std::shared_ptr<Parser::SimpleNode> curr_stmt_node = stmts.at(i);
+        extract_call_relationship_from_stmt(pkb, proc_name, curr_stmt_node);
+    }
+}
+
+void SimpleExtractor::DesignExtractor::extract_call_relationship_from_stmt(
+    std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
+    std::shared_ptr<Parser::SimpleNode> stmt) {
+    auto curr_stmt = extract_statement(pkb, proc_name, stmt);
+    std::shared_ptr<Parser::SimpleNode> stmt_list;
+    std::string callee_name;
+    switch (curr_stmt->get_type()) {
+    case KnowledgeBase::StatementType::ASSIGN:
+    case KnowledgeBase::StatementType::PRINT:
+    case KnowledgeBase::StatementType::READ:
         break;
+    case KnowledgeBase::StatementType::CALL:
+        callee_name = curr_stmt->get_procedure_called();
+        pkb->add_call_relationship(proc_name, callee_name);
+        break;
+    case KnowledgeBase::StatementType::WHILE:
+        // Process nested statements in WHILE
+        stmt_list = stmt->get_child(1);
+        extract_call_relationship_from_stmt_list(pkb, proc_name, stmt_list);
+        break;
+    case KnowledgeBase::StatementType::IF:
+        // Process then branch statements in IF
+        stmt_list = stmt->get_child(1);
+        extract_call_relationship_from_stmt_list(pkb, proc_name, stmt_list);
+        // Process else branch statements in IF
+        stmt_list = stmt->get_child(2);
+        extract_call_relationship_from_stmt_list(pkb, proc_name, stmt_list);
+        break;
+    default:
+        throw std::runtime_error("Unhandled statement type");
     }
 }
 
