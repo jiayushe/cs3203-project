@@ -24,8 +24,10 @@ Domain DomainUtils::get_domain(std::shared_ptr<KnowledgeBase::PKB> pkb,
         return ConstantDomain::get_domain(pkb, constraints);
     case Parser::DesignEntityType::PROCEDURE:
         return ProcedureDomain::get_domain(pkb, constraints);
-    /*case Parser::DesignEntityType::CALL:
-        return CallDomain::get_domain(pkb);*/
+    case Parser::DesignEntityType::CALL:
+        return CallDomain::get_domain(pkb, constraints);
+    case Parser::DesignEntityType::PROG_LINE:
+        return StatementDomain::get_domain(pkb, constraints);
     default:
         throw std::runtime_error("Unknown design entity type");
     }
