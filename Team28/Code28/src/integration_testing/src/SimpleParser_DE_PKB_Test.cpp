@@ -2,6 +2,8 @@
 
 #include "KnowledgeBase/PKB.h"
 #include "Parser/SimpleParser/SimpleNode.h"
+#include "Parser/SimpleParser/SimpleParser.h"
+#include "Parser/shared/Source.h"
 #include "SimpleExtractor/DesignExtractor.h"
 #include <memory>
 #include <string>
@@ -172,6 +174,52 @@ std::shared_ptr<SimpleNode> build_nested_ast() {
     return ast;
 }
 
+std::shared_ptr<SimpleNode> build_multi_proc_ast() {
+    std::string source;
+    source += "procedure main {";
+    source += "    flag = 0;";
+    source += "    call computeCentroid;";
+    source += "    call printResults;";
+    source += "}";
+
+    source += "procedure readPoint {";
+    source += "    read x;";
+    source += "    read y;";
+    source += "}";
+
+    source += "procedure printResults {";
+    source += "    print flag;";
+    source += "    print cenX;";
+    source += "    print cenY;";
+    source += "    print normSq;";
+    source += "}";
+
+    source += "procedure computeCentroid {";
+    source += "    count = 0;";
+    source += "    cenX = 0;";
+    source += "    cenY = 0;";
+    source += "    call printResults;";
+    source += "    while ((x != 0) && (y != 0)) {";
+    source += "        count = count + 1;";
+    source += "        cenX = cenX + x;";
+    source += "        cenY = cenY + y;";
+    source += "        call readPoint;";
+    source += "    }";
+    source += "    if (count == 0) then {";
+    source += "        flag = 1;";
+    source += "    } else {";
+    source += "        cenX = cenX / count;";
+    source += "        cenY = cenY / count;";
+    source += "    }";
+    source += "    normSq = cenX * cenX + cenY * cenY;";
+    source += "}";
+
+    auto base_source = std::make_shared<Parser::Source>(source);
+    Parser::SimpleParser parser(base_source);
+    auto ast = parser.parse_program();
+    return ast;
+}
+
 TEST_CASE("DEPKBIntegration") {
     auto ast = build_ast();
     auto pkb = std::make_shared<KnowledgeBase::PKB>(ast);
@@ -183,7 +231,7 @@ TEST_CASE("DEPKBIntegration") {
     REQUIRE(pkb->get_statements().size() == 8);
     REQUIRE(pkb->get_variables().size() == 8);
     REQUIRE(pkb->get_constants().size() == 3);
-    // Call
+    // Call by statement
     REQUIRE(pkb->get_procedure_by_name("main")->get_statements().size() == 8);
     REQUIRE(pkb->get_procedure_by_name("other")->get_called_by_statements().size() == 1);
     REQUIRE(pkb->get_procedure_by_name("other")->get_called_by_statements().count(2) == 1);
@@ -397,6 +445,141 @@ TEST_CASE("DEPKBIntegration_Nested_AST") {
             REQUIRE(pkb->get_variable_by_name("a")->get_modified_by().count(4) == 1);
             REQUIRE(pkb->get_variable_by_name("a")->get_modified_by().count(7) == 1);
             REQUIRE(pkb->get_variable_by_name("a")->get_modified_by().count(9) == 1);
+        }
+    }
+}
+
+TEST_CASE("DEPKBIntegration_Multi_Procedure_Program") {
+    auto ast = build_multi_proc_ast();
+    auto pkb = std::make_shared<KnowledgeBase::PKB>(ast);
+    SimpleExtractor::DesignExtractor::extract_call_relationship(pkb);
+    REQUIRE(pkb->get_procedures().size() == 4);
+
+    SECTION("Valid record of multiple procedures") {
+        REQUIRE(pkb->get_procedure_by_name("main")->get_statements().size() == 3);
+        REQUIRE(pkb->get_procedure_by_name("readPoint")->get_statements().size() == 2);
+        REQUIRE(pkb->get_procedure_by_name("printResults")->get_statements().size() == 4);
+        REQUIRE(pkb->get_procedure_by_name("computeCentroid")->get_statements().size() == 14);
+    }
+
+    SECTION("Call") {
+        SECTION("Call relationship between procedure") {
+            SECTION("Direct call") {
+                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callees().size() == 2);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callees().count(
+                            "computeCentroid") == 1);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callees().count(
+                            "printResults") == 1);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callers().size() == 0);
+
+                REQUIRE(
+                    pkb->get_procedure_by_name("computeCentroid")->get_direct_callees().size() ==
+                    2);
+                REQUIRE(pkb->get_procedure_by_name("computeCentroid")
+                            ->get_direct_callees()
+                            .count("readPoint") == 1);
+                REQUIRE(pkb->get_procedure_by_name("computeCentroid")
+                            ->get_direct_callees()
+                            .count("printResults") == 1);
+                REQUIRE(
+                    pkb->get_procedure_by_name("computeCentroid")->get_direct_callers().size() ==
+                    1);
+                REQUIRE(pkb->get_procedure_by_name("computeCentroid")
+                            ->get_direct_callers()
+                            .count("main") == 1);
+
+                REQUIRE(pkb->get_procedure_by_name("printResults")->get_direct_callers().size() ==
+                        2);
+                REQUIRE(pkb->get_procedure_by_name("printResults")
+                            ->get_direct_callers()
+                            .count("main") == 1);
+                REQUIRE(pkb->get_procedure_by_name("printResults")
+                            ->get_direct_callers()
+                            .count("computeCentroid") == 1);
+
+                REQUIRE(pkb->get_procedure_by_name("readPoint")->get_direct_callers().size() == 1);
+                REQUIRE(pkb->get_procedure_by_name("readPoint")
+                            ->get_direct_callers()
+                            .count("computeCentroid") == 1);
+            }
+
+            SECTION("Indirect call") {
+                REQUIRE(pkb->get_procedure_by_name("main")->get_callees().size() == 3);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_callees().count(
+                            "computeCentroid") == 1);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_callees().count("printResults") ==
+                        1);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_callees().count("readPoint") == 1);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_callers().size() == 0);
+
+                REQUIRE(pkb->get_procedure_by_name("computeCentroid")->get_callees().size() == 2);
+                REQUIRE(pkb->get_procedure_by_name("computeCentroid")
+                            ->get_callees()
+                            .count("printResults") == 1);
+                REQUIRE(pkb->get_procedure_by_name("computeCentroid")
+                            ->get_callees()
+                            .count("readPoint") == 1);
+                REQUIRE(pkb->get_procedure_by_name("computeCentroid")->get_callers().size() == 1);
+                REQUIRE(
+                    pkb->get_procedure_by_name("computeCentroid")->get_callers().count("main") ==
+                    1);
+
+                REQUIRE(pkb->get_procedure_by_name("printResults")->get_callers().size() == 2);
+                REQUIRE(pkb->get_procedure_by_name("printResults")->get_callers().count("main") ==
+                        1);
+                REQUIRE(pkb->get_procedure_by_name("printResults")
+                            ->get_callers()
+                            .count("computeCentroid") == 1);
+
+                REQUIRE(pkb->get_procedure_by_name("readPoint")->get_callers().size() == 2);
+                REQUIRE(pkb->get_procedure_by_name("readPoint")
+                            ->get_callers()
+                            .count("computeCentroid") == 1);
+                REQUIRE(pkb->get_procedure_by_name("readPoint")->get_callers().count("main") == 1);
+            }
+
+            SECTION("Negative test") {
+                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callees().count(
+                            "readPoint") == 0);
+                REQUIRE(pkb->get_procedure_by_name("computeCentroid")
+                            ->get_direct_callees()
+                            .count("main") == 0);
+                REQUIRE(
+                    pkb->get_procedure_by_name("computeCentroid")->get_callees().count("main") ==
+                    0);
+            }
+
+            SECTION("Call by statement") {
+                REQUIRE(pkb->get_procedure_by_name("main")->get_called_by_statements().size() == 0);
+
+                REQUIRE(pkb->get_procedure_by_name("computeCentroid")
+                            ->get_called_by_statements()
+                            .size() == 1);
+                REQUIRE(pkb->get_procedure_by_name("computeCentroid")
+                            ->get_called_by_statements()
+                            .count(2) == 1);
+                REQUIRE(pkb->get_statement_by_id(2)->get_procedure_called() == "computeCentroid");
+
+                REQUIRE(
+                    pkb->get_procedure_by_name("printResults")->get_called_by_statements().size() ==
+                    2);
+                REQUIRE(pkb->get_procedure_by_name("printResults")
+                            ->get_called_by_statements()
+                            .count(3) == 1);
+                REQUIRE(pkb->get_procedure_by_name("printResults")
+                            ->get_called_by_statements()
+                            .count(13) == 1);
+                REQUIRE(pkb->get_statement_by_id(3)->get_procedure_called() == "printResults");
+                REQUIRE(pkb->get_statement_by_id(13)->get_procedure_called() == "printResults");
+
+                REQUIRE(
+                    pkb->get_procedure_by_name("readPoint")->get_called_by_statements().size() ==
+                    1);
+                REQUIRE(
+                    pkb->get_procedure_by_name("readPoint")->get_called_by_statements().count(18) ==
+                    1);
+                REQUIRE(pkb->get_statement_by_id(18)->get_procedure_called() == "readPoint");
+            }
         }
     }
 }
