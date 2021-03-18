@@ -6,10 +6,10 @@ CallsTConstraintLogic::CallsTConstraintLogic(std::shared_ptr<KnowledgeBase::PKB>
                                              const Parser::EntityRef& lhs,
                                              const Parser::EntityRef& rhs)
     : BaseConstraintLogic(std::move(pkb)), lhs(lhs), rhs(rhs) {
-    if (lhs.get_type() == Parser::EntityRefType::ANY) {
+    if (lhs.get_type() == Parser::EntityRefType::SYNONYM) {
         synonyms.insert(lhs.get_synonym());
     }
-    if (rhs.get_type() == Parser::EntityRefType::ANY) {
+    if (rhs.get_type() == Parser::EntityRefType::SYNONYM) {
         synonyms.insert(rhs.get_synonym());
     }
 }

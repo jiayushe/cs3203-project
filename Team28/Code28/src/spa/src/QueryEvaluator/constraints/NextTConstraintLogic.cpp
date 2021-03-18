@@ -6,10 +6,10 @@ NextTConstraintLogic::NextTConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> p
                                            const Parser::StatementRef& lhs,
                                            const Parser::StatementRef& rhs)
     : BaseConstraintLogic(std::move(pkb)), lhs(lhs), rhs(rhs) {
-    if (lhs.get_type() == Parser::StatementRefType::ANY) {
+    if (lhs.get_type() == Parser::StatementRefType::SYNONYM) {
         synonyms.insert(lhs.get_synonym());
     }
-    if (rhs.get_type() == Parser::StatementRefType::ANY) {
+    if (rhs.get_type() == Parser::StatementRefType::SYNONYM) {
         synonyms.insert(rhs.get_synonym());
     }
 }

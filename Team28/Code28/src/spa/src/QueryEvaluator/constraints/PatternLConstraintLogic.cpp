@@ -36,20 +36,25 @@ PatternLConstraintLogic::PatternLConstraintLogic(std::shared_ptr<KnowledgeBase::
 }
 
 bool PatternLConstraintLogic::is_valid(const AssignmentMap& assignment_map) const {
-    if (entity_ref.get_type() == Parser::EntityRefType::ANY) {
-        return true;
-    }
-
     auto pattern_statement = get_statement(assignment_map, pattern_synonym);
-    auto variable_name = get_variable_name(assignment_map, entity_ref);
 
     switch (type) {
     case Parser::PatternType::ASSIGN: {
+        if (entity_ref.get_type() == Parser::EntityRefType::ANY) {
+            return true;
+        }
+
+        auto variable_name = get_variable_name(assignment_map, entity_ref);
         auto direct_modifies = pattern_statement->get_direct_modifies();
         return direct_modifies.find(variable_name) != direct_modifies.end();
     }
     case Parser::PatternType::IF:
     case Parser::PatternType::WHILE: {
+        if (entity_ref.get_type() == Parser::EntityRefType::ANY) {
+            return !pattern_statement->get_direct_uses().empty();
+        }
+
+        auto variable_name = get_variable_name(assignment_map, entity_ref);
         auto direct_uses = pattern_statement->get_direct_uses();
         return direct_uses.find(variable_name) != direct_uses.end();
     }

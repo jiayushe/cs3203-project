@@ -28,8 +28,8 @@ bool ModifiesSConstraintLogic::is_valid(const AssignmentMap& assignments) const 
         case KnowledgeBase::StatementType::IF:
         case KnowledgeBase::StatementType::ASSIGN:
         case KnowledgeBase::StatementType::READ:
-            return !lhs_statement->get_modifies().empty();
         case KnowledgeBase::StatementType::CALL:
+            return !lhs_statement->get_modifies().empty();
         case KnowledgeBase::StatementType::PRINT:
             return false;
         default:
@@ -44,11 +44,11 @@ bool ModifiesSConstraintLogic::is_valid(const AssignmentMap& assignments) const 
     case KnowledgeBase::StatementType::WHILE:
     case KnowledgeBase::StatementType::IF:
     case KnowledgeBase::StatementType::ASSIGN:
-    case KnowledgeBase::StatementType::READ: {
+    case KnowledgeBase::StatementType::READ:
+    case KnowledgeBase::StatementType::CALL: {
         auto lhs_statement_modifies = lhs_statement->get_modifies();
         return lhs_statement_modifies.find(rhs_variable_name) != lhs_statement_modifies.end();
     }
-    case KnowledgeBase::StatementType::CALL:
     case KnowledgeBase::StatementType::PRINT:
         return false;
     default:

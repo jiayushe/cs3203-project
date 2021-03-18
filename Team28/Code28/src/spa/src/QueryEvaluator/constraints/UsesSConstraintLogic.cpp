@@ -28,9 +28,9 @@ bool UsesSConstraintLogic::is_valid(const AssignmentMap& assignment_map) const {
         case KnowledgeBase::StatementType::IF:
         case KnowledgeBase::StatementType::ASSIGN:
         case KnowledgeBase::StatementType::PRINT:
+        case KnowledgeBase::StatementType::CALL:
             return !lhs_statement->get_uses().empty();
         case KnowledgeBase::StatementType::READ:
-        case KnowledgeBase::StatementType::CALL:
             return false;
         default:
             throw std::runtime_error("Unhandled statement type");
@@ -44,12 +44,12 @@ bool UsesSConstraintLogic::is_valid(const AssignmentMap& assignment_map) const {
     case KnowledgeBase::StatementType::WHILE:
     case KnowledgeBase::StatementType::IF:
     case KnowledgeBase::StatementType::ASSIGN:
-    case KnowledgeBase::StatementType::PRINT: {
+    case KnowledgeBase::StatementType::PRINT:
+    case KnowledgeBase::StatementType::CALL: {
         auto lhs_statement_uses = lhs_statement->get_uses();
         return lhs_statement_uses.find(rhs_variable_name) != lhs_statement_uses.end();
     }
     case KnowledgeBase::StatementType::READ:
-    case KnowledgeBase::StatementType::CALL:
         return false;
     default:
         throw std::runtime_error("Unhandled statement type");

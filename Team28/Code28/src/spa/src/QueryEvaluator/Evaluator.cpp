@@ -5,14 +5,37 @@ using namespace QueryEvaluator;
 void Evaluator::evaluate(std::shared_ptr<KnowledgeBase::PKB> pkb,
                          const Parser::QueryObject& query_object, std::list<std::string>& output) {
 
+    auto result = query_object.get_result();
+
     auto empty_constraints = ConstraintUtils::get_empty_constraints(pkb, query_object);
     for (auto const& empty_constraint : empty_constraints) {
         if (!empty_constraint.is_valid()) {
-            return;
+            switch (result.get_type()) {
+            case Parser::ResultType::BOOLEAN:
+                output.emplace_back("FALSE");
+                return;
+            case Parser::ResultType::TUPLE:
+                return;
+            default:
+                throw std::runtime_error("Unknown result type");
+            }
         }
     }
 
     auto assignment_groups = get_assignment_groups(pkb, query_object);
+    if (assignment_groups.empty()) {
+        // This happens when result type = BOOLEAN and either (1) all empty
+        // constraints pass or (2) there are no constraints at all
+        switch (result.get_type()) {
+        case Parser::ResultType::BOOLEAN:
+            output.emplace_back("TRUE");
+            return;
+        case Parser::ResultType::TUPLE:
+            throw std::runtime_error("This should never happen");
+        default:
+            throw std::runtime_error("Unknown result type");
+        }
+    }
 
     // TODO: Optimisation around which assignment group to evaluate first
     std::vector<AssignmentMaps> all_assignment_maps;
@@ -23,7 +46,17 @@ void Evaluator::evaluate(std::shared_ptr<KnowledgeBase::PKB> pkb,
 
         auto assignment_maps = ForwardCheckingSolver::solve(targets, domain_map, constraints);
         if (assignment_maps.empty()) {
-            return;
+            // Terminate early if any group yields an empty result
+            // (no consistent assignment for the group)
+            switch (result.get_type()) {
+            case Parser::ResultType::BOOLEAN:
+                output.emplace_back("FALSE");
+                return;
+            case Parser::ResultType::TUPLE:
+                return;
+            default:
+                throw std::runtime_error("Unknown result type");
+            }
         }
 
         all_assignment_maps.push_back(assignment_maps);
@@ -124,6 +157,9 @@ DesignEntityMap Evaluator::get_design_entity_map(const Parser::QueryObject& quer
     for (auto const& pattern : query_object.get_all_pattern()) {
         get_design_entity_map(design_entity_map, declaration_map, pattern);
     }
+    for (auto const& with : query_object.get_all_with()) {
+        get_design_entity_map(design_entity_map, declaration_map, with);
+    }
     return design_entity_map;
 }
 
@@ -136,6 +172,8 @@ void Evaluator::get_design_entity_map(DesignEntityMap& design_entity_map,
         for (auto const& elem : result.get_tuple()) {
             get_design_entity_map(design_entity_map, declaration_map, elem);
         }
+        break;
+    case Parser::ResultType::BOOLEAN:
         break;
     default:
         throw std::runtime_error("Unknown result type");
@@ -165,24 +203,58 @@ void Evaluator::get_design_entity_map(DesignEntityMap& design_entity_map,
                                       const Parser::DeclarationMap& declaration_map,
                                       const Parser::Pattern& pattern) {
 
+    std::string pattern_synonym;
+    Parser::EntityRef entity_ref;
+
     switch (pattern.get_type()) {
     case Parser::PatternType::ASSIGN: {
         auto pattern_assign = pattern.get_pattern_assign();
-
-        auto assign_synonym = pattern_assign.get_assign_synonym();
-        auto assign_design_entity = declaration_map.get(assign_synonym);
-        design_entity_map[assign_synonym] = assign_design_entity;
-
-        auto entity_ref = pattern_assign.get_entity_ref();
-        if (has_synonym(entity_ref)) {
-            auto entity_ref_synonym = get_synonym(entity_ref);
-            auto entity_ref_design_entity = declaration_map.get(entity_ref_synonym);
-            design_entity_map[entity_ref_synonym] = entity_ref_design_entity;
-        }
+        pattern_synonym = pattern_assign.get_assign_synonym();
+        entity_ref = pattern_assign.get_entity_ref();
+        break;
+    }
+    case Parser::PatternType::WHILE: {
+        auto pattern_while = pattern.get_pattern_while();
+        pattern_synonym = pattern_while.get_while_synonym();
+        entity_ref = pattern_while.get_entity_ref();
+        break;
+    }
+    case Parser::PatternType::IF: {
+        auto pattern_if = pattern.get_pattern_if();
+        pattern_synonym = pattern_if.get_if_synonym();
+        entity_ref = pattern_if.get_entity_ref();
         break;
     }
     default:
         throw std::runtime_error("Unknown pattern type");
+    }
+
+    auto pattern_design_entity = declaration_map.get(pattern_synonym);
+    design_entity_map[pattern_synonym] = pattern_design_entity;
+
+    if (has_synonym(entity_ref)) {
+        auto entity_ref_synonym = get_synonym(entity_ref);
+        auto entity_ref_design_entity = declaration_map.get(entity_ref_synonym);
+        design_entity_map[entity_ref_synonym] = entity_ref_design_entity;
+    }
+}
+
+void Evaluator::get_design_entity_map(DesignEntityMap& design_entity_map,
+                                      const Parser::DeclarationMap& declaration_map,
+                                      const Parser::With& with) {
+
+    auto left_ref = with.get_left_ref();
+    if (has_synonym(left_ref)) {
+        auto left_ref_synonym = get_synonym(left_ref);
+        auto left_ref_design_entity = declaration_map.get(left_ref_synonym);
+        design_entity_map[left_ref_synonym] = left_ref_design_entity;
+    }
+
+    auto right_ref = with.get_right_ref();
+    if (has_synonym(right_ref)) {
+        auto right_ref_synonym = get_synonym(right_ref);
+        auto right_ref_design_entity = declaration_map.get(right_ref_synonym);
+        design_entity_map[right_ref_synonym] = right_ref_design_entity;
     }
 }
 
@@ -197,6 +269,12 @@ void Evaluator::get_design_entity_map(DesignEntityMap& design_entity_map,
         design_entity_map[elem_synonym] = elem_design_entity;
         break;
     }
+    case Parser::ElemType::ATTR_REF: {
+        auto attr_ref_synonym = elem.get_attr_ref().get_synonym();
+        auto attr_ref_design_entity = declaration_map.get(attr_ref_synonym);
+        design_entity_map[attr_ref_synonym] = attr_ref_design_entity;
+        break;
+    }
     default:
         throw std::runtime_error("Unknown elem type");
     }
@@ -209,6 +287,9 @@ DependencyMap Evaluator::get_dependency_map(const Parser::QueryObject& query_obj
     }
     for (auto const& pattern : query_object.get_all_pattern()) {
         get_dependency_map(dependency_map, pattern);
+    }
+    for (auto const& with : query_object.get_all_with()) {
+        get_dependency_map(dependency_map, with);
     }
     return dependency_map;
 }
@@ -227,20 +308,47 @@ void Evaluator::get_dependency_map(DependencyMap& dependency_map,
 }
 
 void Evaluator::get_dependency_map(DependencyMap& dependency_map, const Parser::Pattern& pattern) {
+    std::string pattern_synonym;
+    Parser::EntityRef entity_ref;
+
     switch (pattern.get_type()) {
     case Parser::PatternType::ASSIGN: {
         auto pattern_assign = pattern.get_pattern_assign();
-        auto assign_synonym = pattern_assign.get_assign_synonym();
-        auto entity_ref = pattern_assign.get_entity_ref();
-        if (has_synonym(entity_ref)) {
-            auto entity_ref_synonym = get_synonym(entity_ref);
-            dependency_map[assign_synonym].push_back(entity_ref_synonym);
-            dependency_map[entity_ref_synonym].push_back(assign_synonym);
-        }
+        pattern_synonym = pattern_assign.get_assign_synonym();
+        entity_ref = pattern_assign.get_entity_ref();
+        break;
+    }
+    case Parser::PatternType::WHILE: {
+        auto pattern_while = pattern.get_pattern_while();
+        pattern_synonym = pattern_while.get_while_synonym();
+        entity_ref = pattern_while.get_entity_ref();
+        break;
+    }
+    case Parser::PatternType::IF: {
+        auto pattern_if = pattern.get_pattern_if();
+        pattern_synonym = pattern_if.get_if_synonym();
+        entity_ref = pattern_if.get_entity_ref();
         break;
     }
     default:
         throw std::runtime_error("Unknown pattern type");
+    }
+
+    if (has_synonym(entity_ref)) {
+        auto entity_ref_synonym = get_synonym(entity_ref);
+        dependency_map[pattern_synonym].push_back(entity_ref_synonym);
+        dependency_map[entity_ref_synonym].push_back(pattern_synonym);
+    }
+}
+
+void Evaluator::get_dependency_map(DependencyMap& dependency_map, const Parser::With& with) {
+    auto left_ref = with.get_left_ref();
+    auto right_ref = with.get_right_ref();
+    if (has_synonym(left_ref) && has_synonym(right_ref)) {
+        auto left_ref_synonym = get_synonym(left_ref);
+        auto right_ref_synonym = get_synonym(right_ref);
+        dependency_map[left_ref_synonym].push_back(right_ref_synonym);
+        dependency_map[right_ref_synonym].push_back(left_ref_synonym);
     }
 }
 
@@ -255,8 +363,13 @@ bool Evaluator::has_synonym(const Parser::SuchThatRef& ref) {
         return has_synonym(statement_ref);
     }
     default:
-        throw std::runtime_error("Unknown ref type");
+        throw std::runtime_error("Unknown such that ref type");
     }
+}
+
+bool Evaluator::has_synonym(const Parser::WithRef& ref) {
+    return ref.get_type() == Parser::WithRefType::SYNONYM ||
+           ref.get_type() == Parser::WithRefType::ATTR_REF;
 }
 
 bool Evaluator::has_synonym(const Parser::EntityRef& entity_ref) {
@@ -312,6 +425,20 @@ std::string Evaluator::get_synonym(const Parser::SuchThatRef& ref) {
     }
 }
 
+std::string Evaluator::get_synonym(const Parser::WithRef& ref) {
+    switch (ref.get_type()) {
+    case Parser::WithRefType::SYNONYM:
+        return ref.get_synonym();
+    case Parser::WithRefType::ATTR_REF:
+        return ref.get_attr_ref().get_synonym();
+    case Parser::WithRefType::NAME:
+    case Parser::WithRefType::STATEMENT_ID:
+        throw std::runtime_error("No synonym in with ref");
+    default:
+        throw std::runtime_error("Unknown with ref type");
+    }
+}
+
 std::string Evaluator::get_synonym(const Parser::EntityRef& entity_ref) {
     if (!has_synonym(entity_ref)) {
         throw std::runtime_error("No synonym in entity ref");
@@ -343,6 +470,7 @@ Evaluator::merge_assignment_maps(const std::vector<AssignmentMaps>& all_assignme
             }
         }
     }
+
     return merged;
 }
 
@@ -361,58 +489,72 @@ std::list<std::string> Evaluator::get_formatted_output(const Parser::Result& res
 
     std::list<std::string> formatted_output;
 
-    for (auto const& assignment_map : assignment_maps) {
-        switch (result.get_type()) {
-        case Parser::ResultType::TUPLE: {
+    switch (result.get_type()) {
+    case Parser::ResultType::TUPLE: {
+        for (auto const& assignment_map : assignment_maps) {
             auto tuple = result.get_tuple();
+            std::string result;
+
             for (auto const& elem : tuple) {
-                auto synonym = elem.get_synonym();
-                auto assignment = assignment_map.at(synonym);
-                std::string result;
+                if (!result.empty()) {
+                    result += " ";
+                }
 
                 switch (elem.get_type()) {
-                case Parser::ElemType::ATTR_REF:
+                case Parser::ElemType::ATTR_REF: {
+                    auto synonym = elem.get_attr_ref().get_synonym();
+                    auto assignment = assignment_map.at(synonym);
+
                     if (elem.get_attr_ref().get_attr_name() == "stmt#" ||
                         elem.get_attr_ref().get_attr_name() == "value") {
-                        result = std::to_string(assignment.get_int_value());
+                        result += std::to_string(assignment.get_int_value());
                     } else if (elem.get_attr_ref().get_attr_name() == "procName" ||
                                elem.get_attr_ref().get_attr_name() == "varName") {
-                        result = assignment.get_string_value();
+                        result += assignment.get_string_value();
                     } else {
                         throw std::runtime_error("Unknown attribute name");
                     }
+
                     break;
-                case Parser::ElemType::SYNONYM:
+                }
+                case Parser::ElemType::SYNONYM: {
+                    auto synonym = elem.get_synonym();
+                    auto assignment = assignment_map.at(synonym);
+
                     switch (assignment.get_type()) {
                     case AssignmentType::INTEGER:
-                        result = std::to_string(assignment.get_int_value());
+                        result += std::to_string(assignment.get_int_value());
                         break;
                     case AssignmentType::STRING:
-                        result = assignment.get_string_value();
+                        result += assignment.get_string_value();
                         break;
                     case AssignmentType::BOTH:
-                        result = std::to_string(assignment.get_int_value());
+                        result += std::to_string(assignment.get_int_value());
                         break;
                     default:
                         throw std::runtime_error("Unknown assignment type");
                     }
-                default:
-                    std::runtime_error("Unknown elem type");
+
                     break;
                 }
-                formatted_output.push_back(result);
+                default:
+                    throw std::runtime_error("Unknown elem type");
+                }
             }
-            break;
+
+            formatted_output.push_back(result);
         }
-        case Parser::ResultType::BOOLEAN:
-            if (assignment_map.size() > 0) {
-                formatted_output.push_back("TRUE");
-            } else {
-                formatted_output.push_back("FALSE");
-            }
-        default:
-            throw std::runtime_error("Unknown result type");
+        break;
+    }
+    case Parser::ResultType::BOOLEAN:
+        if (!assignment_maps.empty()) {
+            formatted_output.emplace_back("TRUE");
+        } else {
+            formatted_output.emplace_back("FALSE");
         }
+        break;
+    default:
+        throw std::runtime_error("Unknown result type");
     }
 
     return formatted_output;

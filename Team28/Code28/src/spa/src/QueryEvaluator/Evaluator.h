@@ -66,6 +66,9 @@ private:
                                       const Parser::Pattern& pattern);
     static void get_design_entity_map(DesignEntityMap& design_entity_map,
                                       const Parser::DeclarationMap& declaration_map,
+                                      const Parser::With& with);
+    static void get_design_entity_map(DesignEntityMap& design_entity_map,
+                                      const Parser::DeclarationMap& declaration_map,
                                       const Parser::Elem& elem);
 
     // Get all the dependencies between synonyms for a query object.
@@ -75,9 +78,11 @@ private:
     static void get_dependency_map(DependencyMap& dependency_map,
                                    const Parser::SuchThat& such_that);
     static void get_dependency_map(DependencyMap& dependency_map, const Parser::Pattern& pattern);
+    static void get_dependency_map(DependencyMap& dependency_map, const Parser::With& with);
 
     // Check whether the query object classes contain any synonym.
     static bool has_synonym(const Parser::SuchThatRef& ref);
+    static bool has_synonym(const Parser::WithRef& ref);
     static bool has_synonym(const Parser::EntityRef& entity_ref);
     static bool has_synonym(const Parser::StatementRef& entity_ref);
 
@@ -85,6 +90,7 @@ private:
     static std::unordered_set<std::string> get_synonyms(const Parser::Result& result);
     static std::string get_synonym(const Parser::Elem& elem);
     static std::string get_synonym(const Parser::SuchThatRef& ref);
+    static std::string get_synonym(const Parser::WithRef& ref);
     static std::string get_synonym(const Parser::EntityRef& ref);
     static std::string get_synonym(const Parser::StatementRef& ref);
 

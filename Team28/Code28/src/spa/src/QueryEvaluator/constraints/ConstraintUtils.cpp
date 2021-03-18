@@ -99,6 +99,7 @@ ConstraintUtils::get_constraint_logics(std::shared_ptr<KnowledgeBase::PKB> pkb,
         case Parser::SuchThatType::NEXT_T:
             constraint_logics.push_back(std::make_shared<NextTConstraintLogic>(
                 pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
+            break;
         case Parser::SuchThatType::CALLS:
             constraint_logics.push_back(std::make_shared<CallsConstraintLogic>(
                 pkb, left_ref.get_entity_ref(), right_ref.get_entity_ref()));
