@@ -33,7 +33,6 @@ TEST_CASE("FollowsConstraintLogic and FollowsTConstraintLogic") {
     statement_id_dup.set_type(Parser::StatementRefType::STATEMENT_ID);
 
     auto while_stmt_node = std::make_shared<Parser::SimpleNode>(SimpleNodeType::WHILE, 1);
-
     auto assign_stmt_node = std::make_shared<Parser::SimpleNode>(SimpleNodeType::ASSIGN, 2);
     assign_stmt_node->add_child(std::make_shared<SimpleNode>(SimpleNodeType::VAR_NAME, "y"));
     auto assign_rhs = std::make_shared<SimpleNode>(SimpleNodeType::ARITHMETIC, "+");
@@ -232,10 +231,10 @@ TEST_CASE("FollowsConstraintLogic and FollowsTConstraintLogic") {
     }
 
     SECTION("multi-level follow") {
+        auto read_stmt_node = std::make_shared<SimpleNode>(SimpleNodeType::READ, 4);
         pkb->add_statement(StatementType::WHILE, 1, "main", while_stmt_node);
         pkb->add_statement(StatementType::ASSIGN, 2, "main", assign_stmt_node);
         pkb->add_statement(StatementType::ASSIGN, 3, "main", assign_stmt_node_two);
-        auto read_stmt_node = std::make_shared<SimpleNode>(SimpleNodeType::READ, 4);
         pkb->add_statement(StatementType::READ, 4, "main", read_stmt_node);
 
         pkb->add_follow_relationship(1, 3);

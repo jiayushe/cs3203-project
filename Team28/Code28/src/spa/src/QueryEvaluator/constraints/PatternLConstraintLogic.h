@@ -2,6 +2,7 @@
 
 #include "BaseConstraintLogic.h"
 #include "KnowledgeBase/PKB.h"
+#include "KnowledgeBase/Statement.h"
 #include "Parser/PQLParser/Pattern.h"
 #include <memory>
 #include <stdexcept>
