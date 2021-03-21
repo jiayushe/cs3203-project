@@ -27,6 +27,9 @@ public:
     // Throws if the given PKB has an invalid AST.
     static void extract_call_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb);
 
+    // Extracts next relationships from the given PKB.
+    static void extract_next_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb);
+
     // Extracts control flow graph from the given PKB.
     // Throws if the given PKB has an invalid AST
     static void extract_cfg(std::shared_ptr<KnowledgeBase::PKB> pkb);
@@ -96,13 +99,21 @@ private:
                                                     std::shared_ptr<Parser::SimpleNode> stmt);
 
     /* CFG */
-    static void extract_cfg_from_stmt_list(std::unordered_map<int, std::unordered_set<int>> cfg,
+    static void extract_cfg_from_stmt_list(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                           std::string proc_name,
+                                           std::unordered_map<int, std::unordered_set<int>>& cfg,
                                            std::shared_ptr<Parser::SimpleNode> stmt_list);
-    static void extract_cfg_from_stmt(std::unordered_map<int, std::unordered_set<int>> cfg,
+    static void extract_cfg_from_stmt(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                      std::string proc_name,
+                                      std::unordered_map<int, std::unordered_set<int>>& cfg,
                                       std::shared_ptr<Parser::SimpleNode> stmt, int next_stmt_id);
-    static void extract_cfg_from_while_stmt(std::unordered_map<int, std::unordered_set<int>> cfg,
+    static void extract_cfg_from_while_stmt(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                            std::string proc_name,
+                                            std::unordered_map<int, std::unordered_set<int>>& cfg,
                                             std::shared_ptr<Parser::SimpleNode> while_stmt);
-    static void extract_cfg_from_if_stmt(std::unordered_map<int, std::unordered_set<int>> cfg,
+    static void extract_cfg_from_if_stmt(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                         std::string proc_name,
+                                         std::unordered_map<int, std::unordered_set<int>>& cfg,
                                          std::shared_ptr<Parser::SimpleNode> if_stmt,
                                          int next_block_stmt_id);
 
