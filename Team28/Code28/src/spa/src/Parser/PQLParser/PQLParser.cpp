@@ -12,65 +12,71 @@ PQLParser::PQLParser(std::shared_ptr<Source> source)
     : BaseParser(std::make_shared<PQLLexer>(source)), source(source) {}
 
 // Parse token string and store it as a QueryObject
-QueryObject PQLParser::parse_query() {
-    repeat({[&]() { process_declaration(); }});
-    process_selection();
+void PQLParser::parse_query(QueryObject& query_object) {
+    repeat({[&]() { process_declaration(query_object); }});
+    process_selection(query_object);
     expect_token(TokenType::END);
 
-    validate_query();
+    validate_query(query_object);
+}
 
+QueryObject PQLParser::parse_query() {
+    QueryObject query_object;
+    parse_query(query_object);
     return query_object;
 }
 
-void PQLParser::process_declaration() {
+void PQLParser::process_declaration(QueryObject& query_object) {
     choice({[&]() {
                 expect_word("stmt");
-                process_declaration_synonym(DesignEntityType::STMT);
+                process_declaration_synonym(query_object, DesignEntityType::STMT);
             },
             [&]() {
                 expect_word("read");
-                process_declaration_synonym(DesignEntityType::READ);
+                process_declaration_synonym(query_object, DesignEntityType::READ);
             },
             [&]() {
                 expect_word("print");
-                process_declaration_synonym(DesignEntityType::PRINT);
+                process_declaration_synonym(query_object, DesignEntityType::PRINT);
             },
             [&]() {
                 expect_word("while");
-                process_declaration_synonym(DesignEntityType::WHILE);
+                process_declaration_synonym(query_object, DesignEntityType::WHILE);
             },
             [&]() {
                 expect_word("if");
-                process_declaration_synonym(DesignEntityType::IF);
+                process_declaration_synonym(query_object, DesignEntityType::IF);
             },
             [&]() {
                 expect_word("assign");
-                process_declaration_synonym(DesignEntityType::ASSIGN);
+                process_declaration_synonym(query_object, DesignEntityType::ASSIGN);
             },
             [&]() {
                 expect_word("variable");
-                process_declaration_synonym(DesignEntityType::VARIABLE);
+                process_declaration_synonym(query_object, DesignEntityType::VARIABLE);
             },
             [&]() {
                 expect_word("constant");
-                process_declaration_synonym(DesignEntityType::CONSTANT);
+                process_declaration_synonym(query_object, DesignEntityType::CONSTANT);
             },
             [&]() {
                 expect_word("procedure");
-                process_declaration_synonym(DesignEntityType::PROCEDURE);
+                process_declaration_synonym(query_object, DesignEntityType::PROCEDURE);
             },
             [&]() {
                 expect_word("call");
-                process_declaration_synonym(DesignEntityType::CALL);
+                process_declaration_synonym(query_object, DesignEntityType::CALL);
             },
             [&]() {
                 expect_word("prog_line");
-                process_declaration_synonym(DesignEntityType::PROG_LINE);
+                process_declaration_synonym(query_object, DesignEntityType::PROG_LINE);
             }},
            "Invalid Design Entity Type parsed");
 }
 
-void PQLParser::process_declaration_synonym(DesignEntityType design_entity_type) {
+void PQLParser::process_declaration_synonym(QueryObject& query_object,
+                                            DesignEntityType design_entity_type) {
+
     auto token = expect_name("synonym");
     DesignEntity design_entity(design_entity_type, token->get_value());
     query_object.add_declaration(token->get_value(), design_entity);
@@ -85,7 +91,7 @@ void PQLParser::process_declaration_synonym(DesignEntityType design_entity_type)
     expect_token(TokenType::SEMICOLON);
 }
 
-void PQLParser::process_selection() {
+void PQLParser::process_selection(QueryObject& query_object) {
     expect_word("Select");
 
     Result result;
@@ -111,14 +117,15 @@ void PQLParser::process_selection() {
     query_object.set_result(result);
 
     repeat({[&]() {
-        choice({[&]() { process_such_that(); }, [&]() { process_pattern(); },
-                [&]() { process_with(); }},
+        choice({[&]() { process_such_that(query_object); },
+                [&]() { process_pattern(query_object); }, [&]() { process_with(query_object); }},
                "Should not throw anything in process_selection");
     }});
 }
 
 Elem PQLParser::process_selection_elem() {
     Elem elem;
+
     choice({// attrRef
             [&]() {
                 auto synonym = expect_name("synonym")->get_value();
@@ -155,77 +162,78 @@ std::vector<Elem> PQLParser::process_selection_tuple() {
     return selection_tuples;
 }
 
-void PQLParser::process_such_that() {
+void PQLParser::process_such_that(QueryObject& query_object) {
     expect_word("such that");
-    process_such_that_condition();
+    process_such_that_condition(query_object);
 
     repeat([&]() {
         expect_word("and");
-        process_such_that_condition();
+        process_such_that_condition(query_object);
     });
 }
 
-void PQLParser::process_such_that_condition() {
+void PQLParser::process_such_that_condition(QueryObject& query_object) {
     choice({[&]() {
                 expect_word("Parent");
-                process_such_that_body(SuchThatType::PARENT);
+                process_such_that_body(query_object, SuchThatType::PARENT);
             },
             [&]() {
                 expect_word("Parent*");
-                process_such_that_body(SuchThatType::PARENT_T);
+                process_such_that_body(query_object, SuchThatType::PARENT_T);
             },
             [&]() {
                 expect_word("Follows");
-                process_such_that_body(SuchThatType::FOLLOWS);
+                process_such_that_body(query_object, SuchThatType::FOLLOWS);
             },
             [&]() {
                 expect_word("Follows*");
-                process_such_that_body(SuchThatType::FOLLOWS_T);
+                process_such_that_body(query_object, SuchThatType::FOLLOWS_T);
             },
             [&]() {
                 expect_word("Calls");
-                process_such_that_body(SuchThatType::CALLS);
+                process_such_that_body(query_object, SuchThatType::CALLS);
             },
             [&]() {
                 expect_word("Calls*");
-                process_such_that_body(SuchThatType::CALLS_T);
+                process_such_that_body(query_object, SuchThatType::CALLS_T);
             },
             [&]() {
                 expect_word("Next");
-                process_such_that_body(SuchThatType::NEXT);
+                process_such_that_body(query_object, SuchThatType::NEXT);
             },
             [&]() {
                 expect_word("Next*");
-                process_such_that_body(SuchThatType::NEXT_T);
+                process_such_that_body(query_object, SuchThatType::NEXT_T);
             },
             [&]() {
                 expect_word("Affects");
-                process_such_that_body(SuchThatType::AFFECTS);
+                process_such_that_body(query_object, SuchThatType::AFFECTS);
             },
             [&]() {
                 expect_word("Affects*");
-                process_such_that_body(SuchThatType::AFFECTS_T);
+                process_such_that_body(query_object, SuchThatType::AFFECTS_T);
             },
             [&]() {
                 expect_word("Modifies");
-                process_such_that_body(SuchThatType::MODIFIES_S);
+                process_such_that_body(query_object, SuchThatType::MODIFIES_S);
             },
             [&]() {
                 expect_word("Modifies");
-                process_such_that_body(SuchThatType::MODIFIES_P);
+                process_such_that_body(query_object, SuchThatType::MODIFIES_P);
             },
             [&]() {
                 expect_word("Uses");
-                process_such_that_body(SuchThatType::USES_S);
+                process_such_that_body(query_object, SuchThatType::USES_S);
             },
             [&]() {
                 expect_word("Uses");
-                process_such_that_body(SuchThatType::USES_P);
+                process_such_that_body(query_object, SuchThatType::USES_P);
             }},
            "Invalid such that type parsed");
 }
 
-SuchThatRef PQLParser::process_such_that_left_ref(SuchThatType such_that_type) {
+SuchThatRef PQLParser::process_such_that_left_ref(const QueryObject& query_object,
+                                                  SuchThatType such_that_type) {
     switch (such_that_type) { // stmtRef and lineRef
     case SuchThatType::PARENT:
     case SuchThatType::PARENT_T:
@@ -240,7 +248,7 @@ SuchThatRef PQLParser::process_such_that_left_ref(SuchThatType such_that_type) {
     }
     case SuchThatType::MODIFIES_S: {
         auto left_statement_ref = process_statement_ref();
-        validate_statement_ref(left_statement_ref,
+        validate_statement_ref(query_object, left_statement_ref,
                                {DesignEntityType::STMT, DesignEntityType::READ,
                                 DesignEntityType::IF, DesignEntityType::WHILE,
                                 DesignEntityType::ASSIGN, DesignEntityType::CALL,
@@ -249,7 +257,7 @@ SuchThatRef PQLParser::process_such_that_left_ref(SuchThatType such_that_type) {
     }
     case SuchThatType::USES_S: {
         auto left_statement_ref = process_statement_ref();
-        validate_statement_ref(left_statement_ref,
+        validate_statement_ref(query_object, left_statement_ref,
                                {DesignEntityType::STMT, DesignEntityType::PRINT,
                                 DesignEntityType::IF, DesignEntityType::WHILE,
                                 DesignEntityType::ASSIGN, DesignEntityType::CALL,
@@ -264,7 +272,7 @@ SuchThatRef PQLParser::process_such_that_left_ref(SuchThatType such_that_type) {
     case SuchThatType::MODIFIES_P:
     case SuchThatType::USES_P: {
         auto left_entity_ref = process_entity_ref();
-        validate_entity_ref(left_entity_ref, {DesignEntityType::PROCEDURE});
+        validate_entity_ref(query_object, left_entity_ref, {DesignEntityType::PROCEDURE});
         return SuchThatRef(left_entity_ref);
     }
     default:
@@ -300,12 +308,12 @@ SuchThatRef PQLParser::process_such_that_right_ref(SuchThatType such_that_type) 
 }
 
 // Parse content of the such_that type
-void PQLParser::process_such_that_body(SuchThatType such_that_type) {
+void PQLParser::process_such_that_body(QueryObject& query_object, SuchThatType such_that_type) {
     SuchThat such_that;
     such_that.set_type(such_that_type);
     expect_token(TokenType::LPAREN);
 
-    SuchThatRef left_such_that_ref = process_such_that_left_ref(such_that_type);
+    SuchThatRef left_such_that_ref = process_such_that_left_ref(query_object, such_that_type);
     such_that.set_left_ref(left_such_that_ref);
 
     expect_token(TokenType::COMMA);
@@ -317,27 +325,28 @@ void PQLParser::process_such_that_body(SuchThatType such_that_type) {
     query_object.add_such_that(such_that);
 }
 
-void PQLParser::process_pattern() {
+void PQLParser::process_pattern(QueryObject& query_object) {
     expect_word("pattern");
-    process_pattern_condition();
+    process_pattern_condition(query_object);
 
     repeat([&]() {
         expect_word("and");
-        process_pattern_condition();
+        process_pattern_condition(query_object);
     });
 }
 
-void PQLParser::process_pattern_condition() {
-    choice({[&]() { process_pattern_assign(); }, [&]() { process_pattern_while(); },
-            [&]() { process_pattern_if(); }},
+void PQLParser::process_pattern_condition(QueryObject& query_object) {
+    choice({[&]() { process_pattern_assign(query_object); },
+            [&]() { process_pattern_while(query_object); },
+            [&]() { process_pattern_if(query_object); }},
            "Invalid pattern condition given");
 }
 
-void PQLParser::process_pattern_assign() {
+void PQLParser::process_pattern_assign(QueryObject& query_object) {
     PatternAssign pattern_assign;
 
     auto token = expect_name("pattern_synonym");
-    expect_declaration(token->get_value(), {DesignEntityType::ASSIGN});
+    expect_declaration(query_object, token->get_value(), {DesignEntityType::ASSIGN});
     pattern_assign.set_assign_synonym(token->get_value());
 
     expect_token(TokenType::LPAREN);
@@ -354,11 +363,11 @@ void PQLParser::process_pattern_assign() {
     query_object.add_pattern(pattern);
 }
 
-void PQLParser::process_pattern_while() {
+void PQLParser::process_pattern_while(QueryObject& query_object) {
     PatternWhile pattern_while;
 
     auto token = expect_name("pattern_synonym");
-    expect_declaration(token->get_value(), {DesignEntityType::WHILE});
+    expect_declaration(query_object, token->get_value(), {DesignEntityType::WHILE});
     pattern_while.set_while_synonym(token->get_value());
 
     expect_token(TokenType::LPAREN);
@@ -374,11 +383,11 @@ void PQLParser::process_pattern_while() {
     query_object.add_pattern(pattern);
 }
 
-void PQLParser::process_pattern_if() {
+void PQLParser::process_pattern_if(QueryObject& query_object) {
     PatternIf pattern_if;
 
     auto token = expect_name("pattern_synonym");
-    expect_declaration(token->get_value(), {DesignEntityType::IF});
+    expect_declaration(query_object, token->get_value(), {DesignEntityType::IF});
     pattern_if.set_if_synonym(token->get_value());
 
     expect_token(TokenType::LPAREN);
@@ -396,13 +405,13 @@ void PQLParser::process_pattern_if() {
     query_object.add_pattern(pattern);
 }
 
-void PQLParser::process_with() {
+void PQLParser::process_with(QueryObject& query_object) {
     expect_word("with");
-    process_with_condition();
+    process_with_condition(query_object);
 
     repeat([&]() {
         expect_word("and");
-        process_with_condition();
+        process_with_condition(query_object);
     });
 }
 
@@ -448,7 +457,7 @@ WithRef PQLParser::process_with_ref() {
     return with_ref;
 }
 
-void PQLParser::process_with_condition() {
+void PQLParser::process_with_condition(QueryObject& query_object) {
     WithRef left_ref = process_with_ref();
     expect_token(TokenType::EQUAL);
     WithRef right_ref = process_with_ref();
@@ -573,25 +582,25 @@ void PQLParser::repeat(const std::function<void()>& parse_func) {
     }
 }
 
-void PQLParser::validate_query() {
-    validate_result(query_object.get_result());
+void PQLParser::validate_query(const QueryObject& query_object) {
+    validate_result(query_object, query_object.get_result());
     for (auto const& such_that : query_object.get_all_such_that()) {
-        validate_such_that(such_that);
+        validate_such_that(query_object, such_that);
     }
     for (auto const& pattern : query_object.get_all_pattern()) {
-        validate_pattern(pattern);
+        validate_pattern(query_object, pattern);
     }
     for (auto const& with : query_object.get_all_with()) {
-        validate_with(with);
+        validate_with(query_object, with);
     }
 }
 
-void PQLParser::validate_with(const With& with) {
+void PQLParser::validate_with(const QueryObject& query_object, const With& with) {
     auto left_with_ref = with.get_left_ref();
-    validate_with_ref(left_with_ref);
+    validate_with_ref(query_object, left_with_ref);
 
     auto right_with_ref = with.get_right_ref();
-    validate_with_ref(right_with_ref);
+    validate_with_ref(query_object, right_with_ref);
 
     if (get_with_ref_data_type(left_with_ref) != get_with_ref_data_type(right_with_ref)) {
         throw std::runtime_error("LHS with ref and RHS with ref are not comparable");
@@ -621,15 +630,15 @@ int PQLParser::get_with_ref_data_type(const WithRef& with_ref) {
     }
 }
 
-void PQLParser::validate_with_ref(const WithRef& with_ref) {
+void PQLParser::validate_with_ref(const QueryObject& query_object, const WithRef& with_ref) {
     switch (with_ref.get_type()) {
     case WithRefType::ATTR_REF: {
         AttrRef attr_ref = with_ref.get_attr_ref();
-        validate_attr_ref(attr_ref);
+        validate_attr_ref(query_object, attr_ref);
         break;
     }
     case WithRefType::SYNONYM: {
-        expect_declaration(with_ref.get_synonym(), {DesignEntityType::PROG_LINE});
+        expect_declaration(query_object, with_ref.get_synonym(), {DesignEntityType::PROG_LINE});
         break;
     }
     case WithRefType::NAME:
@@ -640,19 +649,21 @@ void PQLParser::validate_with_ref(const WithRef& with_ref) {
     }
 }
 
-void PQLParser::validate_attr_ref(const AttrRef& attr_ref) {
+void PQLParser::validate_attr_ref(const QueryObject& query_object, const AttrRef& attr_ref) {
     std::string synonym = attr_ref.get_synonym();
     std::string attr_name = attr_ref.get_attr_name();
 
     if (attr_name == "procName") {
-        expect_declaration(synonym, {DesignEntityType::PROCEDURE, DesignEntityType::CALL});
+        expect_declaration(query_object, synonym,
+                           {DesignEntityType::PROCEDURE, DesignEntityType::CALL});
     } else if (attr_name == "varName") {
         expect_declaration(
-            synonym, {DesignEntityType::VARIABLE, DesignEntityType::READ, DesignEntityType::PRINT});
+            query_object, synonym,
+            {DesignEntityType::VARIABLE, DesignEntityType::READ, DesignEntityType::PRINT});
     } else if (attr_name == "value") {
-        expect_declaration(synonym, {DesignEntityType::CONSTANT});
+        expect_declaration(query_object, synonym, {DesignEntityType::CONSTANT});
     } else if (attr_name == "stmt#") {
-        expect_declaration(synonym,
+        expect_declaration(query_object, synonym,
                            {DesignEntityType::STMT, DesignEntityType::READ, DesignEntityType::PRINT,
                             DesignEntityType::CALL, DesignEntityType::WHILE, DesignEntityType::IF,
                             DesignEntityType::ASSIGN});
@@ -661,12 +672,12 @@ void PQLParser::validate_attr_ref(const AttrRef& attr_ref) {
     }
 }
 
-void PQLParser::validate_result(const Result& result) {
+void PQLParser::validate_result(const QueryObject& query_object, const Result& result) {
     switch (result.get_type()) {
     case ResultType::TUPLE: {
         auto tuple = result.get_tuple();
         for (auto const& elem : tuple) {
-            validate_elem(elem);
+            validate_elem(query_object, elem);
         }
         break;
     }
@@ -677,7 +688,7 @@ void PQLParser::validate_result(const Result& result) {
     }
 }
 
-void PQLParser::validate_such_that(const SuchThat& such_that) {
+void PQLParser::validate_such_that(const QueryObject& query_object, const SuchThat& such_that) {
     auto left_ref = such_that.get_left_ref();
     auto right_ref = such_that.get_right_ref();
 
@@ -692,7 +703,7 @@ void PQLParser::validate_such_that(const SuchThat& such_that) {
 
         // RHS must be VARIABLE
         auto right_entity_ref = right_ref.get_entity_ref();
-        validate_entity_ref(right_entity_ref, {DesignEntityType::VARIABLE});
+        validate_entity_ref(query_object, right_entity_ref, {DesignEntityType::VARIABLE});
         break;
     }
     case SuchThatType::MODIFIES_S:
@@ -705,18 +716,18 @@ void PQLParser::validate_such_that(const SuchThat& such_that) {
 
         // RHS must be VARIABLE
         auto right_entity_ref = right_ref.get_entity_ref();
-        validate_entity_ref(right_entity_ref, {DesignEntityType::VARIABLE});
+        validate_entity_ref(query_object, right_entity_ref, {DesignEntityType::VARIABLE});
         break;
     }
     case SuchThatType::CALLS:
     case SuchThatType::CALLS_T: {
         // LHS must be PROCEDURE
         auto left_entity_ref = left_ref.get_entity_ref();
-        validate_entity_ref(left_entity_ref, {DesignEntityType::PROCEDURE});
+        validate_entity_ref(query_object, left_entity_ref, {DesignEntityType::PROCEDURE});
 
         // RHS must be PROCEDURE
         auto right_entity_ref = right_ref.get_entity_ref();
-        validate_entity_ref(right_entity_ref, {DesignEntityType::PROCEDURE});
+        validate_entity_ref(query_object, right_entity_ref, {DesignEntityType::PROCEDURE});
         break;
     }
     case SuchThatType::AFFECTS:
@@ -726,24 +737,24 @@ void PQLParser::validate_such_that(const SuchThat& such_that) {
 
         // LHS must be valid statement ref
         auto left_statement_ref = left_ref.get_statement_ref();
-        validate_statement_ref(left_statement_ref, expected_types);
+        validate_statement_ref(query_object, left_statement_ref, expected_types);
 
         // RHS must be valid statement ref
         auto right_statement_ref = right_ref.get_statement_ref();
-        validate_statement_ref(right_statement_ref, expected_types);
+        validate_statement_ref(query_object, right_statement_ref, expected_types);
         break;
     }
     case SuchThatType::PARENT:
     case SuchThatType::PARENT_T: {
         // LHS must be valid statement ref
         auto left_statement_ref = left_ref.get_statement_ref();
-        validate_statement_ref(left_statement_ref,
+        validate_statement_ref(query_object, left_statement_ref,
                                {DesignEntityType::STMT, DesignEntityType::PROG_LINE,
                                 DesignEntityType::IF, DesignEntityType::WHILE});
 
         // RHS must be valid statement ref
         auto right_statement_ref = right_ref.get_statement_ref();
-        validate_statement_ref(right_statement_ref);
+        validate_statement_ref(query_object, right_statement_ref);
         break;
     }
 
@@ -753,11 +764,11 @@ void PQLParser::validate_such_that(const SuchThat& such_that) {
     case SuchThatType::NEXT_T: {
         // LHS must be valid statement ref
         auto left_statement_ref = left_ref.get_statement_ref();
-        validate_statement_ref(left_statement_ref);
+        validate_statement_ref(query_object, left_statement_ref);
 
         // RHS must be valid statement ref
         auto right_statement_ref = right_ref.get_statement_ref();
-        validate_statement_ref(right_statement_ref);
+        validate_statement_ref(query_object, right_statement_ref);
         break;
     }
     default:
@@ -765,18 +776,18 @@ void PQLParser::validate_such_that(const SuchThat& such_that) {
     }
 }
 
-void PQLParser::validate_pattern(const Pattern& pattern) {
+void PQLParser::validate_pattern(const QueryObject& query_object, const Pattern& pattern) {
     switch (pattern.get_type()) {
     case PatternType::ASSIGN: {
         auto pattern_assign = pattern.get_pattern_assign();
 
         // PatternAssign synonym must be ASSIGN
         auto synonym = pattern_assign.get_assign_synonym();
-        expect_declaration(synonym, {DesignEntityType::ASSIGN});
+        expect_declaration(query_object, synonym, {DesignEntityType::ASSIGN});
 
         // LHS must be VARIABLE
         auto left_entity_ref = pattern_assign.get_entity_ref();
-        validate_entity_ref(left_entity_ref, {DesignEntityType::VARIABLE});
+        validate_entity_ref(query_object, left_entity_ref, {DesignEntityType::VARIABLE});
         break;
     }
     case PatternType::WHILE: {
@@ -784,11 +795,11 @@ void PQLParser::validate_pattern(const Pattern& pattern) {
 
         // PatternWhile synonym must be WHILE
         auto synonym = pattern_while.get_while_synonym();
-        expect_declaration(synonym, {DesignEntityType::WHILE});
+        expect_declaration(query_object, synonym, {DesignEntityType::WHILE});
 
         // LHS must be VARIABLE
         auto left_entity_ref = pattern_while.get_entity_ref();
-        validate_entity_ref(left_entity_ref, {DesignEntityType::VARIABLE});
+        validate_entity_ref(query_object, left_entity_ref, {DesignEntityType::VARIABLE});
         break;
     }
     case PatternType::IF: {
@@ -796,11 +807,11 @@ void PQLParser::validate_pattern(const Pattern& pattern) {
 
         // PatternIf synonym must be IF
         auto synonym = pattern_if.get_if_synonym();
-        expect_declaration(synonym, {DesignEntityType::IF});
+        expect_declaration(query_object, synonym, {DesignEntityType::IF});
 
         // LHS must be VARIABLE
         auto left_entity_ref = pattern_if.get_entity_ref();
-        validate_entity_ref(left_entity_ref, {DesignEntityType::VARIABLE});
+        validate_entity_ref(query_object, left_entity_ref, {DesignEntityType::VARIABLE});
         break;
     }
     default:
@@ -808,33 +819,33 @@ void PQLParser::validate_pattern(const Pattern& pattern) {
     }
 }
 
-void PQLParser::validate_elem(const Elem& elem) {
+void PQLParser::validate_elem(const QueryObject& query_object, const Elem& elem) {
     switch (elem.get_type()) {
     case ElemType::SYNONYM:
-        expect_declaration(elem.get_synonym());
+        expect_declaration(query_object, elem.get_synonym());
         break;
     case ElemType::ATTR_REF:
-        validate_attr_ref(elem.get_attr_ref());
+        validate_attr_ref(query_object, elem.get_attr_ref());
         break;
     default:
         throw std::runtime_error("Unhandled elem type");
     }
 }
 
-void PQLParser::validate_statement_ref(const StatementRef& statement_ref) {
-    std::vector<DesignEntityType> expected_types = {
-        DesignEntityType::STMT,  DesignEntityType::READ,     DesignEntityType::PRINT,
-        DesignEntityType::WHILE, DesignEntityType::IF,       DesignEntityType::ASSIGN,
-        DesignEntityType::CALL,  DesignEntityType::PROG_LINE};
-
-    validate_statement_ref(statement_ref, expected_types);
+void PQLParser::validate_statement_ref(const QueryObject& query_object,
+                                       const StatementRef& statement_ref) {
+    validate_statement_ref(query_object, statement_ref,
+                           {DesignEntityType::STMT, DesignEntityType::READ, DesignEntityType::PRINT,
+                            DesignEntityType::WHILE, DesignEntityType::IF, DesignEntityType::ASSIGN,
+                            DesignEntityType::CALL, DesignEntityType::PROG_LINE});
 }
 
-void PQLParser::validate_statement_ref(const StatementRef& statement_ref,
+void PQLParser::validate_statement_ref(const QueryObject& query_object,
+                                       const StatementRef& statement_ref,
                                        const std::vector<DesignEntityType>& expected_types) {
     switch (statement_ref.get_type()) {
     case StatementRefType::SYNONYM:
-        expect_declaration(statement_ref.get_synonym(), expected_types);
+        expect_declaration(query_object, statement_ref.get_synonym(), expected_types);
         break;
     case StatementRefType::STATEMENT_ID:
     case StatementRefType::ANY:
@@ -844,11 +855,11 @@ void PQLParser::validate_statement_ref(const StatementRef& statement_ref,
     }
 }
 
-void PQLParser::validate_entity_ref(const EntityRef& entity_ref,
+void PQLParser::validate_entity_ref(const QueryObject& query_object, const EntityRef& entity_ref,
                                     const std::vector<DesignEntityType>& expected_types) {
     switch (entity_ref.get_type()) {
     case EntityRefType::SYNONYM:
-        expect_declaration(entity_ref.get_synonym(), expected_types);
+        expect_declaration(query_object, entity_ref.get_synonym(), expected_types);
         break;
     case EntityRefType::NAME:
     case EntityRefType::ANY:
@@ -858,7 +869,8 @@ void PQLParser::validate_entity_ref(const EntityRef& entity_ref,
     }
 }
 
-DesignEntity PQLParser::expect_declaration(const std::string& synonym) {
+DesignEntity PQLParser::expect_declaration(const QueryObject& query_object,
+                                           const std::string& synonym) {
     auto declarations = query_object.get_declarations();
     if (!declarations.has(synonym)) {
         throw std::runtime_error("Declaration for synonym '" + synonym + "' doesn't exist");
@@ -866,9 +878,10 @@ DesignEntity PQLParser::expect_declaration(const std::string& synonym) {
     return declarations.get(synonym);
 }
 
-DesignEntity PQLParser::expect_declaration(const std::string& synonym,
+DesignEntity PQLParser::expect_declaration(const QueryObject& query_object,
+                                           const std::string& synonym,
                                            const std::vector<DesignEntityType>& expected_types) {
-    auto declaration = expect_declaration(synonym);
+    auto declaration = expect_declaration(query_object, synonym);
     for (auto& expected_type : expected_types) {
         if (declaration.get_type() == expected_type) {
             return declaration;

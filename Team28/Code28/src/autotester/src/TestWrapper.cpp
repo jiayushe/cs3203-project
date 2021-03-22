@@ -17,35 +17,42 @@ TestWrapper::TestWrapper() {}
 
 // method for parsing the SIMPLE source
 void TestWrapper::parse(std::string filename) {
-    try {
-        auto source = std::make_shared<Parser::Source>(filename, true);
-        Parser::SimpleParser parser(source);
-        auto root_node = parser.parse_program();
+    auto source = std::make_shared<Parser::Source>(filename, true);
+    Parser::SimpleParser parser(source);
+    auto root_node = parser.parse_program();
 
-        pkb = std::make_shared<KnowledgeBase::PKB>(root_node);
-        SimpleExtractor::DesignExtractor::extract_cfg(pkb);
-        SimpleExtractor::DesignExtractor::extract_follow_relationship(pkb);
-        SimpleExtractor::DesignExtractor::extract_parent_relationship(pkb);
-        SimpleExtractor::DesignExtractor::extract_call_relationship(pkb);
-        SimpleExtractor::DesignExtractor::extract_modify_relationship(pkb);
-        SimpleExtractor::DesignExtractor::extract_use_relationship(pkb);
-        SimpleExtractor::DesignExtractor::extract_next_relationship(pkb);
-    } catch (std::runtime_error& error) {
-        std::cout << "Error: " << error.what() << std::endl;
-        throw error;
-    }
+    pkb = std::make_shared<KnowledgeBase::PKB>(root_node);
+    SimpleExtractor::DesignExtractor::extract_cfg(pkb);
+    SimpleExtractor::DesignExtractor::extract_follow_relationship(pkb);
+    SimpleExtractor::DesignExtractor::extract_parent_relationship(pkb);
+    SimpleExtractor::DesignExtractor::extract_call_relationship(pkb);
+    SimpleExtractor::DesignExtractor::extract_modify_relationship(pkb);
+    SimpleExtractor::DesignExtractor::extract_use_relationship(pkb);
+    SimpleExtractor::DesignExtractor::extract_next_relationship(pkb);
 }
 
 // method to evaluating a query
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
+    Parser::QueryObject query_object;
     try {
         auto source = std::make_shared<Parser::Source>(query);
         Parser::PQLParser parser(source);
-        auto query_object = parser.parse_query();
+        parser.parse_query(query_object);
 
         QueryEvaluator::Evaluator::evaluate(pkb, query_object, results);
     } catch (std::runtime_error& error) {
         std::cout << "Error: " << error.what() << std::endl;
-        results.clear();
+
+        switch (query_object.get_result().get_type()) {
+        case Parser::ResultType::BOOLEAN:
+            results.emplace_back("FALSE");
+            break;
+        case Parser::ResultType::TUPLE:
+        case Parser::ResultType::INVALID:
+            results.clear();
+            break;
+        default:
+            throw std::runtime_error("Unhandled result type");
+        }
     }
 }
