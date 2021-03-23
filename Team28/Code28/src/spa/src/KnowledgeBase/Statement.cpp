@@ -93,6 +93,22 @@ std::unordered_set<std::string> Statement::get_uses() { return uses; }
 
 void Statement::add_uses(std::string var_name) { uses.insert(var_name); }
 
+std::unordered_set<int> Statement::get_direct_affects() { return direct_affects; }
+
+void Statement::add_direct_affects(int stmt_id) { direct_affects.insert(stmt_id); }
+
+std::unordered_set<int> Statement::get_affects() { return affects; }
+
+void Statement::add_affects(int stmt_id) { affects.insert(stmt_id); }
+
+std::unordered_set<int> Statement::get_direct_affected_by() { return direct_affected_by; }
+
+void Statement::add_direct_affected_by(int stmt_id) { direct_affected_by.insert(stmt_id); }
+
+std::unordered_set<int> Statement::get_affected_by() { return affected_by; }
+
+void Statement::add_affected_by(int stmt_id) { affected_by.insert(stmt_id); }
+
 std::string Statement::get_procedure_called() {
     if (this->type != StatementType::CALL) {
         throw std::runtime_error("This statement is not of type CALL");

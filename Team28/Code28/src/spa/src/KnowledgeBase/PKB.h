@@ -85,6 +85,9 @@ public:
     // Adds a call relationship between two procedure names.
     void add_call_relationship(std::string caller_name, std::string callee_name);
 
+    // Adds an affect relationship between two statement ids.
+    void add_affect_relationship(int affects_id, int affected_id);
+
 private:
     // Base AST
     std::shared_ptr<Parser::SimpleNode> ast;

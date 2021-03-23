@@ -23,12 +23,13 @@ void TestWrapper::parse(std::string filename) {
 
     pkb = std::make_shared<KnowledgeBase::PKB>(root_node);
     SimpleExtractor::DesignExtractor::extract_cfg(pkb);
+    SimpleExtractor::DesignExtractor::extract_next_relationship(pkb);
     SimpleExtractor::DesignExtractor::extract_follow_relationship(pkb);
     SimpleExtractor::DesignExtractor::extract_parent_relationship(pkb);
     SimpleExtractor::DesignExtractor::extract_call_relationship(pkb);
     SimpleExtractor::DesignExtractor::extract_modify_relationship(pkb);
     SimpleExtractor::DesignExtractor::extract_use_relationship(pkb);
-    SimpleExtractor::DesignExtractor::extract_next_relationship(pkb);
+    SimpleExtractor::DesignExtractor::extract_affect_relationship(pkb);
 }
 
 // method to evaluating a query

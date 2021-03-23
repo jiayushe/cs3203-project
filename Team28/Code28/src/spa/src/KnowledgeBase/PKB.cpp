@@ -295,3 +295,23 @@ void PKB::add_call_relationship(std::string caller_name, std::string callee_name
         }
     }
 }
+
+void PKB::add_affect_relationship(int affects_id, int affected_id) {
+    auto affects_stmt = this->get_statement_by_id(affects_id);
+    auto affected_stmt = this->get_statement_by_id(affected_id);
+    affects_stmt->add_direct_affects(affected_id);
+    affected_stmt->add_direct_affected_by(affects_id);
+    // Extract all nested affect relationship.
+    std::unordered_set<int> affects_ids = affects_stmt->get_affected_by();
+    affects_ids.insert(affects_id);
+    std::unordered_set<int> affected_ids = affected_stmt->get_affects();
+    affected_ids.insert(affected_id);
+    for (const auto& curr_affects_id : affects_ids) {
+        auto curr_affects_stmt = this->get_statement_by_id(curr_affects_id);
+        for (const auto& curr_affected_id : affected_ids) {
+            auto curr_affected_stmt = this->get_statement_by_id(curr_affected_id);
+            curr_affects_stmt->add_affects(curr_affected_id);
+            curr_affected_stmt->add_affected_by(curr_affects_id);
+        }
+    }
+}

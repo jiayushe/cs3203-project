@@ -5,6 +5,105 @@
 
 using namespace SimpleExtractor;
 
+void DesignExtractor::extract_cfg(std::shared_ptr<KnowledgeBase::PKB> pkb) {
+    auto ast = assert_node_type(pkb->get_ast(), Parser::SimpleNodeType::PROGRAM);
+    int num_proc = ast->get_children().size();
+    std::unordered_map<int, std::unordered_set<int>> cfg;
+    for (int i = 0; i < num_proc; i++) {
+        auto proc_node = assert_node_type(ast->get_child(i), Parser::SimpleNodeType::PROCEDURE);
+        auto proc = extract_procedure(pkb, proc_node);
+        auto stmt_list_node =
+            assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
+        extract_cfg_from_stmt_list(pkb, proc->get_name(), cfg, stmt_list_node);
+    }
+    pkb->set_cfg(cfg);
+}
+
+void DesignExtractor::extract_cfg_from_stmt_list(
+    std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
+    std::unordered_map<int, std::unordered_set<int>>& cfg,
+    std::shared_ptr<Parser::SimpleNode> stmt_list) {
+    auto stmts = stmt_list->get_children();
+    int num_stmt = stmts.size();
+    for (int i = 0; i < num_stmt; i++) {
+        std::shared_ptr<Parser::SimpleNode> curr_stmt_node = stmts.at(i);
+
+        int next_stmt_id = i == num_stmt - 1 ? -1 : stmts.at(i + 1)->get_statement_id();
+        extract_cfg_from_stmt(pkb, proc_name, cfg, curr_stmt_node, next_stmt_id);
+    }
+}
+
+void DesignExtractor::extract_cfg_from_stmt(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                            std::string proc_name,
+                                            std::unordered_map<int, std::unordered_set<int>>& cfg,
+                                            std::shared_ptr<Parser::SimpleNode> stmt,
+                                            int next_stmt_id) {
+    int curr_stmt_id = stmt->get_statement_id();
+    extract_statement(pkb, proc_name, stmt);
+
+    switch (stmt->get_type()) {
+    case Parser::SimpleNodeType::WHILE:
+        if (next_stmt_id != -1) {
+            cfg[curr_stmt_id].insert(next_stmt_id);
+        }
+        extract_cfg_from_while_stmt(pkb, proc_name, cfg, stmt);
+        break;
+    case Parser::SimpleNodeType::IF:
+        extract_cfg_from_if_stmt(pkb, proc_name, cfg, stmt, next_stmt_id);
+        break;
+    default:
+        if (next_stmt_id != -1) {
+            cfg[curr_stmt_id].insert(next_stmt_id);
+        }
+        break;
+    }
+}
+
+void DesignExtractor::extract_cfg_from_while_stmt(
+    std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
+    std::unordered_map<int, std::unordered_set<int>>& cfg,
+    std::shared_ptr<Parser::SimpleNode> while_stmt) {
+    int parent_stmt_id = while_stmt->get_statement_id();
+    auto child_stmt_list = while_stmt->get_child(1);
+    int first_stmt_id = child_stmt_list->get_child(0)->get_statement_id();
+    cfg[parent_stmt_id].insert(first_stmt_id);
+
+    extract_cfg_from_stmt_list(pkb, proc_name, cfg, child_stmt_list);
+
+    int child_stmt_list_size = child_stmt_list->get_children().size();
+    auto last_stmt = child_stmt_list->get_child(child_stmt_list_size - 1);
+    extract_cfg_from_stmt(pkb, proc_name, cfg, last_stmt, parent_stmt_id);
+}
+
+void DesignExtractor::extract_cfg_from_if_stmt(
+    std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
+    std::unordered_map<int, std::unordered_set<int>>& cfg,
+    std::shared_ptr<Parser::SimpleNode> if_stmt, int next_block_stmt_id) {
+    int parent_stmt_id = if_stmt->get_statement_id();
+    for (int i = 1; i <= 2; i++) {
+        auto branch_stmt_list = if_stmt->get_child(i);
+        int first_stmt_id = branch_stmt_list->get_child(0)->get_statement_id();
+        cfg[parent_stmt_id].insert(first_stmt_id);
+
+        extract_cfg_from_stmt_list(pkb, proc_name, cfg, branch_stmt_list);
+
+        int branch_stmt_list_size = branch_stmt_list->get_children().size();
+        auto last_stmt = branch_stmt_list->get_child(branch_stmt_list_size - 1);
+        extract_cfg_from_stmt(pkb, proc_name, cfg, last_stmt, next_block_stmt_id);
+    }
+}
+
+void DesignExtractor::extract_next_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
+    auto cfg = pkb->get_cfg();
+    for (auto kv : cfg) {
+        int node_id = kv.first;
+        std::unordered_set<int> neighbours = kv.second;
+        for (int neighbour_id : neighbours) {
+            pkb->add_next_relationship(node_id, neighbour_id);
+        }
+    }
+}
+
 void DesignExtractor::extract_modify_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
     auto ast = assert_node_type(pkb->get_ast(), Parser::SimpleNodeType::PROGRAM);
     int num_proc = ast->get_children().size();
@@ -206,7 +305,7 @@ void DesignExtractor::extract_follow_relationship(std::shared_ptr<KnowledgeBase:
     }
 }
 
-void SimpleExtractor::DesignExtractor::extract_follow_relationship_from_stmt_list(
+void DesignExtractor::extract_follow_relationship_from_stmt_list(
     std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
     std::shared_ptr<Parser::SimpleNode> stmt_list) {
     auto stmts = stmt_list->get_children();
@@ -218,7 +317,7 @@ void SimpleExtractor::DesignExtractor::extract_follow_relationship_from_stmt_lis
     }
 }
 
-void SimpleExtractor::DesignExtractor::extract_follow_relationship_from_stmt(
+void DesignExtractor::extract_follow_relationship_from_stmt(
     std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
     std::shared_ptr<Parser::SimpleNode> stmt, int prev_stmt_id) {
     auto curr_stmt = extract_statement(pkb, proc_name, stmt);
@@ -260,7 +359,7 @@ void DesignExtractor::extract_parent_relationship(std::shared_ptr<KnowledgeBase:
     }
 }
 
-void SimpleExtractor::DesignExtractor::extract_parent_relationship_from_stmt_list(
+void DesignExtractor::extract_parent_relationship_from_stmt_list(
     std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
     std::shared_ptr<Parser::SimpleNode> stmt_list, int parent_stmt_id) {
     auto stmts = stmt_list->get_children();
@@ -271,7 +370,7 @@ void SimpleExtractor::DesignExtractor::extract_parent_relationship_from_stmt_lis
     }
 }
 
-void SimpleExtractor::DesignExtractor::extract_parent_relationship_from_stmt(
+void DesignExtractor::extract_parent_relationship_from_stmt(
     std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
     std::shared_ptr<Parser::SimpleNode> stmt, int parent_stmt_id) {
     auto curr_stmt = extract_statement(pkb, proc_name, stmt);
@@ -302,8 +401,7 @@ void SimpleExtractor::DesignExtractor::extract_parent_relationship_from_stmt(
     }
 }
 
-void SimpleExtractor::DesignExtractor::extract_call_relationship(
-    std::shared_ptr<KnowledgeBase::PKB> pkb) {
+void DesignExtractor::extract_call_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
     auto ast = assert_node_type(pkb->get_ast(), Parser::SimpleNodeType::PROGRAM);
     int num_proc = ast->get_children().size();
     for (int i = 0; i < num_proc; i++) {
@@ -315,7 +413,7 @@ void SimpleExtractor::DesignExtractor::extract_call_relationship(
     }
 }
 
-void SimpleExtractor::DesignExtractor::extract_call_relationship_from_stmt_list(
+void DesignExtractor::extract_call_relationship_from_stmt_list(
     std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
     std::shared_ptr<Parser::SimpleNode> stmt_list) {
     auto stmts = stmt_list->get_children();
@@ -326,7 +424,7 @@ void SimpleExtractor::DesignExtractor::extract_call_relationship_from_stmt_list(
     }
 }
 
-void SimpleExtractor::DesignExtractor::extract_call_relationship_from_stmt(
+void DesignExtractor::extract_call_relationship_from_stmt(
     std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
     std::shared_ptr<Parser::SimpleNode> stmt) {
     auto curr_stmt = extract_statement(pkb, proc_name, stmt);
@@ -359,101 +457,58 @@ void SimpleExtractor::DesignExtractor::extract_call_relationship_from_stmt(
     }
 }
 
-void DesignExtractor::extract_next_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
-    auto cfg = pkb->get_cfg();
-    for (auto kv : cfg) {
-        int node_id = kv.first;
-        std::unordered_set<int> neighbours = kv.second;
-        for (int neighbour_id : neighbours) {
-            pkb->add_next_relationship(node_id, neighbour_id);
+struct pair_hash {
+    template <class T1, class T2> std::size_t operator()(std::pair<T1, T2> const& pair) const {
+        std::size_t h1 = std::hash<T1>()(pair.first);
+        std::size_t h2 = std::hash<T2>()(pair.second);
+        return h1 ^ h2;
+    }
+};
+
+void DesignExtractor::extract_affect_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
+    // Assume all entities and all other abstractions have been extracted and stored
+    auto statements = pkb->get_statements();
+    for (auto stmt : statements) {
+        if (stmt->get_type() != KnowledgeBase::StatementType::ASSIGN) {
+            continue;
         }
-    }
-}
-
-void SimpleExtractor::DesignExtractor::extract_cfg(std::shared_ptr<KnowledgeBase::PKB> pkb) {
-    auto ast = assert_node_type(pkb->get_ast(), Parser::SimpleNodeType::PROGRAM);
-    int num_proc = ast->get_children().size();
-    std::unordered_map<int, std::unordered_set<int>> cfg;
-    for (int i = 0; i < num_proc; i++) {
-        auto proc_node = assert_node_type(ast->get_child(i), Parser::SimpleNodeType::PROCEDURE);
-        auto proc = extract_procedure(pkb, proc_node);
-        auto stmt_list_node =
-            assert_node_type(proc_node->get_child(1), Parser::SimpleNodeType::STMT_LST);
-        extract_cfg_from_stmt_list(pkb, proc->get_name(), cfg, stmt_list_node);
-    }
-    pkb->set_cfg(cfg);
-}
-
-void SimpleExtractor::DesignExtractor::extract_cfg_from_stmt_list(
-    std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
-    std::unordered_map<int, std::unordered_set<int>>& cfg,
-    std::shared_ptr<Parser::SimpleNode> stmt_list) {
-    auto stmts = stmt_list->get_children();
-    int num_stmt = stmts.size();
-    for (int i = 0; i < num_stmt; i++) {
-        std::shared_ptr<Parser::SimpleNode> curr_stmt_node = stmts.at(i);
-
-        int next_stmt_id = i == num_stmt - 1 ? -1 : stmts.at(i + 1)->get_statement_id();
-        extract_cfg_from_stmt(pkb, proc_name, cfg, curr_stmt_node, next_stmt_id);
-    }
-}
-
-void SimpleExtractor::DesignExtractor::extract_cfg_from_stmt(
-    std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
-    std::unordered_map<int, std::unordered_set<int>>& cfg, std::shared_ptr<Parser::SimpleNode> stmt,
-    int next_stmt_id) {
-    int curr_stmt_id = stmt->get_statement_id();
-    extract_statement(pkb, proc_name, stmt);
-
-    switch (stmt->get_type()) {
-    case Parser::SimpleNodeType::WHILE:
-        if (next_stmt_id != -1) {
-            cfg[curr_stmt_id].insert(next_stmt_id);
+        int root_stmt_id = stmt->get_id();
+        // There should only be one directly modified variable
+        // This implementation allows for more than one
+        auto direct_modifies_names = stmt->get_direct_modifies();
+        auto direct_next_ids = stmt->get_direct_next();
+        std::queue<std::pair<int, std::string>> bfs;
+        std::unordered_set<std::pair<int, std::string>, pair_hash> visited;
+        for (auto direct_modifies_name : direct_modifies_names) {
+            for (auto direct_next_id : direct_next_ids) {
+                bfs.push({direct_next_id, direct_modifies_name});
+                visited.insert({direct_next_id, direct_modifies_name});
+            }
         }
-        extract_cfg_from_while_stmt(pkb, proc_name, cfg, stmt);
-        break;
-    case Parser::SimpleNodeType::IF:
-        extract_cfg_from_if_stmt(pkb, proc_name, cfg, stmt, next_stmt_id);
-        break;
-    default:
-        if (next_stmt_id != -1) {
-            cfg[curr_stmt_id].insert(next_stmt_id);
+        while (bfs.size()) {
+            auto curr = bfs.front();
+            bfs.pop();
+            int curr_stmt_id = curr.first;
+            std::string curr_var_name = curr.second;
+            auto curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
+            auto curr_stmt_type = curr_stmt->get_type();
+            if (curr_stmt_type == KnowledgeBase::StatementType::ASSIGN &&
+                curr_stmt->get_direct_uses().count(curr_var_name)) {
+                pkb->add_affect_relationship(root_stmt_id, curr_stmt_id);
+            }
+            if (curr_stmt_type != KnowledgeBase::StatementType::IF &&
+                curr_stmt_type != KnowledgeBase::StatementType::WHILE &&
+                curr_stmt->get_modifies().count(curr_var_name)) {
+                continue;
+            }
+            auto curr_direct_next_ids = curr_stmt->get_direct_next();
+            for (auto curr_direct_next_id : curr_direct_next_ids) {
+                if (visited.count({curr_direct_next_id, curr_var_name}) == 0) {
+                    bfs.push({curr_direct_next_id, curr_var_name});
+                    visited.insert({curr_direct_next_id, curr_var_name});
+                }
+            }
         }
-        break;
-    }
-}
-
-void SimpleExtractor::DesignExtractor::extract_cfg_from_while_stmt(
-    std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
-    std::unordered_map<int, std::unordered_set<int>>& cfg,
-    std::shared_ptr<Parser::SimpleNode> while_stmt) {
-    int parent_stmt_id = while_stmt->get_statement_id();
-    auto child_stmt_list = while_stmt->get_child(1);
-    int first_stmt_id = child_stmt_list->get_child(0)->get_statement_id();
-    cfg[parent_stmt_id].insert(first_stmt_id);
-
-    extract_cfg_from_stmt_list(pkb, proc_name, cfg, child_stmt_list);
-
-    int child_stmt_list_size = child_stmt_list->get_children().size();
-    auto last_stmt = child_stmt_list->get_child(child_stmt_list_size - 1);
-    extract_cfg_from_stmt(pkb, proc_name, cfg, last_stmt, parent_stmt_id);
-}
-
-void SimpleExtractor::DesignExtractor::extract_cfg_from_if_stmt(
-    std::shared_ptr<KnowledgeBase::PKB> pkb, std::string proc_name,
-    std::unordered_map<int, std::unordered_set<int>>& cfg,
-    std::shared_ptr<Parser::SimpleNode> if_stmt, int next_block_stmt_id) {
-    int parent_stmt_id = if_stmt->get_statement_id();
-    for (int i = 1; i <= 2; i++) {
-        auto branch_stmt_list = if_stmt->get_child(i);
-        int first_stmt_id = branch_stmt_list->get_child(0)->get_statement_id();
-        cfg[parent_stmt_id].insert(first_stmt_id);
-
-        extract_cfg_from_stmt_list(pkb, proc_name, cfg, branch_stmt_list);
-
-        int branch_stmt_list_size = branch_stmt_list->get_children().size();
-        auto last_stmt = branch_stmt_list->get_child(branch_stmt_list_size - 1);
-        extract_cfg_from_stmt(pkb, proc_name, cfg, last_stmt, next_block_stmt_id);
     }
 }
 

@@ -2,11 +2,19 @@
 
 #include "KnowledgeBase/PKB.h"
 #include <memory>
+#include <queue>
 
 namespace SimpleExtractor {
 
 class DesignExtractor {
 public:
+    // Extracts control flow graph from the given PKB.
+    // Throws if the given PKB has an invalid AST
+    static void extract_cfg(std::shared_ptr<KnowledgeBase::PKB> pkb);
+
+    // Extracts next relationships from the given PKB.
+    static void extract_next_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb);
+
     // Extracts modify relationships from the given PKB.
     // Throws if the given PKB has an invalid AST.
     static void extract_modify_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb);
@@ -27,12 +35,8 @@ public:
     // Throws if the given PKB has an invalid AST.
     static void extract_call_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb);
 
-    // Extracts next relationships from the given PKB.
-    static void extract_next_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb);
-
-    // Extracts control flow graph from the given PKB.
-    // Throws if the given PKB has an invalid AST
-    static void extract_cfg(std::shared_ptr<KnowledgeBase::PKB> pkb);
+    // Extracts affect relationships from the given PKB.
+    static void extract_affect_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb);
 
 private:
     /* Modify */
