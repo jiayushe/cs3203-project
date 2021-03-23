@@ -228,7 +228,24 @@ void PQLParser::process_such_that_condition(QueryObject& query_object) {
             [&]() {
                 expect_word("Uses");
                 process_such_that_body(query_object, SuchThatType::USES_P);
-            }},
+            },
+            [&]() {
+                expect_word("NextBip");
+                process_such_that_body(query_object, SuchThatType::NEXTBIP);
+            },
+            [&]() {
+                expect_word("NextBip*");
+                process_such_that_body(query_object, SuchThatType::NEXTBIP_T);
+            },
+            [&]() {
+                expect_word("AffectsBip");
+                process_such_that_body(query_object, SuchThatType::AFFECTSBIP);
+            },
+            [&]() {
+                expect_word("AffectsBip*");
+                process_such_that_body(query_object, SuchThatType::AFFECTSBIP_T);
+            },
+            },
            "Invalid such that type parsed");
 }
 
@@ -242,7 +259,11 @@ SuchThatRef PQLParser::process_such_that_left_ref(const QueryObject& query_objec
     case SuchThatType::AFFECTS:
     case SuchThatType::AFFECTS_T:
     case SuchThatType::NEXT:
-    case SuchThatType::NEXT_T: {
+    case SuchThatType::NEXT_T:
+    case SuchThatType::NEXTBIP:
+    case SuchThatType::NEXTBIP_T:
+    case SuchThatType::AFFECTSBIP:
+    case SuchThatType::AFFECTSBIP_T: {
         auto left_statement_ref = process_statement_ref();
         return SuchThatRef(left_statement_ref);
     }
@@ -289,7 +310,11 @@ SuchThatRef PQLParser::process_such_that_right_ref(SuchThatType such_that_type) 
     case SuchThatType::AFFECTS:
     case SuchThatType::AFFECTS_T:
     case SuchThatType::NEXT:
-    case SuchThatType::NEXT_T: {
+    case SuchThatType::NEXT_T:
+    case SuchThatType::NEXTBIP:
+    case SuchThatType::NEXTBIP_T:
+    case SuchThatType::AFFECTSBIP:
+    case SuchThatType::AFFECTSBIP_T: {
         auto right_statement_ref = process_statement_ref();
         return SuchThatRef(right_statement_ref);
     }
@@ -731,7 +756,9 @@ void PQLParser::validate_such_that(const QueryObject& query_object, const SuchTh
         break;
     }
     case SuchThatType::AFFECTS:
-    case SuchThatType::AFFECTS_T: {
+    case SuchThatType::AFFECTS_T:
+    case SuchThatType::AFFECTSBIP:
+    case SuchThatType::AFFECTSBIP_T: {
         std::vector<DesignEntityType> expected_types = {
             DesignEntityType::STMT, DesignEntityType::PROG_LINE, DesignEntityType::ASSIGN};
 
@@ -761,7 +788,9 @@ void PQLParser::validate_such_that(const QueryObject& query_object, const SuchTh
     case SuchThatType::FOLLOWS:
     case SuchThatType::FOLLOWS_T:
     case SuchThatType::NEXT:
-    case SuchThatType::NEXT_T: {
+    case SuchThatType::NEXT_T:
+    case SuchThatType::NEXTBIP:
+    case SuchThatType::NEXTBIP_T: {
         // LHS must be valid statement ref
         auto left_statement_ref = left_ref.get_statement_ref();
         validate_statement_ref(query_object, left_statement_ref);

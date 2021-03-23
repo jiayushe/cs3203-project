@@ -19,7 +19,11 @@ enum class SuchThatType {
     NEXT,
     NEXT_T,
     AFFECTS,
-    AFFECTS_T
+    AFFECTS_T,
+    NEXTBIP,
+    NEXTBIP_T,
+    AFFECTSBIP,
+    AFFECTSBIP_T
 };
 
 class SuchThat {
