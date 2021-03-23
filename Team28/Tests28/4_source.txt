@@ -1,0 +1,86 @@
+procedure proc1 {
+    read v1; read v2;  read v3;     read    unused;read unmodified;
+    read v4;    read v5;
+        read v6;
+read v7;    read    v8; read     v9;read
+v10;
+    read
+        v11;
+
+    print v1;   print v2;
+
+    if ((v1 + v2< 1) && (v3 > v4 + unmodified))     then {
+        print v1;
+        v1 = v1 + 2;
+        v2 = v1; 
+        call PROC2;
+    } else {
+        x = x + 5;
+        y = ((2 + 3) / 30) + z;
+        z = 1;
+
+        while((x != v9) || (z >= v10 * 123%v8)){
+            print z;
+            read v12;
+            v6 = v1 + 3 + v2 +  v4 +v5;
+            v5 = 8 *(v6 - v7);
+
+            if (v1 == 0) then {
+                v10 = v10 + v11;
+            } else {
+                print a;
+            }
+        }
+    }
+
+    v5 = v2 + v3;
+    v9 = v10 / v11 / v12;
+    call proc3;
+    v7 = x -y  + z;
+    v12 = 8;
+
+    call proc4;       print v2;
+      print v3;
+
+}
+
+  procedure PROC2 {
+      x = y - 8;
+      if ((x != 0) && (x % 5 > 10)) then {
+          y = x - 1;
+          v2 = 3 + 400; 
+      } else {
+          y = x + 1;
+      }
+      print v3;
+      read v8;
+      v1 = v1 * 2;
+      call proc3;
+
+      print v1;
+  }
+
+  procedure proc3 {
+      v1 = v2;
+      v2 = v3;
+      v3 = v4 / 100 + 5 / (2 + 4);
+  }
+
+  procedure proc4 {
+      print v12;
+      while (v3 > 10) {
+          v4 = v5;
+      }
+      print v5;
+      call proc5;
+      print unmodified;
+  }
+
+  procedure proc5 {
+      a = b + c;
+      call proc6;
+  }
+
+  procedure proc6 {
+      read v10;
+  }
