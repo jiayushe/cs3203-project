@@ -684,7 +684,9 @@ TEST_CASE("Parser::PQLParser") {
         SECTION("WithRef NAME test") {
             std::string op1 = GENERATE("\"name1\"", "10", "p.procName", "s.stmt#", "pg");
             std::string op = GENERATE("\"NAME2\"", "v.varName");
-            std::string query = "prog_line pg; procedure p; variable v; stmt s; Select BOOLEAN with " + op + " = " + op1;
+            std::string query =
+                "prog_line pg; procedure p; variable v; stmt s; Select BOOLEAN with " + op + " = " +
+                op1;
             auto source = std::make_shared<Parser::Source>(query);
             Parser::PQLParser parser(source);
 
@@ -734,7 +736,8 @@ TEST_CASE("Parser::PQLParser") {
         SECTION("WithRef INTEGER test") {
             std::string op1 = GENERATE("\"name1\"", "10", "p.procName", "s.stmt#", "pg");
             std::string op = GENERATE("20", "s1.stmt#", "pg1");
-            std::string query = "prog_line pg, pg1; procedure p; stmt s, s1; Select BOOLEAN with " + op + "=" + op1;
+            std::string query =
+                "prog_line pg, pg1; procedure p; stmt s, s1; Select BOOLEAN with " + op + "=" + op1;
             auto source = std::make_shared<Parser::Source>(query);
             Parser::PQLParser parser(source);
 
@@ -782,8 +785,7 @@ TEST_CASE("Parser::PQLParser") {
     }
 
     SECTION("Multiple With clauses") {
-        std::string op = GENERATE("with 10 =20 and 30= 40",
-                                  "with 10 =20 with 30= 40");
+        std::string op = GENERATE("with 10 =20 and 30= 40", "with 10 =20 with 30= 40");
         std::string query = "Select BOOLEAN " + op;
 
         auto source = std::make_shared<Parser::Source>(query);
@@ -853,7 +855,9 @@ TEST_CASE("Parser::PQLParser") {
 
         std::vector<Pattern> pattern_vector = query_object.get_all_pattern();
         REQUIRE(pattern_vector[0].get_type() == PatternType::ASSIGN);
-        REQUIRE(pattern_vector[0].get_pattern_assign().get_expression_spec().get_pattern()->is_equal(pattern_node));
+        REQUIRE(
+            pattern_vector[0].get_pattern_assign().get_expression_spec().get_pattern()->is_equal(
+                pattern_node));
         REQUIRE(pattern_vector[1].get_type() == PatternType::ASSIGN);
         REQUIRE(pattern_vector[2].get_type() == PatternType::ASSIGN);
 
@@ -966,7 +970,8 @@ TEST_CASE("Parser::PQLParser") {
 
         SECTION("Pattern synonym must be assign/if/while") {
             std::string op = GENERATE("s", "pg", "const", "c", "r", "p", "v1");
-            std::string query = "stmt s; prog_line pg; constant const; call c; read r; print p; variable v, v1; ";
+            std::string query =
+                "stmt s; prog_line pg; constant const; call c; read r; print p; variable v, v1; ";
             query += "Select s pattern " + op + "(v, _)";
             auto source = std::make_shared<Parser::Source>(query);
             Parser::PQLParser parser(source);
@@ -1067,7 +1072,8 @@ TEST_CASE("Parser::PQLParser") {
 
         SECTION("Modifies LHS can accept read and procedure but not print") {
             std::string op = GENERATE("r", "proc", "p");
-            std::string query = "read r; procedure proc; print p; Select r such that Modifies(" + op + ", _)";
+            std::string query =
+                "read r; procedure proc; print p; Select r such that Modifies(" + op + ", _)";
             auto source = std::make_shared<Parser::Source>(query);
             Parser::PQLParser parser(source);
 
@@ -1080,7 +1086,8 @@ TEST_CASE("Parser::PQLParser") {
 
         SECTION("Uses LHS can accept print and procedure but not read") {
             std::string op = GENERATE("r", "p", "proc");
-            std::string query = "read r; print p; procedure proc; Select p such that Uses(" + op + ", _)";
+            std::string query =
+                "read r; print p; procedure proc; Select p such that Uses(" + op + ", _)";
             auto source = std::make_shared<Parser::Source>(query);
             Parser::PQLParser parser(source);
 
@@ -1093,7 +1100,8 @@ TEST_CASE("Parser::PQLParser") {
 
         SECTION("Modifies, Uses, Follows, Follows*, Next, Next* LHS must be statementRef") {
             SECTION("Positive test cases") {
-                std::string op = GENERATE("Uses", "Modifies", "Follows", "Follows*", "Next", "Next*");
+                std::string op =
+                    GENERATE("Uses", "Modifies", "Follows", "Follows*", "Next", "Next*");
                 std::string op1 = GENERATE("s", "ifs", "w", "pg", "c", "a");
                 std::string query = "stmt s; if ifs; while w; prog_line pg; call c; assign a; ";
                 query += "Select w such that " + op + "(" + op1 + ", _)";
@@ -1103,7 +1111,8 @@ TEST_CASE("Parser::PQLParser") {
             }
 
             SECTION("Negative test cases") {
-                std::string op = GENERATE("Uses", "Modifies", "Follows", "Follows*", "Next", "Next*");
+                std::string op =
+                    GENERATE("Uses", "Modifies", "Follows", "Follows*", "Next", "Next*");
                 std::string op1 = GENERATE("const", "v");
                 std::string query = "constant const; variable v; ";
                 query += "Select v such that " + op + "(" + op1 + ", _)";
@@ -1127,7 +1136,8 @@ TEST_CASE("Parser::PQLParser") {
             SECTION("Negative test cases") {
                 std::string op = GENERATE("Parent", "Parent*");
                 std::string op1 = GENERATE("proc", "const", "c", "r", "p", "v", "a");
-                std::string query = "procedure proc; constant const; call c; read r; print p; variable v; assign a; ";
+                std::string query = "procedure proc; constant const; call c; read r; print p; "
+                                    "variable v; assign a; ";
                 query += "Select v such that " + op + "(" + op1 + ", _)";
                 auto source = std::make_shared<Parser::Source>(query);
                 Parser::PQLParser parser(source);
@@ -1151,12 +1161,12 @@ TEST_CASE("Parser::PQLParser") {
             SECTION("Negative test cases") {
                 std::string op = GENERATE("Affects", "Affects*");
                 std::string op1 = GENERATE("const", "c", "r", "p", "v", "ifs", "w", "proc");
-                std::string query =
-                        "constant const; call c; read r; print p; variable v; if ifs; while w; procedure proc ";
+                std::string query = "constant const; call c; read r; print p; variable v; if ifs; "
+                                    "while w; procedure proc ";
                 query += "Select v such that " + op + "(" + op1 + ", _)";
 
-                std::string query_1 =
-                        "constant const; call c; read r; print p; variable v; if ifs; while w; procedure proc ";
+                std::string query_1 = "constant const; call c; read r; print p; variable v; if "
+                                      "ifs; while w; procedure proc ";
                 query_1 += "Select v such that " + op + "(_, " + op1 + ")";
 
                 auto source = std::make_shared<Parser::Source>(query);
@@ -1178,9 +1188,11 @@ TEST_CASE("Parser::PQLParser") {
 
         SECTION("Follows, Follows*, Parent, Parent*, Next, Next* RHS must be statementRef") {
             SECTION("Positive test cases") {
-                std::string op = GENERATE("Follows", "Follows*", "Parent", "Parent*", "Next", "Next*");
+                std::string op =
+                    GENERATE("Follows", "Follows*", "Parent", "Parent*", "Next", "Next*");
                 std::string op1 = GENERATE("s", "r", "p", "ifs", "w", "pg", "c", "a");
-                std::string query = "stmt s; read r; print p; if ifs; while w; prog_line pg; call c; assign a; ";
+                std::string query =
+                    "stmt s; read r; print p; if ifs; while w; prog_line pg; call c; assign a; ";
                 query += "Select w such that " + op + "(_, " + op1 + ")";
                 auto source = std::make_shared<Parser::Source>(query);
                 Parser::PQLParser parser(source);
@@ -1188,7 +1200,8 @@ TEST_CASE("Parser::PQLParser") {
             }
 
             SECTION("Negative test cases") {
-                std::string op = GENERATE("Follows", "Follows*", "Parent", "Parent*", "Next", "Next*");
+                std::string op =
+                    GENERATE("Follows", "Follows*", "Parent", "Parent*", "Next", "Next*");
                 std::string op1 = GENERATE("const", "v");
                 std::string query = "constant const; variable v; ";
                 query += "Select v such that " + op + "(" + op1 + ", _)";

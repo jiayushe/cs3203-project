@@ -1,5 +1,7 @@
 #pragma once
 
+#include "AffectsConstraintLogic.h"
+#include "AffectsTConstraintLogic.h"
 #include "BaseConstraintLogic.h"
 #include "BinaryConstraint.h"
 #include "CallsConstraintLogic.h"

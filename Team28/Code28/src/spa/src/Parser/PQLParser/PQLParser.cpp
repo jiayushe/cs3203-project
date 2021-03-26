@@ -173,79 +173,80 @@ void PQLParser::process_such_that(QueryObject& query_object) {
 }
 
 void PQLParser::process_such_that_condition(QueryObject& query_object) {
-    choice({[&]() {
-                expect_word("Parent");
-                process_such_that_body(query_object, SuchThatType::PARENT);
-            },
-            [&]() {
-                expect_word("Parent*");
-                process_such_that_body(query_object, SuchThatType::PARENT_T);
-            },
-            [&]() {
-                expect_word("Follows");
-                process_such_that_body(query_object, SuchThatType::FOLLOWS);
-            },
-            [&]() {
-                expect_word("Follows*");
-                process_such_that_body(query_object, SuchThatType::FOLLOWS_T);
-            },
-            [&]() {
-                expect_word("Calls");
-                process_such_that_body(query_object, SuchThatType::CALLS);
-            },
-            [&]() {
-                expect_word("Calls*");
-                process_such_that_body(query_object, SuchThatType::CALLS_T);
-            },
-            [&]() {
-                expect_word("Next");
-                process_such_that_body(query_object, SuchThatType::NEXT);
-            },
-            [&]() {
-                expect_word("Next*");
-                process_such_that_body(query_object, SuchThatType::NEXT_T);
-            },
-            [&]() {
-                expect_word("Affects");
-                process_such_that_body(query_object, SuchThatType::AFFECTS);
-            },
-            [&]() {
-                expect_word("Affects*");
-                process_such_that_body(query_object, SuchThatType::AFFECTS_T);
-            },
-            [&]() {
-                expect_word("Modifies");
-                process_such_that_body(query_object, SuchThatType::MODIFIES_S);
-            },
-            [&]() {
-                expect_word("Modifies");
-                process_such_that_body(query_object, SuchThatType::MODIFIES_P);
-            },
-            [&]() {
-                expect_word("Uses");
-                process_such_that_body(query_object, SuchThatType::USES_S);
-            },
-            [&]() {
-                expect_word("Uses");
-                process_such_that_body(query_object, SuchThatType::USES_P);
-            },
-            [&]() {
-                expect_word("NextBip");
-                process_such_that_body(query_object, SuchThatType::NEXTBIP);
-            },
-            [&]() {
-                expect_word("NextBip*");
-                process_such_that_body(query_object, SuchThatType::NEXTBIP_T);
-            },
-            [&]() {
-                expect_word("AffectsBip");
-                process_such_that_body(query_object, SuchThatType::AFFECTSBIP);
-            },
-            [&]() {
-                expect_word("AffectsBip*");
-                process_such_that_body(query_object, SuchThatType::AFFECTSBIP_T);
-            },
-            },
+    choice({
+               [&]() {
+                   expect_word("Parent");
+                   process_such_that_body(query_object, SuchThatType::PARENT);
+               },
+               [&]() {
+                   expect_word("Parent*");
+                   process_such_that_body(query_object, SuchThatType::PARENT_T);
+               },
+               [&]() {
+                   expect_word("Follows");
+                   process_such_that_body(query_object, SuchThatType::FOLLOWS);
+               },
+               [&]() {
+                   expect_word("Follows*");
+                   process_such_that_body(query_object, SuchThatType::FOLLOWS_T);
+               },
+               [&]() {
+                   expect_word("Calls");
+                   process_such_that_body(query_object, SuchThatType::CALLS);
+               },
+               [&]() {
+                   expect_word("Calls*");
+                   process_such_that_body(query_object, SuchThatType::CALLS_T);
+               },
+               [&]() {
+                   expect_word("Next");
+                   process_such_that_body(query_object, SuchThatType::NEXT);
+               },
+               [&]() {
+                   expect_word("Next*");
+                   process_such_that_body(query_object, SuchThatType::NEXT_T);
+               },
+               [&]() {
+                   expect_word("Affects");
+                   process_such_that_body(query_object, SuchThatType::AFFECTS);
+               },
+               [&]() {
+                   expect_word("Affects*");
+                   process_such_that_body(query_object, SuchThatType::AFFECTS_T);
+               },
+               [&]() {
+                   expect_word("Modifies");
+                   process_such_that_body(query_object, SuchThatType::MODIFIES_S);
+               },
+               [&]() {
+                   expect_word("Modifies");
+                   process_such_that_body(query_object, SuchThatType::MODIFIES_P);
+               },
+               [&]() {
+                   expect_word("Uses");
+                   process_such_that_body(query_object, SuchThatType::USES_S);
+               },
+               [&]() {
+                   expect_word("Uses");
+                   process_such_that_body(query_object, SuchThatType::USES_P);
+               },
+               [&]() {
+                   expect_word("NextBip");
+                   process_such_that_body(query_object, SuchThatType::NEXTBIP);
+               },
+               [&]() {
+                   expect_word("NextBip*");
+                   process_such_that_body(query_object, SuchThatType::NEXTBIP_T);
+               },
+               [&]() {
+                   expect_word("AffectsBip");
+                   process_such_that_body(query_object, SuchThatType::AFFECTSBIP);
+               },
+               [&]() {
+                   expect_word("AffectsBip*");
+                   process_such_that_body(query_object, SuchThatType::AFFECTSBIP_T);
+               },
+           },
            "Invalid such that type parsed");
 }
 

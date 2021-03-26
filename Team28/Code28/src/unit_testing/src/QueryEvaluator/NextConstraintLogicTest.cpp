@@ -132,19 +132,31 @@ TEST_CASE("NextConstraintLogic and NextTConstraintLogic") {
         auto next_constraint = NextConstraintLogic(pkb, statement_any, statement_id);
         REQUIRE(next_constraint.is_valid(assign_mappings));
 
+        auto nextT_constraint = NextTConstraintLogic(pkb, statement_any, statement_id);
+        REQUIRE(nextT_constraint.is_valid(assign_mappings));
+
         statement_id.set_statement_id(1);
         next_constraint = NextConstraintLogic(pkb, statement_any, statement_id);
         REQUIRE_FALSE(next_constraint.is_valid(assign_mappings));
+
+        nextT_constraint = NextTConstraintLogic(pkb, statement_any, statement_id);
+        REQUIRE_FALSE(nextT_constraint.is_valid(assign_mappings));
 
         assign_mappings["w"] = Assignment(2);
         statement_synonym.set_synonym("w");
         next_constraint = NextConstraintLogic(pkb, statement_any, statement_synonym);
         REQUIRE(next_constraint.is_valid(assign_mappings));
 
+        nextT_constraint = NextTConstraintLogic(pkb, statement_any, statement_synonym);
+        REQUIRE(nextT_constraint.is_valid(assign_mappings));
+
         assign_mappings["pr"] = Assignment(1);
         statement_synonym.set_synonym("pr");
         next_constraint = NextConstraintLogic(pkb, statement_any, statement_synonym);
         REQUIRE_FALSE(next_constraint.is_valid(assign_mappings));
+
+        nextT_constraint = NextTConstraintLogic(pkb, statement_any, statement_synonym);
+        REQUIRE_FALSE(nextT_constraint.is_valid(assign_mappings));
     }
 
     SECTION("both statement id") {

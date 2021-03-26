@@ -108,6 +108,14 @@ ConstraintUtils::get_constraint_logics(std::shared_ptr<KnowledgeBase::PKB> pkb,
             constraint_logics.push_back(std::make_shared<CallsTConstraintLogic>(
                 pkb, left_ref.get_entity_ref(), right_ref.get_entity_ref()));
             break;
+        case Parser::SuchThatType::AFFECTS:
+            constraint_logics.push_back(std::make_shared<AffectsConstraintLogic>(
+                pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
+            break;
+        case Parser::SuchThatType::AFFECTS_T:
+            constraint_logics.push_back(std::make_shared<AffectsTConstraintLogic>(
+                pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
+            break;
         default:
             throw std::runtime_error("Unknown such that type");
         }
