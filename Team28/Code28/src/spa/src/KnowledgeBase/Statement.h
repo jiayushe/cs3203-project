@@ -109,6 +109,38 @@ public:
     // Adds a next prog line via id.
     void add_next(int next_id);
 
+    // Gets the list of ids of the direct previous prog lines.
+    // Follows the definition of NextBip.
+    std::unordered_set<int> get_direct_previous_bip();
+
+    // Adds a direct previous prog line via id.
+    // Follows the definition of NextBip.
+    void add_direct_previous_bip(int previous_id);
+
+    // Gets the list of ids of the previous prog lines.
+    // Follows the definition of NextBip*.
+    std::unordered_set<int> get_previous_bip();
+
+    // Adds a previous prog line via id.
+    // Follows the definition of NextBip*.
+    void add_previous_bip(int previous_id);
+
+    // Gets the list of ids of the direct next prog lines.
+    // Follows the definition of NextBip.
+    std::unordered_set<int> get_direct_next_bip();
+
+    // Adds a direct next prog line via id.
+    // Follows the definition of NextBip.
+    void add_direct_next_bip(int next_id);
+
+    // Gets the list of ids of the next prog lines.
+    // Follows the definition of NextBip*.
+    std::unordered_set<int> get_next_bip();
+
+    // Adds a next prog line via id.
+    // Follows the definition of NextBip*.
+    void add_next_bip(int next_id);
+
     // Gets the list of names of variables that are directly modified.
     std::unordered_set<std::string> get_direct_modifies();
 
@@ -157,6 +189,38 @@ public:
     // Adds a statement that affects this statement.
     void add_affected_by(int stmt_id);
 
+    // Gets the list of ids of statements that are directly affected by this statement.
+    // Follows the definition of AffectsBip.
+    std::unordered_set<int> get_direct_affects_bip();
+
+    // Adds a statement that is directly affected by this statement.
+    // Follows the definition of AffectsBip.
+    void add_direct_affects_bip(int stmt_id);
+
+    // Gets the list of ids of statements that are affected by this statement.
+    // Follows the definition of AffectsBip*.
+    std::unordered_set<int> get_affects_bip();
+
+    // Adds a statement that is affected by this statement.
+    // Follows the definition of AffectsBip*.
+    void add_affects_bip(int stmt_id);
+
+    // Gets the list of ids of statements that directly affect this statement.
+    // Follows the definition of AffectsBip.
+    std::unordered_set<int> get_direct_affected_bip_by();
+
+    // Adds a statement that directly affects this statement.
+    // Follows the definition of AffectsBip.
+    void add_direct_affected_bip_by(int stmt_id);
+
+    // Gets the list of ids of statements that affect this statement.
+    // Follows the definition of AffectsBip*.
+    std::unordered_set<int> get_affected_bip_by();
+
+    // Adds a statement that affects this statement.
+    // Follows the definition of AffectsBip*.
+    void add_affected_bip_by(int stmt_id);
+
     // Gets the name of the procedure that is called.
     // Throws unless its type is CALL.
     std::string get_procedure_called();
@@ -189,6 +253,10 @@ private:
     std::unordered_set<int> previous;
     std::unordered_set<int> direct_next;
     std::unordered_set<int> next;
+    std::unordered_set<int> direct_previous_bip;
+    std::unordered_set<int> previous_bip;
+    std::unordered_set<int> direct_next_bip;
+    std::unordered_set<int> next_bip;
     std::unordered_set<std::string> direct_modifies;
     std::unordered_set<std::string> modifies;
     std::unordered_set<std::string> direct_uses;
@@ -197,6 +265,10 @@ private:
     std::unordered_set<int> affects;
     std::unordered_set<int> direct_affected_by;
     std::unordered_set<int> affected_by;
+    std::unordered_set<int> direct_affects_bip;
+    std::unordered_set<int> affects_bip;
+    std::unordered_set<int> direct_affected_bip_by;
+    std::unordered_set<int> affected_bip_by;
     // Only for CALL.
     std::string procedure_called;
     // Only for ASSIGN.

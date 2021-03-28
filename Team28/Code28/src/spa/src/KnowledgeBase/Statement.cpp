@@ -77,6 +77,24 @@ std::unordered_set<int> Statement::get_next() { return next; }
 
 void Statement::add_next(int next_id) { next.insert(next_id); }
 
+std::unordered_set<int> Statement::get_direct_previous_bip() { return direct_previous_bip; }
+
+void Statement::add_direct_previous_bip(int previous_id) {
+    direct_previous_bip.insert(previous_id);
+}
+
+std::unordered_set<int> Statement::get_previous_bip() { return previous_bip; }
+
+void Statement::add_previous_bip(int previous_id) { previous_bip.insert(previous_id); }
+
+std::unordered_set<int> Statement::get_direct_next_bip() { return direct_next_bip; }
+
+void Statement::add_direct_next_bip(int next_id) { direct_next_bip.insert(next_id); }
+
+std::unordered_set<int> Statement::get_next_bip() { return next_bip; }
+
+void Statement::add_next_bip(int next_id) { next_bip.insert(next_id); }
+
 std::unordered_set<std::string> Statement::get_direct_modifies() { return direct_modifies; }
 
 void Statement::add_direct_modifies(std::string var_name) { direct_modifies.insert(var_name); }
@@ -108,6 +126,22 @@ void Statement::add_direct_affected_by(int stmt_id) { direct_affected_by.insert(
 std::unordered_set<int> Statement::get_affected_by() { return affected_by; }
 
 void Statement::add_affected_by(int stmt_id) { affected_by.insert(stmt_id); }
+
+std::unordered_set<int> Statement::get_direct_affects_bip() { return direct_affects_bip; }
+
+void Statement::add_direct_affects_bip(int stmt_id) { direct_affects_bip.insert(stmt_id); }
+
+std::unordered_set<int> Statement::get_affects_bip() { return affects_bip; }
+
+void Statement::add_affects_bip(int stmt_id) { affects_bip.insert(stmt_id); }
+
+std::unordered_set<int> Statement::get_direct_affected_bip_by() { return direct_affected_bip_by; }
+
+void Statement::add_direct_affected_bip_by(int stmt_id) { direct_affected_bip_by.insert(stmt_id); }
+
+std::unordered_set<int> Statement::get_affected_bip_by() { return affected_bip_by; }
+
+void Statement::add_affected_bip_by(int stmt_id) { affected_bip_by.insert(stmt_id); }
 
 std::string Statement::get_procedure_called() {
     if (this->type != StatementType::CALL) {
