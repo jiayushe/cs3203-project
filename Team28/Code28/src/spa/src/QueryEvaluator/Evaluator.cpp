@@ -37,9 +37,9 @@ void Evaluator::evaluate(std::shared_ptr<KnowledgeBase::PKB> pkb,
         }
     }
 
-    // TODO: Optimisation around which assignment group to evaluate first
     std::vector<AssignmentMaps> all_assignment_maps;
-    for (auto const& assignment_group : assignment_groups) {
+    while (!assignment_groups.empty()) {
+        auto assignment_group = choose_assignment_group(assignment_groups);
         auto targets = std::get<0>(assignment_group);
         auto domain_map = std::get<1>(assignment_group);
         auto constraints = std::get<2>(assignment_group);
@@ -63,7 +63,6 @@ void Evaluator::evaluate(std::shared_ptr<KnowledgeBase::PKB> pkb,
     }
 
     auto merged_assignment_maps = merge_assignment_maps(all_assignment_maps);
-
     auto formatted_output = get_formatted_output(query_object.get_result(), merged_assignment_maps);
     output.insert(output.end(), formatted_output.begin(), formatted_output.end());
 }
@@ -119,6 +118,43 @@ Evaluator::get_assignment_groups(std::shared_ptr<KnowledgeBase::PKB> pkb,
     }
 
     return assignment_groups;
+}
+
+AssignmentGroup
+Evaluator::choose_assignment_group(std::vector<AssignmentGroup>& assignment_groups) {
+    if (assignment_groups.empty()) {
+        throw std::runtime_error("Assignment group vector must not be empty");
+    }
+
+    auto min_index = 0;
+    auto min_score = score_assignment_group(assignment_groups[0]);
+    for (auto i = 1; i < assignment_groups.size(); i++) {
+        auto curr_score = score_assignment_group(assignment_groups[i]);
+        if (curr_score < min_score) {
+            min_index = i;
+            min_score = curr_score;
+        }
+    }
+
+    auto chosen = assignment_groups[min_index];
+    assignment_groups.erase(assignment_groups.begin() + min_index);
+
+    return chosen;
+}
+
+long Evaluator::score_assignment_group(const AssignmentGroup& assignment_group) {
+    // We score assignment groups based on the expected number of steps our constraint solver
+    // component needs to take before terminating. This can be approximated by computing the
+    // product of the size of the domains in the assignment group.
+    auto score = 1L;
+    auto targets = std::get<0>(assignment_group);
+    auto domain_map = std::get<1>(assignment_group);
+    for (auto const& entry : domain_map) {
+        if (targets.find(entry.first) != targets.end()) {
+            score *= entry.second.size();
+        }
+    }
+    return score;
 }
 
 std::unordered_set<std::string>

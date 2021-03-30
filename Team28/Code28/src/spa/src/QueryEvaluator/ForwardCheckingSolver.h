@@ -37,14 +37,14 @@ private:
     // Similar to `solve`, `search` is the main constraint solving routine (in fact `solve` simply
     // wraps around `search`). The algorithm implemented is forward-checking backtracking search.
     static bool search(AssignmentMaps& results, AssignmentMap& assignment_map,
-                       const std::unordered_set<std::string>& targets,
-                       std::unordered_set<std::string>& remaining_targets, DomainMap& domain_map,
+                       const std::unordered_set<std::string>& targets, DomainMap& domain_map,
                        const std::vector<BinaryConstraint>& constraints);
 
-    // Choose a synonym to evaluate next during the search process.
-    static std::string get_unassigned_synonym(const std::unordered_set<std::string>& targets,
-                                              const AssignmentMap& assignment_map,
-                                              const DomainMap& domain_map);
+    // Choose a synonym to evaluate next during the search process. A good choice heuristic will
+    // speed up the constraint solving process significantly.
+    static std::string choose_unassigned_synonym(const std::unordered_set<std::string>& targets,
+                                                 const AssignmentMap& assignment_map,
+                                                 const DomainMap& domain_map);
 
     // Execute the forward-checking step, i.e. remove all values in the domain which are
     // inconsistent with the current assignment.

@@ -48,6 +48,12 @@ private:
     get_assignment_groups(std::shared_ptr<KnowledgeBase::PKB> pkb,
                           const Parser::QueryObject& query_object);
 
+    // Choose an assignment group to evaluate next. In some cases, this will speed up evaluation
+    // process since we might be able to terminate early if the evaluation of an assignment group
+    // yields no result.
+    static AssignmentGroup choose_assignment_group(std::vector<AssignmentGroup>& assignment_groups);
+    static long score_assignment_group(const AssignmentGroup& assignment_group);
+
     // Get all the synonyms connected to the given starting synonym.
     static std::unordered_set<std::string>
     get_connected_synonyms(const std::string& starting_synonym, DependencyMap& dependency_map);

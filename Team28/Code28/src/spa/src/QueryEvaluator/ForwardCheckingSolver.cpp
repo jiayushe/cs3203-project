@@ -8,22 +8,17 @@ AssignmentMaps ForwardCheckingSolver::solve(const std::unordered_set<std::string
 
     AssignmentMaps results;
     AssignmentMap empty_assignment_map;
-    std::unordered_set<std::string> remaining_targets;
-    search(results, empty_assignment_map, targets, remaining_targets, domain_map, constraints);
+    search(results, empty_assignment_map, targets, domain_map, constraints);
     return results;
 }
 
 bool ForwardCheckingSolver::search(AssignmentMaps& results, AssignmentMap& assignment_map,
                                    const std::unordered_set<std::string>& targets,
-                                   std::unordered_set<std::string>& remaining_targets,
                                    DomainMap& domain_map,
                                    const std::vector<BinaryConstraint>& constraints) {
 
-    auto synonym = get_unassigned_synonym(targets, assignment_map, domain_map);
-    remaining_targets.erase(synonym);
-
-    auto is_target = targets.find(synonym) != targets.end();
-    auto can_short = remaining_targets.empty() && !is_target;
+    auto synonym = choose_unassigned_synonym(targets, assignment_map, domain_map);
+    auto can_short = targets.find(synonym) == targets.end();
 
     auto domain = domain_map[synonym];
     for (auto const& assignment : domain) {
@@ -41,8 +36,7 @@ bool ForwardCheckingSolver::search(AssignmentMaps& results, AssignmentMap& assig
         auto removed_domain_map =
             remove_invalid_domains(synonym, assignment_map, domain_map, constraints);
 
-        auto is_shorted =
-            search(results, assignment_map, targets, remaining_targets, domain_map, constraints);
+        auto is_shorted = search(results, assignment_map, targets, domain_map, constraints);
 
         assignment_map.erase(synonym);
         merge_domains(domain_map, removed_domain_map);
@@ -52,38 +46,26 @@ bool ForwardCheckingSolver::search(AssignmentMaps& results, AssignmentMap& assig
         }
     }
 
-    if (is_target) {
-        remaining_targets.insert(synonym);
-    }
-
     return false;
 }
 
 std::string
-ForwardCheckingSolver::get_unassigned_synonym(const std::unordered_set<std::string>& targets,
-                                              const AssignmentMap& assignment_map,
-                                              const DomainMap& domain_map) {
+ForwardCheckingSolver::choose_unassigned_synonym(const std::unordered_set<std::string>& targets,
+                                                 const AssignmentMap& assignment_map,
+                                                 const DomainMap& domain_map) {
 
-    std::string min_synonym = "";
+    std::string min_synonym;
     auto min_domain_size = (int)1e9;
-    auto min_is_target = false;
 
     for (auto const& entry : domain_map) {
         auto synonym = entry.first;
         auto domain = entry.second;
 
-        // TODO: Verify empirically whether it is better to always choose target over non-target
-        auto is_target = targets.find(synonym) != targets.end();
         auto is_unassigned = assignment_map.find(synonym) == assignment_map.end();
         auto is_domain_smaller = domain.size() < min_domain_size;
-        auto is_better = is_unassigned && ((is_target && !min_is_target) ||
-                                           (is_target && min_is_target && is_domain_smaller) ||
-                                           (!is_target && !min_is_target && is_domain_smaller));
-
-        if (is_better) {
+        if (is_unassigned && is_domain_smaller) {
             min_synonym = synonym;
             min_domain_size = domain.size();
-            min_is_target = is_target;
         }
     }
 
