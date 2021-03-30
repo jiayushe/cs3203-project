@@ -4,25 +4,40 @@
 
 ## Development
 
-### Code formatter
+### Formatting the code
 ```bash
 make format
 ```
 
-### Autotester
+### Building the project
 
-_Ensure autotester binary is available (build the project)_
+There are a few ways you can build the project:
+1. Use your favourite IDE, e.g. Visual Studio or CLion.
+2. Use the Bash scripts provided in `Team28/Code28/scripts` (see [Installing Python and its packages](#installing-python-and-its-packages)). You can run either:
+   - `Team28/Code28/scripts/build.sh`, which builds the project, or
+   - `Team28/Code28/scripts/build_and_autotest.sh`, which builds the project and runs the system tests defined in `Team28/Tests28` using autotester.
 
-- Powershell
-  1. Run Windows Powershell as Administrator
-  2. You may need to run `Set-ExecutionPolicy Unrestricted` to enable execution of remote scripts
-  3. `cd Team28\Code28\scripts`
-  4. `.\autotest.ps1`
+### Running autotester
 
-- Python
-  1. Ensure python 3.6+ is installed (tested on python 3.6.8)
-  2. `cd Team28/Code28/scripts`
-  3. (Optional) `python -m venv venv`
-  4. `pip install -r requirements.txt`
-  5. `python autotest.py PATH_TO_AUTOTESTER_BINARY`
+There are a few ways you can run autotester:
+1. Powershell
+   - Build the project (see [Building the project](#building-the-project)).
+   - Run Windows Powershell as Administrator.
+   - You may need to run `Set-ExecutionPolicy Unrestricted` to enable execution of remote scripts.
+   - Run `cd Team28\Code28\scripts`.
+   - Run `.\autotest.ps1`.
+2. Python
+   - Install Python 3.6+ and some packages (see [Installing Python and its packages](#installing-python-and-its-packages)).
+   - Build the project (see [Building the project](#building-the-project)).
+   - Run `python autotest.py PATH_TO_AUTOTESTER_BINARY` (replace `PATH_TO_AUTOTESTER_BINARY` with the path to your autotester binary).
+3. Bash
+   - Install Python 3.6+ and some packages (see [Installing Python and its packages](#installing-python-and-its-packages)).
+   - Run `Team28/Code28/scripts/build_and_autotest.sh`.
 
+### Installing Python and its packages
+
+Some of our scripts in `Team28/Code28/scripts`, namely `build.sh`, `build_and_autotest.sh`, and `autotest.py`, depend on Python 3.6+ and some packages which can be installed from pip.
+
+To run these scripts:
+- Ensure that Python 3.6+ is installed.
+- Run `pip install -r Team28/Code28/scripts/requirements.txt`.
