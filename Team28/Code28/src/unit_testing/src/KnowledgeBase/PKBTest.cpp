@@ -67,11 +67,11 @@ TEST_CASE("KnowledgeBase::PKB") {
         pkb.add_variable(var_name);
         pkb.add_statement(read_stmt_type, read_stmt_id, proc_name, read_stmt);
         pkb.add_modify_relationship(read_stmt_id, var_name);
-        REQUIRE(pkb.get_statement_by_id(read_stmt_id)->get_direct_modifies().count(var_name) == 1);
-        REQUIRE(pkb.get_statement_by_id(read_stmt_id)->get_modifies().count(var_name) == 1);
-        REQUIRE(pkb.get_variable_by_name(var_name)->get_direct_modified_by().count(read_stmt_id) ==
+        REQUIRE(pkb.get_statement_by_id(read_stmt_id)->get_direct_modifies()->count(var_name) == 1);
+        REQUIRE(pkb.get_statement_by_id(read_stmt_id)->get_modifies()->count(var_name) == 1);
+        REQUIRE(pkb.get_variable_by_name(var_name)->get_direct_modified_by()->count(read_stmt_id) ==
                 1);
-        REQUIRE(pkb.get_variable_by_name(var_name)->get_modified_by().count(read_stmt_id) == 1);
+        REQUIRE(pkb.get_variable_by_name(var_name)->get_modified_by()->count(read_stmt_id) == 1);
     }
 
     SECTION("add_use_relationship") {
@@ -86,10 +86,11 @@ TEST_CASE("KnowledgeBase::PKB") {
         pkb.add_variable(var_name);
         pkb.add_statement(print_stmt_type, print_stmt_id, proc_name, print_stmt);
         pkb.add_use_relationship(print_stmt_id, var_name);
-        REQUIRE(pkb.get_statement_by_id(print_stmt_id)->get_direct_uses().count(var_name) == 1);
-        REQUIRE(pkb.get_statement_by_id(print_stmt_id)->get_uses().count(var_name) == 1);
-        REQUIRE(pkb.get_variable_by_name(var_name)->get_direct_used_by().count(print_stmt_id) == 1);
-        REQUIRE(pkb.get_variable_by_name(var_name)->get_used_by().count(print_stmt_id) == 1);
+        REQUIRE(pkb.get_statement_by_id(print_stmt_id)->get_direct_uses()->count(var_name) == 1);
+        REQUIRE(pkb.get_statement_by_id(print_stmt_id)->get_uses()->count(var_name) == 1);
+        REQUIRE(pkb.get_variable_by_name(var_name)->get_direct_used_by()->count(print_stmt_id) ==
+                1);
+        REQUIRE(pkb.get_variable_by_name(var_name)->get_used_by()->count(print_stmt_id) == 1);
     }
 
     SECTION("add_follow_relationship") {
@@ -108,9 +109,9 @@ TEST_CASE("KnowledgeBase::PKB") {
         pkb.add_statement(print_stmt_type, print_stmt_id, proc_name, print_stmt);
         pkb.add_follow_relationship(read_stmt_id, print_stmt_id);
         REQUIRE(pkb.get_statement_by_id(read_stmt_id)->get_direct_follower() == print_stmt_id);
-        REQUIRE(pkb.get_statement_by_id(read_stmt_id)->get_followers().count(print_stmt_id) == 1);
+        REQUIRE(pkb.get_statement_by_id(read_stmt_id)->get_followers()->count(print_stmt_id) == 1);
         REQUIRE(pkb.get_statement_by_id(print_stmt_id)->get_direct_following() == read_stmt_id);
-        REQUIRE(pkb.get_statement_by_id(print_stmt_id)->get_followings().count(read_stmt_id) == 1);
+        REQUIRE(pkb.get_statement_by_id(print_stmt_id)->get_followings()->count(read_stmt_id) == 1);
     }
 
     SECTION("add_parent_relationship") {
@@ -134,9 +135,10 @@ TEST_CASE("KnowledgeBase::PKB") {
         while_stmt->add_child(while_stmt_lst);
         pkb.add_statement(while_stmt_type, while_stmt_id, proc_name, while_stmt);
         pkb.add_parent_relationship(while_stmt_id, call_stmt_id);
-        REQUIRE(pkb.get_statement_by_id(while_stmt_id)->get_children().count(call_stmt_id) == 1);
-        REQUIRE(pkb.get_statement_by_id(while_stmt_id)->get_descendants().count(call_stmt_id) == 1);
+        REQUIRE(pkb.get_statement_by_id(while_stmt_id)->get_children()->count(call_stmt_id) == 1);
+        REQUIRE(pkb.get_statement_by_id(while_stmt_id)->get_descendants()->count(call_stmt_id) ==
+                1);
         REQUIRE(pkb.get_statement_by_id(call_stmt_id)->get_parent() == while_stmt_id);
-        REQUIRE(pkb.get_statement_by_id(call_stmt_id)->get_ancestors().count(while_stmt_id) == 1);
+        REQUIRE(pkb.get_statement_by_id(call_stmt_id)->get_ancestors()->count(while_stmt_id) == 1);
     }
 }

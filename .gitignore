@@ -14,10 +14,7 @@ build_win
 # Testing
 tests
 out.xml
-1_out.xml
-2_out.xml
-3_out.xml
-4_out.xml
+*_out.xml
 
 # Python
 venv

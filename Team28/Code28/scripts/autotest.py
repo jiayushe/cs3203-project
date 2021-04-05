@@ -1,22 +1,26 @@
 import fire
 import glob
 import os
+import re
 import sys
 import subprocess
 import xml.etree.ElementTree as ET
 
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
-TEST_DIR = os.path.join(FILE_DIR, "../../Tests28/")
+TEST_DIR = os.path.join(FILE_DIR, "..", "..", "Tests28")
 
-TEST_SUITE_COUNT = len(glob.glob(os.path.join(TEST_DIR, "*_source.txt")))
+TEST_SUITE_IDS = sorted([
+    re.search(r"([a-zA-Z0-9]+)_source.txt$", source)[1]
+    for source in glob.glob(os.path.join(TEST_DIR, "*_source.txt"))
+])
 TEST_SUITE_FILES = [
     (
-        i,
-        os.path.join(TEST_DIR, f"{i}_source.txt"),
-        os.path.join(TEST_DIR, f"{i}_queries.txt"),
-        os.path.join(TEST_DIR, f"{i}_out.xml")
+        suite_id,
+        os.path.join(TEST_DIR, f"{suite_id}_source.txt"),
+        os.path.join(TEST_DIR, f"{suite_id}_queries.txt"),
+        os.path.join(TEST_DIR, f"{suite_id}_out.xml")
     )
-    for i in range(1, TEST_SUITE_COUNT + 1)
+    for suite_id in TEST_SUITE_IDS
 ]
 
 def get_statistics(out_path, num_slowest):
@@ -56,11 +60,14 @@ def get_statistics(out_path, num_slowest):
 
     return statistics
 
-def autotest(binary_path, num_slowest=10):
+def autotest(binary_path, name=None, num_slowest=10):
     failed = False
     summary = {}
     for i, source_path, queries_path, out_path in TEST_SUITE_FILES:
-        print(f"Running test suite #{i}...")
+        if name is not None and name != i:
+            continue
+
+        print(f"Running test suite {i}...")
 
         subprocess.run([binary_path, source_path, queries_path, out_path],
                 stdout=subprocess.DEVNULL)
@@ -68,17 +75,11 @@ def autotest(binary_path, num_slowest=10):
         statistics = get_statistics(out_path, num_slowest)
         if statistics["failed_count"] > 0:
             failed = True
+        summary[i] = statistics
 
-        summary[i] = {}
-        summary[i]["time_25"] = statistics["time_25"]
-        summary[i]["time_50"] = statistics["time_50"]
-        summary[i]["time_75"] = statistics["time_75"]
-        summary[i]["time_avg"] = statistics["time_avg"]
-        summary[i]["time_total"] = statistics["time_total"]
-
-        print(f"# of queries = {statistics['query_count']}")
-        print(f"# of passed  = {statistics['passed_count']}")
-        print(f"# of failed  = {statistics['failed_count']}")
+        print(f"# total      = {statistics['query_count']}")
+        print(f"# passed     = {statistics['passed_count']}")
+        print(f"# failed     = {statistics['failed_count']}")
         print(f"p25 time     = {statistics['time_25']:.3f}ms")
         print(f"p50 time     = {statistics['time_50']:.3f}ms")
         print(f"p75 time     = {statistics['time_75']:.3f}ms")
@@ -90,17 +91,23 @@ def autotest(binary_path, num_slowest=10):
         print()
 
     print("Summary")
-    print("| ---------- | ---------- | ---------- | ---------- | ---------- | ---------- |")
-    print("| Test case  |   p25 time |   p50 time |   p75 time |   avg time | total time |")
-    print("| ---------- | ---------- | ---------- | ---------- | ---------- | ---------- |")
+    print("----------------------------------------------------------------------------------------------------------------------------")
+    print("| Test case        |    # total |   # passed |   # failed |   p25 time |   p50 time |   p75 time |   avg time | total time |")
+    print("----------------------------------------------------------------------------------------------------------------------------")
     for i, _, __, ___ in TEST_SUITE_FILES:
-        print(f"| {i:10} |", end="")
+        if name is not None and name != i:
+            continue
+
+        print(f"| {i:16} |", end="")
+        print(f" {summary[i]['query_count']:10} |", end="")
+        print(f" {summary[i]['passed_count']:10} |", end="")
+        print(f" {summary[i]['failed_count']:10} |", end="")
         print(f" {summary[i]['time_25']:10.3f} |", end="")
         print(f" {summary[i]['time_50']:10.3f} |", end="")
         print(f" {summary[i]['time_75']:10.3f} |", end="")
         print(f" {summary[i]['time_avg']:10.3f} |", end="")
         print(f" {summary[i]['time_total']:10.3f} |")
-    print("| ---------- | ---------- | ---------- | ---------- | ---------- | ---------- |")
+    print("----------------------------------------------------------------------------------------------------------------------------")
     print()
 
     if failed:

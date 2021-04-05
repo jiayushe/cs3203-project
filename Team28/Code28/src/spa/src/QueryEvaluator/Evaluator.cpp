@@ -37,15 +37,15 @@ void Evaluator::evaluate(std::shared_ptr<KnowledgeBase::PKB> pkb,
         }
     }
 
-    std::vector<AssignmentMaps> all_assignment_maps;
+    std::vector<AssignmentMapSet> assignment_map_sets;
     while (!assignment_groups.empty()) {
         auto assignment_group = choose_assignment_group(assignment_groups);
         auto targets = std::get<0>(assignment_group);
         auto domain_map = std::get<1>(assignment_group);
         auto constraints = std::get<2>(assignment_group);
 
-        auto assignment_maps = ForwardCheckingSolver::solve(targets, domain_map, constraints);
-        if (assignment_maps.empty()) {
+        auto assignment_map_set = ForwardCheckingSolver::solve(targets, domain_map, constraints);
+        if (assignment_map_set.empty()) {
             // Terminate early if any group yields an empty result
             // (no consistent assignment for the group)
             switch (result.get_type()) {
@@ -59,10 +59,10 @@ void Evaluator::evaluate(std::shared_ptr<KnowledgeBase::PKB> pkb,
             }
         }
 
-        all_assignment_maps.push_back(assignment_maps);
+        assignment_map_sets.push_back(assignment_map_set);
     }
 
-    auto merged_assignment_maps = merge_assignment_maps(all_assignment_maps);
+    auto merged_assignment_maps = merge_assignment_map_sets(assignment_map_sets);
     auto formatted_output = get_formatted_output(query_object.get_result(), merged_assignment_maps);
     output.insert(output.end(), formatted_output.begin(), formatted_output.end());
 }
@@ -489,64 +489,60 @@ std::string Evaluator::get_synonym(const Parser::StatementRef& statement_ref) {
     return statement_ref.get_synonym();
 }
 
-AssignmentMaps
-Evaluator::merge_assignment_maps(const std::vector<AssignmentMaps>& all_assignment_maps) {
-    if (all_assignment_maps.empty()) {
-        throw std::runtime_error("all_assignment_maps cannot be empty");
-    }
-
-    auto merged = all_assignment_maps[0];
-    for (int i = 1; i < all_assignment_maps.size(); i++) {
-        auto merged_copy = merged;
-        auto assignment_maps = all_assignment_maps[i];
-        merged.clear();
-        for (auto const& first : merged_copy) {
-            for (auto const& second : assignment_maps) {
-                merged.insert(merge_assignment_map(first, second));
-            }
-        }
-    }
-
+AssignmentMapVector
+Evaluator::merge_assignment_map_sets(const std::vector<AssignmentMapSet>& all_assignment_maps) {
+    AssignmentMapVector merged;
+    AssignmentMap empty_assignment_map;
+    merge_assignment_map_sets(merged, empty_assignment_map, all_assignment_maps, 0);
     return merged;
 }
 
-AssignmentMap Evaluator::merge_assignment_map(const AssignmentMap& first,
-                                              const AssignmentMap& second) {
-
-    auto merged = first;
-    for (auto const& entry : second) {
-        merged[entry.first] = entry.second;
+void Evaluator::merge_assignment_map_sets(AssignmentMapVector& results,
+                                          AssignmentMap& assignment_map,
+                                          const std::vector<AssignmentMapSet>& all_assignment_maps,
+                                          int pos) {
+    if (pos == all_assignment_maps.size()) {
+        results.push_back(assignment_map);
+        return;
     }
-    return merged;
+    for (auto const& new_assignment_map : all_assignment_maps.at(pos)) {
+        merge_assignment_map(assignment_map, new_assignment_map);
+        merge_assignment_map_sets(results, assignment_map, all_assignment_maps, pos + 1);
+    }
+}
+
+void Evaluator::merge_assignment_map(AssignmentMap& dest, const AssignmentMap& src) {
+    for (auto const& entry : src) {
+        dest[entry.first] = entry.second;
+    }
 }
 
 std::list<std::string> Evaluator::get_formatted_output(const Parser::Result& result,
-                                                       const AssignmentMaps& assignment_maps) {
+                                                       const AssignmentMapVector& assignment_maps) {
 
     std::list<std::string> formatted_output;
 
     switch (result.get_type()) {
     case Parser::ResultType::TUPLE: {
+        auto tuple = result.get_tuple();
         for (auto const& assignment_map : assignment_maps) {
-            auto tuple = result.get_tuple();
-            std::string result;
-
+            std::string answer;
             for (auto const& elem : tuple) {
-                if (!result.empty()) {
-                    result += " ";
+                if (!answer.empty()) {
+                    answer += " ";
                 }
 
                 switch (elem.get_type()) {
                 case Parser::ElemType::ATTR_REF: {
                     auto synonym = elem.get_attr_ref().get_synonym();
-                    auto assignment = assignment_map.at(synonym);
+                    auto const& assignment = assignment_map.at(synonym);
 
                     if (elem.get_attr_ref().get_attr_name() == "stmt#" ||
                         elem.get_attr_ref().get_attr_name() == "value") {
-                        result += std::to_string(assignment.get_int_value());
+                        answer += std::to_string(assignment.get_int_value());
                     } else if (elem.get_attr_ref().get_attr_name() == "procName" ||
                                elem.get_attr_ref().get_attr_name() == "varName") {
-                        result += assignment.get_string_value();
+                        answer += assignment.get_string_value();
                     } else {
                         throw std::runtime_error("Unknown attribute name");
                     }
@@ -555,17 +551,17 @@ std::list<std::string> Evaluator::get_formatted_output(const Parser::Result& res
                 }
                 case Parser::ElemType::SYNONYM: {
                     auto synonym = elem.get_synonym();
-                    auto assignment = assignment_map.at(synonym);
+                    auto const& assignment = assignment_map.at(synonym);
 
                     switch (assignment.get_type()) {
                     case AssignmentType::INTEGER:
-                        result += std::to_string(assignment.get_int_value());
+                        answer += std::to_string(assignment.get_int_value());
                         break;
                     case AssignmentType::STRING:
-                        result += assignment.get_string_value();
+                        answer += assignment.get_string_value();
                         break;
                     case AssignmentType::BOTH:
-                        result += std::to_string(assignment.get_int_value());
+                        answer += std::to_string(assignment.get_int_value());
                         break;
                     default:
                         throw std::runtime_error("Unknown assignment type");
@@ -578,7 +574,7 @@ std::list<std::string> Evaluator::get_formatted_output(const Parser::Result& res
                 }
             }
 
-            formatted_output.push_back(result);
+            formatted_output.push_back(answer);
         }
         break;
     }

@@ -100,17 +100,18 @@ private:
     static std::string get_synonym(const Parser::EntityRef& ref);
     static std::string get_synonym(const Parser::StatementRef& ref);
 
-    // Merge a list of AssignmentMaps together (via a cross-product).
-    static AssignmentMaps
-    merge_assignment_maps(const std::vector<AssignmentMaps>& all_assignment_maps);
-
-    // Merge two AssignmentMap together.
-    static AssignmentMap merge_assignment_map(const AssignmentMap& first,
-                                              const AssignmentMap& second);
+    // Merge a list of assignment maps together (via a cross-product).
+    static AssignmentMapVector
+    merge_assignment_map_sets(const std::vector<AssignmentMapSet>& assignment_map_sets);
+    static void merge_assignment_map_sets(AssignmentMapVector& results,
+                                          AssignmentMap& assignment_map,
+                                          const std::vector<AssignmentMapSet>& assignment_map_sets,
+                                          int pos);
+    static void merge_assignment_map(AssignmentMap& dest, const AssignmentMap& src);
 
     // Get the formatted output to a query.
     static std::list<std::string> get_formatted_output(const Parser::Result& result,
-                                                       const AssignmentMaps& assignment_maps);
+                                                       const AssignmentMapVector& assignment_maps);
 };
 
 } // namespace QueryEvaluator

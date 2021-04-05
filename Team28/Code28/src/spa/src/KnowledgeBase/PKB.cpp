@@ -145,7 +145,7 @@ void PKB::add_modify_relationship(int stmt_id, std::string var_name, bool direct
     var->add_modified_by(stmt_id);
     // Extract ancestors of the current stmt.
     // Assume all parent-child relationships have been extracted and stored.
-    std::unordered_set<int> ancestor_ids = stmt->get_ancestors();
+    auto ancestor_ids = *stmt->get_ancestors();
     for (const auto& curr_ancestor_id : ancestor_ids) {
         auto curr_ancestor_stmt = this->get_statement_by_id(curr_ancestor_id);
         curr_ancestor_stmt->add_modifies(var_name);
@@ -159,13 +159,13 @@ void PKB::add_modify_relationship(int stmt_id, std::string var_name, bool direct
     // Assume all call relationships have been extracted and stored.
     std::string proc_name = stmt->get_procedure_name();
     auto proc = this->get_procedure_by_name(proc_name);
-    std::unordered_set<std::string> caller_names = proc->get_callers();
+    auto caller_names = *proc->get_callers();
     caller_names.insert(proc_name);
     for (const auto& curr_caller_name : caller_names) {
         auto curr_caller_proc = this->get_procedure_by_name(curr_caller_name);
         curr_caller_proc->add_modifies(var_name);
         var->add_modified_by_procedure(curr_caller_name);
-        auto curr_called_by_ids = curr_caller_proc->get_called_by_statements();
+        auto curr_called_by_ids = *curr_caller_proc->get_called_by_statements();
         for (const auto& curr_called_by_id : curr_called_by_ids) {
             this->add_modify_relationship(curr_called_by_id, var_name, false);
         }
@@ -183,7 +183,7 @@ void PKB::add_use_relationship(int stmt_id, std::string var_name, bool direct) {
     var->add_used_by(stmt_id);
     // Extract ancestors of the current stmt.
     // Assume all parent-child relationships have been extracted and stored.
-    std::unordered_set<int> ancestor_ids = stmt->get_ancestors();
+    auto ancestor_ids = *stmt->get_ancestors();
     for (const auto& curr_ancestor_id : ancestor_ids) {
         auto curr_ancestor_stmt = this->get_statement_by_id(curr_ancestor_id);
         curr_ancestor_stmt->add_uses(var_name);
@@ -197,13 +197,13 @@ void PKB::add_use_relationship(int stmt_id, std::string var_name, bool direct) {
     // Assume all call relationships have been extracted and stored.
     std::string proc_name = stmt->get_procedure_name();
     auto proc = this->get_procedure_by_name(proc_name);
-    std::unordered_set<std::string> caller_names = proc->get_callers();
+    auto caller_names = *proc->get_callers();
     caller_names.insert(proc_name);
     for (const auto& curr_caller_name : caller_names) {
         auto curr_caller_proc = this->get_procedure_by_name(curr_caller_name);
         curr_caller_proc->add_uses(var_name);
         var->add_used_by_procedure(curr_caller_name);
-        auto curr_called_by_ids = curr_caller_proc->get_called_by_statements();
+        auto curr_called_by_ids = *curr_caller_proc->get_called_by_statements();
         for (const auto& curr_called_by_id : curr_called_by_ids) {
             this->add_use_relationship(curr_called_by_id, var_name, false);
         }
@@ -219,9 +219,9 @@ void PKB::add_follow_relationship(int following_id, int follower_id) {
     following_stmt->set_direct_follower(follower_id);
     follower_stmt->set_direct_following(following_id);
     // Extract all followings and followers.
-    std::unordered_set<int> following_ids = following_stmt->get_followings();
+    auto following_ids = *following_stmt->get_followings();
     following_ids.insert(following_id);
-    std::unordered_set<int> follower_ids = follower_stmt->get_followers();
+    auto follower_ids = *follower_stmt->get_followers();
     follower_ids.insert(follower_id);
     for (const auto& curr_following_id : following_ids) {
         auto curr_following_stmt = this->get_statement_by_id(curr_following_id);
@@ -242,9 +242,9 @@ void PKB::add_parent_relationship(int parent_id, int child_id) {
     parent_stmt->add_child(child_id);
     child_stmt->set_parent(parent_id);
     // Extract all ancestors and descendants.
-    std::unordered_set<int> ancestor_ids = parent_stmt->get_ancestors();
+    auto ancestor_ids = *parent_stmt->get_ancestors();
     ancestor_ids.insert(parent_id);
-    std::unordered_set<int> descendant_ids = child_stmt->get_descendants();
+    auto descendant_ids = *child_stmt->get_descendants();
     descendant_ids.insert(child_id);
     for (const auto& curr_ancestor_id : ancestor_ids) {
         auto curr_ancestor_stmt = this->get_statement_by_id(curr_ancestor_id);
@@ -262,9 +262,9 @@ void PKB::add_next_relationship(int prev_id, int next_id) {
     prev_stmt->add_direct_next(next_id);
     next_stmt->add_direct_previous(prev_id);
     // Extract all previous and next.
-    std::unordered_set<int> prev_ids = prev_stmt->get_previous();
+    auto prev_ids = *prev_stmt->get_previous();
     prev_ids.insert(prev_id);
-    std::unordered_set<int> next_ids = next_stmt->get_next();
+    auto next_ids = *next_stmt->get_next();
     next_ids.insert(next_id);
     for (const auto& curr_prev_id : prev_ids) {
         auto curr_prev_stmt = this->get_statement_by_id(curr_prev_id);
@@ -282,9 +282,9 @@ void PKB::add_call_relationship(std::string caller_name, std::string callee_name
     caller_proc->add_direct_callee(callee_name);
     callee_proc->add_direct_caller(caller_name);
     // Extract all callers and callees.
-    std::unordered_set<std::string> caller_names = caller_proc->get_callers();
+    auto caller_names = *caller_proc->get_callers();
     caller_names.insert(caller_name);
-    std::unordered_set<std::string> callee_names = callee_proc->get_callees();
+    auto callee_names = *callee_proc->get_callees();
     callee_names.insert(callee_name);
     for (const auto& curr_caller_name : caller_names) {
         auto curr_caller_proc = this->get_procedure_by_name(curr_caller_name);
@@ -302,9 +302,9 @@ void PKB::add_affect_relationship(int affects_id, int affected_id) {
     affects_stmt->add_direct_affects(affected_id);
     affected_stmt->add_direct_affected_by(affects_id);
     // Extract all nested affect relationship.
-    std::unordered_set<int> affects_ids = affects_stmt->get_affected_by();
+    auto affects_ids = *affects_stmt->get_affected_by();
     affects_ids.insert(affects_id);
-    std::unordered_set<int> affected_ids = affected_stmt->get_affects();
+    auto affected_ids = *affected_stmt->get_affects();
     affected_ids.insert(affected_id);
     for (const auto& curr_affects_id : affects_ids) {
         auto curr_affects_stmt = this->get_statement_by_id(curr_affects_id);

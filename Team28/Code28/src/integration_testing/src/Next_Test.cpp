@@ -65,182 +65,182 @@ TEST_CASE("Test for next relationship") {
 
     SECTION("Procedure main") {
         SECTION("First stmt of procedure") {
-            REQUIRE(pkb->get_statement_by_id(1)->get_direct_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(1)->get_direct_next().count(2) == 1);
-            REQUIRE(pkb->get_statement_by_id(1)->get_next().size() == 2);
-            REQUIRE(pkb->get_statement_by_id(1)->get_next().count(2) == 1);
-            REQUIRE(pkb->get_statement_by_id(1)->get_next().count(3) == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_next()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_next()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(1)->get_next()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_next()->count(3) == 1);
 
             // Negative cases
-            REQUIRE(pkb->get_statement_by_id(1)->get_direct_previous().size() == 0);
-            REQUIRE(pkb->get_statement_by_id(1)->get_previous().size() == 0);
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_previous()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(1)->get_previous()->size() == 0);
         }
 
         SECTION("Middle stmt of procedure") {
-            REQUIRE(pkb->get_statement_by_id(2)->get_direct_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(2)->get_direct_next().count(3) == 1);
-            REQUIRE(pkb->get_statement_by_id(2)->get_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(2)->get_next().count(3) == 1);
-            REQUIRE(pkb->get_statement_by_id(2)->get_direct_previous().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(2)->get_direct_previous().count(1) == 1);
-            REQUIRE(pkb->get_statement_by_id(2)->get_previous().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(2)->get_previous().count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_direct_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_direct_next()->count(3) == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_next()->count(3) == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_direct_previous()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_direct_previous()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_previous()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_previous()->count(1) == 1);
         }
 
         SECTION("Last stmt of procedure") {
-            REQUIRE(pkb->get_statement_by_id(3)->get_direct_previous().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_direct_previous().count(2) == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_previous().size() == 2);
-            REQUIRE(pkb->get_statement_by_id(3)->get_previous().count(1) == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_previous().count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_direct_previous()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_direct_previous()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_previous()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(3)->get_previous()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_previous()->count(2) == 1);
 
             // Negative cases
-            REQUIRE(pkb->get_statement_by_id(3)->get_direct_next().size() == 0);
-            REQUIRE(pkb->get_statement_by_id(3)->get_next().size() == 0);
+            REQUIRE(pkb->get_statement_by_id(3)->get_direct_next()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(3)->get_next()->size() == 0);
         }
     }
 
     SECTION("Procedure readPoint") {
         SECTION("First stmt of procedure") {
-            REQUIRE(pkb->get_statement_by_id(4)->get_direct_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(4)->get_direct_next().count(5) == 1);
-            REQUIRE(pkb->get_statement_by_id(4)->get_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(4)->get_next().count(5) == 1);
+            REQUIRE(pkb->get_statement_by_id(4)->get_direct_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(4)->get_direct_next()->count(5) == 1);
+            REQUIRE(pkb->get_statement_by_id(4)->get_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(4)->get_next()->count(5) == 1);
 
             // Negative cases
-            REQUIRE(pkb->get_statement_by_id(4)->get_direct_previous().size() == 0);
-            REQUIRE(pkb->get_statement_by_id(4)->get_previous().size() == 0);
+            REQUIRE(pkb->get_statement_by_id(4)->get_direct_previous()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(4)->get_previous()->size() == 0);
         }
 
         SECTION("Last stmt of procedure") {
-            REQUIRE(pkb->get_statement_by_id(5)->get_direct_previous().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(5)->get_direct_previous().count(4) == 1);
-            REQUIRE(pkb->get_statement_by_id(5)->get_previous().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(5)->get_previous().count(4) == 1);
+            REQUIRE(pkb->get_statement_by_id(5)->get_direct_previous()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(5)->get_direct_previous()->count(4) == 1);
+            REQUIRE(pkb->get_statement_by_id(5)->get_previous()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(5)->get_previous()->count(4) == 1);
 
             // Negative cases
-            REQUIRE(pkb->get_statement_by_id(5)->get_direct_next().size() == 0);
-            REQUIRE(pkb->get_statement_by_id(5)->get_next().size() == 0);
+            REQUIRE(pkb->get_statement_by_id(5)->get_direct_next()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(5)->get_next()->size() == 0);
         }
     }
 
     SECTION("Procedure printResults") {
         SECTION("First stmt of procedure") {
-            REQUIRE(pkb->get_statement_by_id(6)->get_direct_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(6)->get_direct_next().count(7) == 1);
-            REQUIRE(pkb->get_statement_by_id(6)->get_next().size() == 3);
-            REQUIRE(pkb->get_statement_by_id(6)->get_next().count(7) == 1);
-            REQUIRE(pkb->get_statement_by_id(6)->get_next().count(8) == 1);
-            REQUIRE(pkb->get_statement_by_id(6)->get_next().count(9) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_direct_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_direct_next()->count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_next()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(6)->get_next()->count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_next()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_next()->count(9) == 1);
 
             // Negative cases
-            REQUIRE(pkb->get_statement_by_id(6)->get_direct_previous().size() == 0);
-            REQUIRE(pkb->get_statement_by_id(6)->get_previous().size() == 0);
+            REQUIRE(pkb->get_statement_by_id(6)->get_direct_previous()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(6)->get_previous()->size() == 0);
         }
 
         SECTION("Middle stmt of procedure") {
-            REQUIRE(pkb->get_statement_by_id(8)->get_direct_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(8)->get_direct_next().count(9) == 1);
-            REQUIRE(pkb->get_statement_by_id(8)->get_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(8)->get_next().count(9) == 1);
-            REQUIRE(pkb->get_statement_by_id(8)->get_direct_previous().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(8)->get_direct_previous().count(7) == 1);
-            REQUIRE(pkb->get_statement_by_id(8)->get_previous().size() == 2);
-            REQUIRE(pkb->get_statement_by_id(8)->get_previous().count(6) == 1);
-            REQUIRE(pkb->get_statement_by_id(8)->get_previous().count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_next()->count(9) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_next()->count(9) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_previous()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_previous()->count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_previous()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(8)->get_previous()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_previous()->count(7) == 1);
         }
 
         SECTION("Last stmt of procedure") {
-            REQUIRE(pkb->get_statement_by_id(9)->get_direct_previous().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(9)->get_direct_previous().count(8) == 1);
-            REQUIRE(pkb->get_statement_by_id(9)->get_previous().size() == 3);
-            REQUIRE(pkb->get_statement_by_id(9)->get_previous().count(6) == 1);
-            REQUIRE(pkb->get_statement_by_id(9)->get_previous().count(7) == 1);
-            REQUIRE(pkb->get_statement_by_id(9)->get_previous().count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(9)->get_direct_previous()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(9)->get_direct_previous()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(9)->get_previous()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(9)->get_previous()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(9)->get_previous()->count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(9)->get_previous()->count(8) == 1);
 
             // Negative cases
-            REQUIRE(pkb->get_statement_by_id(9)->get_direct_next().size() == 0);
-            REQUIRE(pkb->get_statement_by_id(9)->get_next().size() == 0);
+            REQUIRE(pkb->get_statement_by_id(9)->get_direct_next()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(9)->get_next()->size() == 0);
         }
     }
 
     SECTION("Procedure computeCentroid") {
         SECTION("First stmt of procedure") {
-            REQUIRE(pkb->get_statement_by_id(10)->get_direct_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(10)->get_direct_next().count(11) == 1);
+            REQUIRE(pkb->get_statement_by_id(10)->get_direct_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(10)->get_direct_next()->count(11) == 1);
             std::unordered_set<int> next_stmts(
                 {11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23});
-            REQUIRE(pkb->get_statement_by_id(10)->get_next() == next_stmts);
+            REQUIRE(*pkb->get_statement_by_id(10)->get_next() == next_stmts);
 
             // Negative cases
-            REQUIRE(pkb->get_statement_by_id(10)->get_direct_previous().size() == 0);
-            REQUIRE(pkb->get_statement_by_id(10)->get_previous().size() == 0);
+            REQUIRE(pkb->get_statement_by_id(10)->get_direct_previous()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(10)->get_previous()->size() == 0);
         }
 
         SECTION("Middle stmt of procedure") {
             // WHILE stmt
-            REQUIRE(pkb->get_statement_by_id(14)->get_direct_next().size() == 2);
-            REQUIRE(pkb->get_statement_by_id(14)->get_direct_next().count(15) == 1);
-            REQUIRE(pkb->get_statement_by_id(14)->get_direct_next().count(19) == 1);
+            REQUIRE(pkb->get_statement_by_id(14)->get_direct_next()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(14)->get_direct_next()->count(15) == 1);
+            REQUIRE(pkb->get_statement_by_id(14)->get_direct_next()->count(19) == 1);
             std::unordered_set<int> while_next_stmts({14, 15, 16, 17, 18, 19, 20, 21, 22, 23});
-            REQUIRE(pkb->get_statement_by_id(14)->get_next() == while_next_stmts);
-            REQUIRE(pkb->get_statement_by_id(14)->get_direct_previous().size() == 2);
-            REQUIRE(pkb->get_statement_by_id(14)->get_direct_previous().count(13) == 1);
-            REQUIRE(pkb->get_statement_by_id(14)->get_direct_previous().count(18) == 1);
+            REQUIRE(*pkb->get_statement_by_id(14)->get_next() == while_next_stmts);
+            REQUIRE(pkb->get_statement_by_id(14)->get_direct_previous()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(14)->get_direct_previous()->count(13) == 1);
+            REQUIRE(pkb->get_statement_by_id(14)->get_direct_previous()->count(18) == 1);
             std::unordered_set<int> while_prev_stmts({10, 11, 12, 13, 14, 15, 16, 17, 18});
-            REQUIRE(pkb->get_statement_by_id(14)->get_previous() == while_prev_stmts);
+            REQUIRE(*pkb->get_statement_by_id(14)->get_previous() == while_prev_stmts);
 
             // Last stmt of while block
-            REQUIRE(pkb->get_statement_by_id(18)->get_direct_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(18)->get_direct_next().count(14) == 1);
+            REQUIRE(pkb->get_statement_by_id(18)->get_direct_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(18)->get_direct_next()->count(14) == 1);
 
             // IF stmt
-            REQUIRE(pkb->get_statement_by_id(19)->get_direct_next().size() == 2);
-            REQUIRE(pkb->get_statement_by_id(19)->get_direct_next().count(20) == 1);
-            REQUIRE(pkb->get_statement_by_id(19)->get_direct_next().count(21) == 1);
+            REQUIRE(pkb->get_statement_by_id(19)->get_direct_next()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(19)->get_direct_next()->count(20) == 1);
+            REQUIRE(pkb->get_statement_by_id(19)->get_direct_next()->count(21) == 1);
             std::unordered_set<int> if_next_stmts({20, 21, 22, 23});
-            REQUIRE(pkb->get_statement_by_id(19)->get_next() == if_next_stmts);
-            REQUIRE(pkb->get_statement_by_id(19)->get_direct_previous().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(19)->get_direct_previous().count(14) == 1);
+            REQUIRE(*pkb->get_statement_by_id(19)->get_next() == if_next_stmts);
+            REQUIRE(pkb->get_statement_by_id(19)->get_direct_previous()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(19)->get_direct_previous()->count(14) == 1);
             std::unordered_set<int> if_prev_stmts({10, 11, 12, 13, 14, 15, 16, 17, 18});
-            REQUIRE(pkb->get_statement_by_id(19)->get_previous() == if_prev_stmts);
+            REQUIRE(*pkb->get_statement_by_id(19)->get_previous() == if_prev_stmts);
 
             // Last stmt of then branch
-            REQUIRE(pkb->get_statement_by_id(20)->get_direct_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(20)->get_direct_next().count(23) == 1);
-            REQUIRE(pkb->get_statement_by_id(20)->get_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(20)->get_next().count(23) == 1);
+            REQUIRE(pkb->get_statement_by_id(20)->get_direct_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(20)->get_direct_next()->count(23) == 1);
+            REQUIRE(pkb->get_statement_by_id(20)->get_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(20)->get_next()->count(23) == 1);
 
             // Last stmt of else branch
-            REQUIRE(pkb->get_statement_by_id(22)->get_direct_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(22)->get_direct_next().count(23) == 1);
-            REQUIRE(pkb->get_statement_by_id(22)->get_next().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(22)->get_next().count(23) == 1);
+            REQUIRE(pkb->get_statement_by_id(22)->get_direct_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(22)->get_direct_next()->count(23) == 1);
+            REQUIRE(pkb->get_statement_by_id(22)->get_next()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(22)->get_next()->count(23) == 1);
         }
 
         SECTION("Last stmt of procedure") {
-            REQUIRE(pkb->get_statement_by_id(23)->get_direct_previous().size() == 2);
-            REQUIRE(pkb->get_statement_by_id(23)->get_direct_previous().count(20) == 1);
-            REQUIRE(pkb->get_statement_by_id(23)->get_direct_previous().count(22) == 1);
+            REQUIRE(pkb->get_statement_by_id(23)->get_direct_previous()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(23)->get_direct_previous()->count(20) == 1);
+            REQUIRE(pkb->get_statement_by_id(23)->get_direct_previous()->count(22) == 1);
             std::unordered_set<int> prev_stmts(
                 {10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22});
-            REQUIRE(pkb->get_statement_by_id(23)->get_previous() == prev_stmts);
+            REQUIRE(*pkb->get_statement_by_id(23)->get_previous() == prev_stmts);
 
             // Negative cases
-            REQUIRE(pkb->get_statement_by_id(23)->get_direct_next().size() == 0);
-            REQUIRE(pkb->get_statement_by_id(23)->get_next().size() == 0);
+            REQUIRE(pkb->get_statement_by_id(23)->get_direct_next()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(23)->get_next()->size() == 0);
         }
 
         SECTION("Cross-level edge cases") {
-            REQUIRE(pkb->get_statement_by_id(11)->get_next().count(16) == 1);
-            REQUIRE(pkb->get_statement_by_id(11)->get_next().count(20) == 1);
-            REQUIRE(pkb->get_statement_by_id(11)->get_next().count(22) == 1);
-            REQUIRE(pkb->get_statement_by_id(16)->get_previous().count(11) == 1);
-            REQUIRE(pkb->get_statement_by_id(20)->get_previous().count(11) == 1);
-            REQUIRE(pkb->get_statement_by_id(22)->get_previous().count(11) == 1);
+            REQUIRE(pkb->get_statement_by_id(11)->get_next()->count(16) == 1);
+            REQUIRE(pkb->get_statement_by_id(11)->get_next()->count(20) == 1);
+            REQUIRE(pkb->get_statement_by_id(11)->get_next()->count(22) == 1);
+            REQUIRE(pkb->get_statement_by_id(16)->get_previous()->count(11) == 1);
+            REQUIRE(pkb->get_statement_by_id(20)->get_previous()->count(11) == 1);
+            REQUIRE(pkb->get_statement_by_id(22)->get_previous()->count(11) == 1);
 
-            REQUIRE(pkb->get_statement_by_id(16)->get_next().count(20) == 1);
-            REQUIRE(pkb->get_statement_by_id(20)->get_previous().count(16) == 1);
+            REQUIRE(pkb->get_statement_by_id(16)->get_next()->count(20) == 1);
+            REQUIRE(pkb->get_statement_by_id(20)->get_previous()->count(16) == 1);
         }
     }
 }

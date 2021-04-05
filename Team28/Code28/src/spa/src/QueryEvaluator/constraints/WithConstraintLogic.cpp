@@ -19,13 +19,16 @@ WithConstraintLogic::WithConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb
 }
 
 bool WithConstraintLogic::is_valid(const AssignmentMap& assignment_map) const {
+
     if (is_string_value(lhs) && is_string_value(rhs)) {
         return get_string_value(assignment_map, lhs) == get_string_value(assignment_map, rhs);
-    } else if (is_integer_value(lhs) && is_integer_value(rhs)) {
-        return get_integer_value(assignment_map, lhs) == get_integer_value(assignment_map, rhs);
-    } else {
-        return false;
     }
+
+    if (is_integer_value(lhs) && is_integer_value(rhs)) {
+        return get_integer_value(assignment_map, lhs) == get_integer_value(assignment_map, rhs);
+    }
+
+    return false;
 }
 
 bool WithConstraintLogic::is_string_value(const Parser::WithRef& with_ref) {

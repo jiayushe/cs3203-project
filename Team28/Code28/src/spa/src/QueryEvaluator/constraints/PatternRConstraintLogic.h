@@ -10,7 +10,6 @@
 
 namespace QueryEvaluator {
 
-// TODO: Documentation
 class PatternRConstraintLogic : public BaseConstraintLogic {
 public:
     PatternRConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb,

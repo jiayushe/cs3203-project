@@ -42,21 +42,21 @@ TEST_CASE("KnowledgeBase::Statement") {
             int ancestor_id = 8;
             stmt.add_ancestor(ancestor_id);
             auto ancestor_set = stmt.get_ancestors();
-            REQUIRE(ancestor_set.size() == 1);
-            REQUIRE(ancestor_set.count(ancestor_id) == 1);
-            REQUIRE(ancestor_set.count(100) == 0);
+            REQUIRE(ancestor_set->size() == 1);
+            REQUIRE(ancestor_set->count(ancestor_id) == 1);
+            REQUIRE(ancestor_set->count(100) == 0);
         }
 
         SECTION("add_get_children") {
             int child_id = 12;
             REQUIRE_THROWS(stmt.add_child(child_id));
-            REQUIRE(stmt.get_children().size() == 0);
+            REQUIRE(stmt.get_children()->size() == 0);
         }
 
         SECTION("add_get_descendants") {
             int descendant_id = 12;
             REQUIRE_THROWS(stmt.add_descendant(descendant_id));
-            REQUIRE(stmt.get_descendants().size() == 0);
+            REQUIRE(stmt.get_descendants()->size() == 0);
         }
 
         SECTION("set_get_direct_following") {
@@ -70,9 +70,9 @@ TEST_CASE("KnowledgeBase::Statement") {
             int following_id = 9;
             stmt.add_following(following_id);
             auto following_set = stmt.get_followings();
-            REQUIRE(following_set.size() == 1);
-            REQUIRE(following_set.count(following_id) == 1);
-            REQUIRE(following_set.count(100) == 0);
+            REQUIRE(following_set->size() == 1);
+            REQUIRE(following_set->count(following_id) == 1);
+            REQUIRE(following_set->count(100) == 0);
         }
 
         SECTION("set_get_direct_follower") {
@@ -86,45 +86,45 @@ TEST_CASE("KnowledgeBase::Statement") {
             int follower_id = 9;
             stmt.add_follower(follower_id);
             auto follower_set = stmt.get_followers();
-            REQUIRE(follower_set.size() == 1);
-            REQUIRE(follower_set.count(follower_id) == 1);
-            REQUIRE(follower_set.count(100) == 0);
+            REQUIRE(follower_set->size() == 1);
+            REQUIRE(follower_set->count(follower_id) == 1);
+            REQUIRE(follower_set->count(100) == 0);
         }
 
         SECTION("add_get_direct_modifies") {
             std::string var_name = "direct_modifies";
             stmt.add_direct_modifies(var_name);
             auto direct_modifies_set = stmt.get_direct_modifies();
-            REQUIRE(direct_modifies_set.size() == 1);
-            REQUIRE(direct_modifies_set.count(var_name) == 1);
-            REQUIRE(direct_modifies_set.count("a") == 0);
+            REQUIRE(direct_modifies_set->size() == 1);
+            REQUIRE(direct_modifies_set->count(var_name) == 1);
+            REQUIRE(direct_modifies_set->count("a") == 0);
         }
 
         SECTION("add_get_modifies") {
             std::string var_name = "modifies";
             stmt.add_modifies(var_name);
             auto modifies_set = stmt.get_modifies();
-            REQUIRE(modifies_set.size() == 1);
-            REQUIRE(modifies_set.count(var_name) == 1);
-            REQUIRE(modifies_set.count("a") == 0);
+            REQUIRE(modifies_set->size() == 1);
+            REQUIRE(modifies_set->count(var_name) == 1);
+            REQUIRE(modifies_set->count("a") == 0);
         }
 
         SECTION("add_get_direct_uses") {
             std::string var_name = "direct_uses";
             stmt.add_direct_uses(var_name);
             auto direct_uses_set = stmt.get_direct_uses();
-            REQUIRE(direct_uses_set.size() == 1);
-            REQUIRE(direct_uses_set.count(var_name) == 1);
-            REQUIRE(direct_uses_set.count("a") == 0);
+            REQUIRE(direct_uses_set->size() == 1);
+            REQUIRE(direct_uses_set->count(var_name) == 1);
+            REQUIRE(direct_uses_set->count("a") == 0);
         }
 
         SECTION("add_get_uses") {
             std::string var_name = "uses";
             stmt.add_uses(var_name);
             auto uses_set = stmt.get_uses();
-            REQUIRE(uses_set.size() == 1);
-            REQUIRE(uses_set.count(var_name) == 1);
-            REQUIRE(uses_set.count("a") == 0);
+            REQUIRE(uses_set->size() == 1);
+            REQUIRE(uses_set->count(var_name) == 1);
+            REQUIRE(uses_set->count("a") == 0);
         }
 
         SECTION("set_get_procedure_called") {
@@ -177,18 +177,18 @@ TEST_CASE("KnowledgeBase::Statement") {
             int child_id = 12;
             stmt.add_child(child_id);
             auto child_set = stmt.get_children();
-            REQUIRE(child_set.size() == 1);
-            REQUIRE(child_set.count(child_id) == 1);
-            REQUIRE(child_set.count(100) == 0);
+            REQUIRE(child_set->size() == 1);
+            REQUIRE(child_set->count(child_id) == 1);
+            REQUIRE(child_set->count(100) == 0);
         }
 
         SECTION("add_get_descendants") {
             int descendant_id = 12;
             stmt.add_descendant(descendant_id);
             auto descendant_set = stmt.get_descendants();
-            REQUIRE(descendant_set.size() == 1);
-            REQUIRE(descendant_set.count(descendant_id) == 1);
-            REQUIRE(descendant_set.count(100) == 0);
+            REQUIRE(descendant_set->size() == 1);
+            REQUIRE(descendant_set->count(descendant_id) == 1);
+            REQUIRE(descendant_set->count(100) == 0);
         }
     }
 }

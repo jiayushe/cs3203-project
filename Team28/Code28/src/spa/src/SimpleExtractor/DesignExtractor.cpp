@@ -479,8 +479,8 @@ void DesignExtractor::extract_affect_relationship(std::shared_ptr<KnowledgeBase:
         auto direct_next_ids = stmt->get_direct_next();
         std::queue<std::pair<int, std::string>> bfs;
         std::unordered_set<std::pair<int, std::string>, pair_hash> visited;
-        for (auto direct_modifies_name : direct_modifies_names) {
-            for (auto direct_next_id : direct_next_ids) {
+        for (auto direct_modifies_name : *direct_modifies_names) {
+            for (auto direct_next_id : *direct_next_ids) {
                 bfs.push({direct_next_id, direct_modifies_name});
                 visited.insert({direct_next_id, direct_modifies_name});
             }
@@ -493,16 +493,16 @@ void DesignExtractor::extract_affect_relationship(std::shared_ptr<KnowledgeBase:
             auto curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
             auto curr_stmt_type = curr_stmt->get_type();
             if (curr_stmt_type == KnowledgeBase::StatementType::ASSIGN &&
-                curr_stmt->get_direct_uses().count(curr_var_name)) {
+                curr_stmt->get_direct_uses()->count(curr_var_name)) {
                 pkb->add_affect_relationship(root_stmt_id, curr_stmt_id);
             }
             if (curr_stmt_type != KnowledgeBase::StatementType::IF &&
                 curr_stmt_type != KnowledgeBase::StatementType::WHILE &&
-                curr_stmt->get_modifies().count(curr_var_name)) {
+                curr_stmt->get_modifies()->count(curr_var_name)) {
                 continue;
             }
             auto curr_direct_next_ids = curr_stmt->get_direct_next();
-            for (auto curr_direct_next_id : curr_direct_next_ids) {
+            for (auto curr_direct_next_id : *curr_direct_next_ids) {
                 if (visited.count({curr_direct_next_id, curr_var_name}) == 0) {
                     bfs.push({curr_direct_next_id, curr_var_name});
                     visited.insert({curr_direct_next_id, curr_var_name});

@@ -232,74 +232,74 @@ TEST_CASE("DEPKBIntegration") {
     REQUIRE(pkb->get_variables().size() == 8);
     REQUIRE(pkb->get_constants().size() == 3);
     // Call by statement
-    REQUIRE(pkb->get_procedure_by_name("main")->get_statements().size() == 8);
-    REQUIRE(pkb->get_procedure_by_name("other")->get_called_by_statements().size() == 1);
-    REQUIRE(pkb->get_procedure_by_name("other")->get_called_by_statements().count(2) == 1);
+    REQUIRE(pkb->get_procedure_by_name("main")->get_statements()->size() == 8);
+    REQUIRE(pkb->get_procedure_by_name("other")->get_called_by_statements()->size() == 1);
+    REQUIRE(pkb->get_procedure_by_name("other")->get_called_by_statements()->count(2) == 1);
     REQUIRE(pkb->get_statement_by_id(2)->get_procedure_called() == "other");
     // Uses
-    REQUIRE(pkb->get_statement_by_id(3)->get_direct_uses().size() == 1);
-    REQUIRE(pkb->get_statement_by_id(3)->get_direct_uses().count("b") == 1);
-    REQUIRE(pkb->get_statement_by_id(3)->get_uses().size() == 1);
-    REQUIRE(pkb->get_statement_by_id(3)->get_uses().count("b") == 1);
-    REQUIRE(pkb->get_variable_by_name("b")->get_direct_used_by().size() == 1);
-    REQUIRE(pkb->get_variable_by_name("b")->get_direct_used_by().count(3) == 1);
-    REQUIRE(pkb->get_variable_by_name("b")->get_used_by().size() == 1);
-    REQUIRE(pkb->get_variable_by_name("b")->get_used_by().count(3) == 1);
-    REQUIRE(pkb->get_statement_by_id(4)->get_direct_uses().size() == 1);
-    REQUIRE(pkb->get_statement_by_id(4)->get_direct_uses().count("c") == 1);
-    REQUIRE(pkb->get_statement_by_id(4)->get_uses().size() == 2);
-    REQUIRE(pkb->get_statement_by_id(4)->get_uses().count("c") == 1);
-    REQUIRE(pkb->get_statement_by_id(4)->get_uses().count("e") == 1);
-    REQUIRE(pkb->get_statement_by_id(5)->get_uses().size() == 1);
-    REQUIRE(pkb->get_statement_by_id(5)->get_uses().count("e") == 1);
-    REQUIRE(pkb->get_variable_by_name("c")->get_direct_used_by().size() == 1);
-    REQUIRE(pkb->get_variable_by_name("c")->get_direct_used_by().count(4) == 1);
-    REQUIRE(pkb->get_variable_by_name("c")->get_used_by().size() == 1);
-    REQUIRE(pkb->get_variable_by_name("c")->get_used_by().count(4) == 1);
-    REQUIRE(pkb->get_variable_by_name("e")->get_direct_used_by().size() == 1);
-    REQUIRE(pkb->get_variable_by_name("e")->get_direct_used_by().count(5) == 1);
-    REQUIRE(pkb->get_variable_by_name("e")->get_used_by().size() == 2);
-    REQUIRE(pkb->get_variable_by_name("e")->get_used_by().count(4) == 1);
-    REQUIRE(pkb->get_variable_by_name("e")->get_used_by().count(5) == 1);
+    REQUIRE(pkb->get_statement_by_id(3)->get_direct_uses()->size() == 1);
+    REQUIRE(pkb->get_statement_by_id(3)->get_direct_uses()->count("b") == 1);
+    REQUIRE(pkb->get_statement_by_id(3)->get_uses()->size() == 1);
+    REQUIRE(pkb->get_statement_by_id(3)->get_uses()->count("b") == 1);
+    REQUIRE(pkb->get_variable_by_name("b")->get_direct_used_by()->size() == 1);
+    REQUIRE(pkb->get_variable_by_name("b")->get_direct_used_by()->count(3) == 1);
+    REQUIRE(pkb->get_variable_by_name("b")->get_used_by()->size() == 1);
+    REQUIRE(pkb->get_variable_by_name("b")->get_used_by()->count(3) == 1);
+    REQUIRE(pkb->get_statement_by_id(4)->get_direct_uses()->size() == 1);
+    REQUIRE(pkb->get_statement_by_id(4)->get_direct_uses()->count("c") == 1);
+    REQUIRE(pkb->get_statement_by_id(4)->get_uses()->size() == 2);
+    REQUIRE(pkb->get_statement_by_id(4)->get_uses()->count("c") == 1);
+    REQUIRE(pkb->get_statement_by_id(4)->get_uses()->count("e") == 1);
+    REQUIRE(pkb->get_statement_by_id(5)->get_uses()->size() == 1);
+    REQUIRE(pkb->get_statement_by_id(5)->get_uses()->count("e") == 1);
+    REQUIRE(pkb->get_variable_by_name("c")->get_direct_used_by()->size() == 1);
+    REQUIRE(pkb->get_variable_by_name("c")->get_direct_used_by()->count(4) == 1);
+    REQUIRE(pkb->get_variable_by_name("c")->get_used_by()->size() == 1);
+    REQUIRE(pkb->get_variable_by_name("c")->get_used_by()->count(4) == 1);
+    REQUIRE(pkb->get_variable_by_name("e")->get_direct_used_by()->size() == 1);
+    REQUIRE(pkb->get_variable_by_name("e")->get_direct_used_by()->count(5) == 1);
+    REQUIRE(pkb->get_variable_by_name("e")->get_used_by()->size() == 2);
+    REQUIRE(pkb->get_variable_by_name("e")->get_used_by()->count(4) == 1);
+    REQUIRE(pkb->get_variable_by_name("e")->get_used_by()->count(5) == 1);
     // Modifies
-    REQUIRE(pkb->get_statement_by_id(1)->get_direct_modifies().size() == 1);
-    REQUIRE(pkb->get_statement_by_id(1)->get_direct_modifies().count("a") == 1);
-    REQUIRE(pkb->get_statement_by_id(1)->get_modifies().size() == 1);
-    REQUIRE(pkb->get_statement_by_id(1)->get_modifies().count("a") == 1);
-    REQUIRE(pkb->get_variable_by_name("a")->get_direct_modified_by().size() == 1);
-    REQUIRE(pkb->get_variable_by_name("a")->get_direct_modified_by().count(1) == 1);
-    REQUIRE(pkb->get_variable_by_name("a")->get_modified_by().size() == 1);
-    REQUIRE(pkb->get_variable_by_name("a")->get_modified_by().count(1) == 1);
-    REQUIRE(pkb->get_statement_by_id(4)->get_direct_modifies().size() == 0);
-    REQUIRE(pkb->get_statement_by_id(4)->get_direct_modifies().count("d") == 0);
-    REQUIRE(pkb->get_statement_by_id(4)->get_modifies().size() == 1);
-    REQUIRE(pkb->get_statement_by_id(4)->get_modifies().count("d") == 1);
-    REQUIRE(pkb->get_statement_by_id(5)->get_modifies().size() == 1);
-    REQUIRE(pkb->get_statement_by_id(5)->get_modifies().count("d") == 1);
-    REQUIRE(pkb->get_variable_by_name("d")->get_direct_modified_by().size() == 1);
-    REQUIRE(pkb->get_variable_by_name("d")->get_direct_modified_by().count(5) == 1);
-    REQUIRE(pkb->get_variable_by_name("d")->get_modified_by().size() == 2);
-    REQUIRE(pkb->get_variable_by_name("d")->get_modified_by().count(4) == 1);
-    REQUIRE(pkb->get_variable_by_name("d")->get_modified_by().count(5) == 1);
+    REQUIRE(pkb->get_statement_by_id(1)->get_direct_modifies()->size() == 1);
+    REQUIRE(pkb->get_statement_by_id(1)->get_direct_modifies()->count("a") == 1);
+    REQUIRE(pkb->get_statement_by_id(1)->get_modifies()->size() == 1);
+    REQUIRE(pkb->get_statement_by_id(1)->get_modifies()->count("a") == 1);
+    REQUIRE(pkb->get_variable_by_name("a")->get_direct_modified_by()->size() == 1);
+    REQUIRE(pkb->get_variable_by_name("a")->get_direct_modified_by()->count(1) == 1);
+    REQUIRE(pkb->get_variable_by_name("a")->get_modified_by()->size() == 1);
+    REQUIRE(pkb->get_variable_by_name("a")->get_modified_by()->count(1) == 1);
+    REQUIRE(pkb->get_statement_by_id(4)->get_direct_modifies()->size() == 0);
+    REQUIRE(pkb->get_statement_by_id(4)->get_direct_modifies()->count("d") == 0);
+    REQUIRE(pkb->get_statement_by_id(4)->get_modifies()->size() == 1);
+    REQUIRE(pkb->get_statement_by_id(4)->get_modifies()->count("d") == 1);
+    REQUIRE(pkb->get_statement_by_id(5)->get_modifies()->size() == 1);
+    REQUIRE(pkb->get_statement_by_id(5)->get_modifies()->count("d") == 1);
+    REQUIRE(pkb->get_variable_by_name("d")->get_direct_modified_by()->size() == 1);
+    REQUIRE(pkb->get_variable_by_name("d")->get_direct_modified_by()->count(5) == 1);
+    REQUIRE(pkb->get_variable_by_name("d")->get_modified_by()->size() == 2);
+    REQUIRE(pkb->get_variable_by_name("d")->get_modified_by()->count(4) == 1);
+    REQUIRE(pkb->get_variable_by_name("d")->get_modified_by()->count(5) == 1);
     // Follows
     REQUIRE(pkb->get_statement_by_id(1)->get_direct_follower() == 2);
-    REQUIRE(pkb->get_statement_by_id(1)->get_followers().size() == 4);
-    REQUIRE(pkb->get_statement_by_id(1)->get_followers().count(2) == 1);
-    REQUIRE(pkb->get_statement_by_id(1)->get_followers().count(3) == 1);
-    REQUIRE(pkb->get_statement_by_id(1)->get_followers().count(4) == 1);
-    REQUIRE(pkb->get_statement_by_id(1)->get_followers().count(6) == 1);
+    REQUIRE(pkb->get_statement_by_id(1)->get_followers()->size() == 4);
+    REQUIRE(pkb->get_statement_by_id(1)->get_followers()->count(2) == 1);
+    REQUIRE(pkb->get_statement_by_id(1)->get_followers()->count(3) == 1);
+    REQUIRE(pkb->get_statement_by_id(1)->get_followers()->count(4) == 1);
+    REQUIRE(pkb->get_statement_by_id(1)->get_followers()->count(6) == 1);
     REQUIRE(pkb->get_statement_by_id(1)->get_direct_following() == -1);
-    REQUIRE(pkb->get_statement_by_id(1)->get_followings().size() == 0);
+    REQUIRE(pkb->get_statement_by_id(1)->get_followings()->size() == 0);
     // Parent
-    REQUIRE(pkb->get_statement_by_id(6)->get_children().size() == 2);
-    REQUIRE(pkb->get_statement_by_id(6)->get_children().count(7) == 1);
-    REQUIRE(pkb->get_statement_by_id(6)->get_children().count(8) == 1);
-    REQUIRE(pkb->get_statement_by_id(6)->get_descendants().size() == 2);
-    REQUIRE(pkb->get_statement_by_id(6)->get_descendants().count(7) == 1);
-    REQUIRE(pkb->get_statement_by_id(6)->get_descendants().count(8) == 1);
+    REQUIRE(pkb->get_statement_by_id(6)->get_children()->size() == 2);
+    REQUIRE(pkb->get_statement_by_id(6)->get_children()->count(7) == 1);
+    REQUIRE(pkb->get_statement_by_id(6)->get_children()->count(8) == 1);
+    REQUIRE(pkb->get_statement_by_id(6)->get_descendants()->size() == 2);
+    REQUIRE(pkb->get_statement_by_id(6)->get_descendants()->count(7) == 1);
+    REQUIRE(pkb->get_statement_by_id(6)->get_descendants()->count(8) == 1);
     REQUIRE(pkb->get_statement_by_id(8)->get_parent() == 6);
-    REQUIRE(pkb->get_statement_by_id(8)->get_ancestors().size() == 1);
-    REQUIRE(pkb->get_statement_by_id(8)->get_ancestors().count(6) == 1);
+    REQUIRE(pkb->get_statement_by_id(8)->get_ancestors()->size() == 1);
+    REQUIRE(pkb->get_statement_by_id(8)->get_ancestors()->count(6) == 1);
 }
 
 TEST_CASE("DEPKBIntegration_Nested_AST") {
@@ -317,134 +317,134 @@ TEST_CASE("DEPKBIntegration_Nested_AST") {
     SECTION("Follows") {
         SECTION("inside while stmt") {
             REQUIRE(pkb->get_statement_by_id(4)->get_direct_follower() == 5);
-            REQUIRE(pkb->get_statement_by_id(4)->get_followers().size() == 3);
-            REQUIRE(pkb->get_statement_by_id(4)->get_followers().count(5) == 1);
-            REQUIRE(pkb->get_statement_by_id(4)->get_followers().count(6) == 1);
-            REQUIRE(pkb->get_statement_by_id(4)->get_followers().count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(4)->get_followers()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(4)->get_followers()->count(5) == 1);
+            REQUIRE(pkb->get_statement_by_id(4)->get_followers()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(4)->get_followers()->count(7) == 1);
             REQUIRE(pkb->get_statement_by_id(5)->get_direct_following() == 4);
-            REQUIRE(pkb->get_statement_by_id(5)->get_followings().size() == 1);
+            REQUIRE(pkb->get_statement_by_id(5)->get_followings()->size() == 1);
         }
 
         SECTION("inside if stmt") {
             REQUIRE(pkb->get_statement_by_id(8)->get_direct_follower() == 9);
-            REQUIRE(pkb->get_statement_by_id(8)->get_followers().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(8)->get_followers().count(9) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_followers()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_followers()->count(9) == 1);
             REQUIRE(pkb->get_statement_by_id(9)->get_direct_following() == 8);
-            REQUIRE(pkb->get_statement_by_id(9)->get_followings().size() == 1);
+            REQUIRE(pkb->get_statement_by_id(9)->get_followings()->size() == 1);
         }
 
         SECTION("negative edge cases") {
             SECTION("first of stmt list") {
                 REQUIRE(pkb->get_statement_by_id(1)->get_direct_following() == -1);
-                REQUIRE(pkb->get_statement_by_id(1)->get_followings().size() == 0);
+                REQUIRE(pkb->get_statement_by_id(1)->get_followings()->size() == 0);
                 REQUIRE(pkb->get_statement_by_id(4)->get_direct_following() == -1);
-                REQUIRE(pkb->get_statement_by_id(4)->get_followings().size() == 0);
+                REQUIRE(pkb->get_statement_by_id(4)->get_followings()->size() == 0);
                 REQUIRE(pkb->get_statement_by_id(8)->get_direct_following() == -1);
-                REQUIRE(pkb->get_statement_by_id(8)->get_followings().size() == 0);
+                REQUIRE(pkb->get_statement_by_id(8)->get_followings()->size() == 0);
             }
 
             SECTION("end of stmt list") {
                 REQUIRE(pkb->get_statement_by_id(7)->get_direct_follower() == -1);
-                REQUIRE(pkb->get_statement_by_id(7)->get_followers().size() == 0);
+                REQUIRE(pkb->get_statement_by_id(7)->get_followers()->size() == 0);
                 REQUIRE(pkb->get_statement_by_id(9)->get_direct_follower() == -1);
-                REQUIRE(pkb->get_statement_by_id(9)->get_followers().size() == 0);
+                REQUIRE(pkb->get_statement_by_id(9)->get_followers()->size() == 0);
                 REQUIRE(pkb->get_statement_by_id(10)->get_direct_follower() == -1);
-                REQUIRE(pkb->get_statement_by_id(10)->get_followers().size() == 0);
+                REQUIRE(pkb->get_statement_by_id(10)->get_followers()->size() == 0);
             }
 
             SECTION("cross-level stmts") {
-                REQUIRE(pkb->get_statement_by_id(5)->get_followers().count(9) == 0);
-                REQUIRE(pkb->get_statement_by_id(9)->get_followings().count(5) == 0);
+                REQUIRE(pkb->get_statement_by_id(5)->get_followers()->count(9) == 0);
+                REQUIRE(pkb->get_statement_by_id(9)->get_followings()->count(5) == 0);
             }
         }
     }
 
     SECTION("Parent") {
         SECTION("while stmt") {
-            REQUIRE(pkb->get_statement_by_id(3)->get_children().size() == 4);
-            REQUIRE(pkb->get_statement_by_id(3)->get_children().count(4) == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_children().count(5) == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_children().count(6) == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_children().count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_children()->size() == 4);
+            REQUIRE(pkb->get_statement_by_id(3)->get_children()->count(4) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_children()->count(5) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_children()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_children()->count(7) == 1);
 
-            REQUIRE(pkb->get_statement_by_id(3)->get_descendants().size() == 7);
-            REQUIRE(pkb->get_statement_by_id(3)->get_descendants().count(4) == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_descendants().count(5) == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_descendants().count(6) == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_descendants().count(7) == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_descendants().count(8) == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_descendants().count(9) == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_descendants().count(10) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_descendants()->size() == 7);
+            REQUIRE(pkb->get_statement_by_id(3)->get_descendants()->count(4) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_descendants()->count(5) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_descendants()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_descendants()->count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_descendants()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_descendants()->count(9) == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_descendants()->count(10) == 1);
         }
 
         SECTION("if stmt") {
-            REQUIRE(pkb->get_statement_by_id(7)->get_children().size() == 3);
-            REQUIRE(pkb->get_statement_by_id(7)->get_children().count(8) == 1);
-            REQUIRE(pkb->get_statement_by_id(7)->get_children().count(9) == 1);
-            REQUIRE(pkb->get_statement_by_id(7)->get_children().count(10) == 1);
+            REQUIRE(pkb->get_statement_by_id(7)->get_children()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(7)->get_children()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(7)->get_children()->count(9) == 1);
+            REQUIRE(pkb->get_statement_by_id(7)->get_children()->count(10) == 1);
 
-            REQUIRE(pkb->get_statement_by_id(7)->get_descendants().size() == 3);
-            REQUIRE(pkb->get_statement_by_id(7)->get_descendants().count(8) == 1);
-            REQUIRE(pkb->get_statement_by_id(7)->get_descendants().count(9) == 1);
-            REQUIRE(pkb->get_statement_by_id(7)->get_descendants().count(10) == 1);
+            REQUIRE(pkb->get_statement_by_id(7)->get_descendants()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(7)->get_descendants()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(7)->get_descendants()->count(9) == 1);
+            REQUIRE(pkb->get_statement_by_id(7)->get_descendants()->count(10) == 1);
 
             REQUIRE(pkb->get_statement_by_id(9)->get_parent() == 7);
-            REQUIRE(pkb->get_statement_by_id(9)->get_ancestors().size() == 2);
-            REQUIRE(pkb->get_statement_by_id(9)->get_ancestors().count(3) == 1);
-            REQUIRE(pkb->get_statement_by_id(9)->get_ancestors().count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(9)->get_ancestors()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(9)->get_ancestors()->count(3) == 1);
+            REQUIRE(pkb->get_statement_by_id(9)->get_ancestors()->count(7) == 1);
         }
 
         SECTION("non if/while stmt") {
-            REQUIRE(pkb->get_statement_by_id(6)->get_children().size() == 0);
-            REQUIRE(pkb->get_statement_by_id(6)->get_descendants().size() == 0);
+            REQUIRE(pkb->get_statement_by_id(6)->get_children()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(6)->get_descendants()->size() == 0);
         }
     }
 
     SECTION("Uses with if/while stmt") {
         SECTION("Uses by statement") {
-            REQUIRE(pkb->get_statement_by_id(3)->get_direct_uses().size() == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_direct_uses().count("c") == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_uses().size() == 4);
-            REQUIRE(pkb->get_statement_by_id(3)->get_uses().count("a") == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_uses().count("b") == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_uses().count("c") == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_uses().count("e") == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_direct_uses()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_direct_uses()->count("c") == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_uses()->size() == 4);
+            REQUIRE(pkb->get_statement_by_id(3)->get_uses()->count("a") == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_uses()->count("b") == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_uses()->count("c") == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_uses()->count("e") == 1);
         }
 
         SECTION("Uses on variable") {
-            REQUIRE(pkb->get_variable_by_name("a")->get_direct_used_by().size() == 3);
-            REQUIRE(pkb->get_variable_by_name("a")->get_direct_used_by().count(2) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_direct_used_by().count(5) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_direct_used_by().count(9) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_used_by().size() == 5);
-            REQUIRE(pkb->get_variable_by_name("a")->get_used_by().count(2) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_used_by().count(3) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_used_by().count(5) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_used_by().count(7) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_used_by().count(9) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_direct_used_by()->size() == 3);
+            REQUIRE(pkb->get_variable_by_name("a")->get_direct_used_by()->count(2) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_direct_used_by()->count(5) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_direct_used_by()->count(9) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_used_by()->size() == 5);
+            REQUIRE(pkb->get_variable_by_name("a")->get_used_by()->count(2) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_used_by()->count(3) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_used_by()->count(5) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_used_by()->count(7) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_used_by()->count(9) == 1);
         }
     }
 
     SECTION("Modifies with if/while stmt") {
         SECTION("Modifies by statement") {
-            REQUIRE(pkb->get_statement_by_id(3)->get_direct_modifies().size() == 0);
-            REQUIRE(pkb->get_statement_by_id(3)->get_modifies().size() == 3);
-            REQUIRE(pkb->get_statement_by_id(3)->get_modifies().count("a") == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_modifies().count("c") == 1);
-            REQUIRE(pkb->get_statement_by_id(3)->get_modifies().count("d") == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_direct_modifies()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(3)->get_modifies()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(3)->get_modifies()->count("a") == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_modifies()->count("c") == 1);
+            REQUIRE(pkb->get_statement_by_id(3)->get_modifies()->count("d") == 1);
         }
 
         SECTION("Modifies on variable") {
-            REQUIRE(pkb->get_variable_by_name("a")->get_direct_modified_by().size() == 3);
-            REQUIRE(pkb->get_variable_by_name("a")->get_direct_modified_by().count(1) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_direct_modified_by().count(4) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_direct_modified_by().count(9) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_modified_by().size() == 5);
-            REQUIRE(pkb->get_variable_by_name("a")->get_modified_by().count(1) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_modified_by().count(3) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_modified_by().count(4) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_modified_by().count(7) == 1);
-            REQUIRE(pkb->get_variable_by_name("a")->get_modified_by().count(9) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_direct_modified_by()->size() == 3);
+            REQUIRE(pkb->get_variable_by_name("a")->get_direct_modified_by()->count(1) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_direct_modified_by()->count(4) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_direct_modified_by()->count(9) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_modified_by()->size() == 5);
+            REQUIRE(pkb->get_variable_by_name("a")->get_modified_by()->count(1) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_modified_by()->count(3) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_modified_by()->count(4) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_modified_by()->count(7) == 1);
+            REQUIRE(pkb->get_variable_by_name("a")->get_modified_by()->count(9) == 1);
         }
     }
 }
@@ -456,128 +456,129 @@ TEST_CASE("DEPKBIntegration_Multi_Procedure_Program") {
     REQUIRE(pkb->get_procedures().size() == 4);
 
     SECTION("Valid record of multiple procedures") {
-        REQUIRE(pkb->get_procedure_by_name("main")->get_statements().size() == 3);
-        REQUIRE(pkb->get_procedure_by_name("readPoint")->get_statements().size() == 2);
-        REQUIRE(pkb->get_procedure_by_name("printResults")->get_statements().size() == 4);
-        REQUIRE(pkb->get_procedure_by_name("computeCentroid")->get_statements().size() == 14);
+        REQUIRE(pkb->get_procedure_by_name("main")->get_statements()->size() == 3);
+        REQUIRE(pkb->get_procedure_by_name("readPoint")->get_statements()->size() == 2);
+        REQUIRE(pkb->get_procedure_by_name("printResults")->get_statements()->size() == 4);
+        REQUIRE(pkb->get_procedure_by_name("computeCentroid")->get_statements()->size() == 14);
     }
 
     SECTION("Call") {
         SECTION("Call relationship between procedure") {
             SECTION("Direct call") {
-                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callees().size() == 2);
-                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callees().count(
+                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callees()->size() == 2);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callees()->count(
                             "computeCentroid") == 1);
-                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callees().count(
+                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callees()->count(
                             "printResults") == 1);
-                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callers().size() == 0);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callers()->size() == 0);
 
                 REQUIRE(
-                    pkb->get_procedure_by_name("computeCentroid")->get_direct_callees().size() ==
+                    pkb->get_procedure_by_name("computeCentroid")->get_direct_callees()->size() ==
                     2);
                 REQUIRE(pkb->get_procedure_by_name("computeCentroid")
                             ->get_direct_callees()
-                            .count("readPoint") == 1);
+                            ->count("readPoint") == 1);
                 REQUIRE(pkb->get_procedure_by_name("computeCentroid")
                             ->get_direct_callees()
-                            .count("printResults") == 1);
+                            ->count("printResults") == 1);
                 REQUIRE(
-                    pkb->get_procedure_by_name("computeCentroid")->get_direct_callers().size() ==
+                    pkb->get_procedure_by_name("computeCentroid")->get_direct_callers()->size() ==
                     1);
                 REQUIRE(pkb->get_procedure_by_name("computeCentroid")
                             ->get_direct_callers()
-                            .count("main") == 1);
+                            ->count("main") == 1);
 
-                REQUIRE(pkb->get_procedure_by_name("printResults")->get_direct_callers().size() ==
+                REQUIRE(pkb->get_procedure_by_name("printResults")->get_direct_callers()->size() ==
                         2);
                 REQUIRE(pkb->get_procedure_by_name("printResults")
                             ->get_direct_callers()
-                            .count("main") == 1);
+                            ->count("main") == 1);
                 REQUIRE(pkb->get_procedure_by_name("printResults")
                             ->get_direct_callers()
-                            .count("computeCentroid") == 1);
+                            ->count("computeCentroid") == 1);
 
-                REQUIRE(pkb->get_procedure_by_name("readPoint")->get_direct_callers().size() == 1);
+                REQUIRE(pkb->get_procedure_by_name("readPoint")->get_direct_callers()->size() == 1);
                 REQUIRE(pkb->get_procedure_by_name("readPoint")
                             ->get_direct_callers()
-                            .count("computeCentroid") == 1);
+                            ->count("computeCentroid") == 1);
             }
 
             SECTION("Indirect call") {
-                REQUIRE(pkb->get_procedure_by_name("main")->get_callees().size() == 3);
-                REQUIRE(pkb->get_procedure_by_name("main")->get_callees().count(
+                REQUIRE(pkb->get_procedure_by_name("main")->get_callees()->size() == 3);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_callees()->count(
                             "computeCentroid") == 1);
-                REQUIRE(pkb->get_procedure_by_name("main")->get_callees().count("printResults") ==
+                REQUIRE(pkb->get_procedure_by_name("main")->get_callees()->count("printResults") ==
                         1);
-                REQUIRE(pkb->get_procedure_by_name("main")->get_callees().count("readPoint") == 1);
-                REQUIRE(pkb->get_procedure_by_name("main")->get_callers().size() == 0);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_callees()->count("readPoint") == 1);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_callers()->size() == 0);
 
-                REQUIRE(pkb->get_procedure_by_name("computeCentroid")->get_callees().size() == 2);
+                REQUIRE(pkb->get_procedure_by_name("computeCentroid")->get_callees()->size() == 2);
                 REQUIRE(pkb->get_procedure_by_name("computeCentroid")
                             ->get_callees()
-                            .count("printResults") == 1);
+                            ->count("printResults") == 1);
                 REQUIRE(pkb->get_procedure_by_name("computeCentroid")
                             ->get_callees()
-                            .count("readPoint") == 1);
-                REQUIRE(pkb->get_procedure_by_name("computeCentroid")->get_callers().size() == 1);
+                            ->count("readPoint") == 1);
+                REQUIRE(pkb->get_procedure_by_name("computeCentroid")->get_callers()->size() == 1);
                 REQUIRE(
-                    pkb->get_procedure_by_name("computeCentroid")->get_callers().count("main") ==
+                    pkb->get_procedure_by_name("computeCentroid")->get_callers()->count("main") ==
                     1);
 
-                REQUIRE(pkb->get_procedure_by_name("printResults")->get_callers().size() == 2);
-                REQUIRE(pkb->get_procedure_by_name("printResults")->get_callers().count("main") ==
+                REQUIRE(pkb->get_procedure_by_name("printResults")->get_callers()->size() == 2);
+                REQUIRE(pkb->get_procedure_by_name("printResults")->get_callers()->count("main") ==
                         1);
                 REQUIRE(pkb->get_procedure_by_name("printResults")
                             ->get_callers()
-                            .count("computeCentroid") == 1);
+                            ->count("computeCentroid") == 1);
 
-                REQUIRE(pkb->get_procedure_by_name("readPoint")->get_callers().size() == 2);
+                REQUIRE(pkb->get_procedure_by_name("readPoint")->get_callers()->size() == 2);
                 REQUIRE(pkb->get_procedure_by_name("readPoint")
                             ->get_callers()
-                            .count("computeCentroid") == 1);
-                REQUIRE(pkb->get_procedure_by_name("readPoint")->get_callers().count("main") == 1);
+                            ->count("computeCentroid") == 1);
+                REQUIRE(pkb->get_procedure_by_name("readPoint")->get_callers()->count("main") == 1);
             }
 
             SECTION("Negative test") {
-                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callees().count(
+                REQUIRE(pkb->get_procedure_by_name("main")->get_direct_callees()->count(
                             "readPoint") == 0);
                 REQUIRE(pkb->get_procedure_by_name("computeCentroid")
                             ->get_direct_callees()
-                            .count("main") == 0);
+                            ->count("main") == 0);
                 REQUIRE(
-                    pkb->get_procedure_by_name("computeCentroid")->get_callees().count("main") ==
+                    pkb->get_procedure_by_name("computeCentroid")->get_callees()->count("main") ==
                     0);
             }
 
             SECTION("Call by statement") {
-                REQUIRE(pkb->get_procedure_by_name("main")->get_called_by_statements().size() == 0);
+                REQUIRE(pkb->get_procedure_by_name("main")->get_called_by_statements()->size() ==
+                        0);
 
                 REQUIRE(pkb->get_procedure_by_name("computeCentroid")
                             ->get_called_by_statements()
-                            .size() == 1);
+                            ->size() == 1);
                 REQUIRE(pkb->get_procedure_by_name("computeCentroid")
                             ->get_called_by_statements()
-                            .count(2) == 1);
+                            ->count(2) == 1);
                 REQUIRE(pkb->get_statement_by_id(2)->get_procedure_called() == "computeCentroid");
 
-                REQUIRE(
-                    pkb->get_procedure_by_name("printResults")->get_called_by_statements().size() ==
-                    2);
                 REQUIRE(pkb->get_procedure_by_name("printResults")
                             ->get_called_by_statements()
-                            .count(3) == 1);
+                            ->size() == 2);
                 REQUIRE(pkb->get_procedure_by_name("printResults")
                             ->get_called_by_statements()
-                            .count(13) == 1);
+                            ->count(3) == 1);
+                REQUIRE(pkb->get_procedure_by_name("printResults")
+                            ->get_called_by_statements()
+                            ->count(13) == 1);
                 REQUIRE(pkb->get_statement_by_id(3)->get_procedure_called() == "printResults");
                 REQUIRE(pkb->get_statement_by_id(13)->get_procedure_called() == "printResults");
 
                 REQUIRE(
-                    pkb->get_procedure_by_name("readPoint")->get_called_by_statements().size() ==
+                    pkb->get_procedure_by_name("readPoint")->get_called_by_statements()->size() ==
                     1);
-                REQUIRE(
-                    pkb->get_procedure_by_name("readPoint")->get_called_by_statements().count(18) ==
-                    1);
+                REQUIRE(pkb->get_procedure_by_name("readPoint")
+                            ->get_called_by_statements()
+                            ->count(18) == 1);
                 REQUIRE(pkb->get_statement_by_id(18)->get_procedure_called() == "readPoint");
             }
         }

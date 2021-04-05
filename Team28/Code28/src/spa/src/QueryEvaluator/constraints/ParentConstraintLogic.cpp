@@ -16,6 +16,7 @@ ParentConstraintLogic::ParentConstraintLogic(std::shared_ptr<KnowledgeBase::PKB>
 }
 
 bool ParentConstraintLogic::is_valid(const AssignmentMap& assignments) const {
+
     if (lhs.get_type() == Parser::StatementRefType::ANY &&
         rhs.get_type() == Parser::StatementRefType::ANY) {
         auto statements = pkb->get_statements();
@@ -34,12 +35,13 @@ bool ParentConstraintLogic::is_valid(const AssignmentMap& assignments) const {
         switch (lhs_statement->get_type()) {
         case KnowledgeBase::StatementType::WHILE:
         case KnowledgeBase::StatementType::IF:
-            return !lhs_statement->get_children().empty();
+            return !lhs_statement->get_children()->empty();
         case KnowledgeBase::StatementType::ASSIGN:
         case KnowledgeBase::StatementType::READ:
         case KnowledgeBase::StatementType::PRINT:
         case KnowledgeBase::StatementType::CALL:
             return false;
+            break;
         default:
             throw std::runtime_error("Unhandled statement type");
         }

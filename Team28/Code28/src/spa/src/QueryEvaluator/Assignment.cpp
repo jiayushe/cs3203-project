@@ -33,15 +33,16 @@ bool Assignment::operator==(const Assignment& other) const {
 }
 
 std::size_t AssignmentHash::operator()(const Assignment& assignment) const {
-    // TODO: Verify the quality of this hash function
+    std::hash<int> int_hash;
+    std::hash<std::string> string_hash;
     switch (assignment.get_type()) {
     case AssignmentType::INTEGER:
-        return std::hash<int>()(assignment.get_int_value());
+        return int_hash(1) ^ int_hash(assignment.get_int_value());
     case AssignmentType::STRING:
-        return std::hash<std::string>()(assignment.get_string_value());
+        return int_hash(2) ^ string_hash(assignment.get_string_value());
     case AssignmentType::BOTH:
-        return std::hash<int>()(assignment.get_int_value()) ^
-               std::hash<std::string>()(assignment.get_string_value());
+        return int_hash(3) ^ int_hash(assignment.get_int_value()) ^
+               string_hash(assignment.get_string_value());
     default:
         throw std::runtime_error("Unhandled assignment type");
     }

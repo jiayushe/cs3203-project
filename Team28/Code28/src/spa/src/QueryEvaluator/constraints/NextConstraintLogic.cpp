@@ -15,11 +15,12 @@ NextConstraintLogic::NextConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> pkb
 }
 
 bool NextConstraintLogic::is_valid(const AssignmentMap& assignment_map) const {
+
     if (lhs.get_type() == Parser::StatementRefType::ANY &&
         rhs.get_type() == Parser::StatementRefType::ANY) {
         auto statements = pkb->get_statements();
         for (auto const& statement : statements) {
-            if (!statement->get_direct_next().empty()) {
+            if (!statement->get_direct_next()->empty()) {
                 return true;
             }
         }
@@ -29,20 +30,20 @@ bool NextConstraintLogic::is_valid(const AssignmentMap& assignment_map) const {
     if (lhs.get_type() != Parser::StatementRefType::ANY &&
         rhs.get_type() == Parser::StatementRefType::ANY) {
         auto lhs_statement = get_statement(assignment_map, lhs);
-        return !lhs_statement->get_direct_next().empty();
+        return !lhs_statement->get_direct_next()->empty();
     }
 
     if (lhs.get_type() == Parser::StatementRefType::ANY &&
         rhs.get_type() != Parser::StatementRefType::ANY) {
         auto rhs_statement = get_statement(assignment_map, rhs);
-        return !rhs_statement->get_direct_previous().empty();
+        return !rhs_statement->get_direct_previous()->empty();
     }
 
     auto lhs_statement = get_statement(assignment_map, lhs);
     auto rhs_statement_id = get_statement_id(assignment_map, rhs);
 
     auto lhs_statement_direct_next = lhs_statement->get_direct_next();
-    return lhs_statement_direct_next.find(rhs_statement_id) != lhs_statement_direct_next.end();
+    return lhs_statement_direct_next->find(rhs_statement_id) != lhs_statement_direct_next->end();
 }
 
 std::unordered_set<std::string> NextConstraintLogic::get_synonyms() const { return synonyms; }

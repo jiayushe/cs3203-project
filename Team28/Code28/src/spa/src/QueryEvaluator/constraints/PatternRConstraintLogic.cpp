@@ -8,6 +8,7 @@ PatternRConstraintLogic::PatternRConstraintLogic(std::shared_ptr<KnowledgeBase::
       expression_spec(pattern_assign.get_expression_spec()) {}
 
 bool PatternRConstraintLogic::is_valid(const AssignmentMap& assignment_map) const {
+
     switch (expression_spec.get_type()) {
     case Parser::ExpressionSpecType::ANY:
         return true;

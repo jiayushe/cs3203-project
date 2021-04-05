@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common.h"
+#include "Profiler.h"
 #include "constraints/BinaryConstraint.h"
 #include <string>
 #include <unordered_set>
@@ -29,14 +30,14 @@ public:
     //   a = A and b = B and BC(B, C) is consistent if b = B and c = C
     //
     // Then, we expect the output to be {{"a": 1, "b": 2}}.
-    static AssignmentMaps solve(const std::unordered_set<std::string>& targets,
-                                DomainMap domain_map,
-                                const std::vector<BinaryConstraint>& constraints);
+    static AssignmentMapSet solve(const std::unordered_set<std::string>& targets,
+                                  DomainMap domain_map,
+                                  const std::vector<BinaryConstraint>& constraints);
 
 private:
     // Similar to `solve`, `search` is the main constraint solving routine (in fact `solve` simply
     // wraps around `search`). The algorithm implemented is forward-checking backtracking search.
-    static bool search(AssignmentMaps& results, AssignmentMap& assignment_map,
+    static bool search(AssignmentMapSet& results, AssignmentMap& assignment_map,
                        const std::unordered_set<std::string>& targets, DomainMap& domain_map,
                        const std::vector<BinaryConstraint>& constraints);
 
@@ -46,20 +47,16 @@ private:
                                                  const AssignmentMap& assignment_map,
                                                  const DomainMap& domain_map);
 
-    // Execute the forward-checking step, i.e. remove all values in the domain which are
+    // Execute the forward-checking step, i.e. invalidate all values in the domain which are
     // inconsistent with the current assignment.
-    static DomainMap remove_invalid_domains(const std::string& synonym,
-                                            AssignmentMap& assignment_map, DomainMap& domain_map,
-                                            const std::vector<BinaryConstraint>& constraints);
+    static DomainMap invalidate_domain_map(const std::string& synonym,
+                                           AssignmentMap& assignment_map,
+                                           const std::vector<BinaryConstraint>& constraints,
+                                           DomainMap& domain_map);
 
-    // Part of the backtracking step, i.e. used to restore all domains that were removed when
-    // `remove_invalid_domains` is called.
-    static void merge_domains(DomainMap& dest_domain_map, const DomainMap& src_domain_map);
-
-    // Check whether all synonyms have been assigned (indicate whether we've found a consistent
-    // assignment).
-    static bool are_all_synonyms_assigned(const AssignmentMap& assignment_map,
-                                          const DomainMap& domain_map);
+    // Part of the backtracking step, i.e. used to restore all domains that were invalidated when
+    // `invalidate_domain_map` is called.
+    static void restore_domain_map(DomainMap& domain_map, const DomainMap& invalidated_domain_map);
 
     // Helper to construct an assignment map consisting of the given keys.
     static AssignmentMap pick(const AssignmentMap& assignment_map,

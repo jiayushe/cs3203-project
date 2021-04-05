@@ -15,6 +15,7 @@ FollowsConstraintLogic::FollowsConstraintLogic(std::shared_ptr<KnowledgeBase::PK
 }
 
 bool FollowsConstraintLogic::is_valid(const AssignmentMap& assignments) const {
+
     if (lhs.get_type() == Parser::StatementRefType::ANY &&
         rhs.get_type() == Parser::StatementRefType::ANY) {
         auto statements = pkb->get_statements();

@@ -16,6 +16,7 @@ UsesSConstraintLogic::UsesSConstraintLogic(std::shared_ptr<KnowledgeBase::PKB> p
 }
 
 bool UsesSConstraintLogic::is_valid(const AssignmentMap& assignment_map) const {
+
     if (lhs.get_type() == Parser::StatementRefType::ANY) {
         return false;
     }
@@ -29,7 +30,7 @@ bool UsesSConstraintLogic::is_valid(const AssignmentMap& assignment_map) const {
         case KnowledgeBase::StatementType::ASSIGN:
         case KnowledgeBase::StatementType::PRINT:
         case KnowledgeBase::StatementType::CALL:
-            return !lhs_statement->get_uses().empty();
+            return !lhs_statement->get_uses()->empty();
         case KnowledgeBase::StatementType::READ:
             return false;
         default:
@@ -47,7 +48,7 @@ bool UsesSConstraintLogic::is_valid(const AssignmentMap& assignment_map) const {
     case KnowledgeBase::StatementType::PRINT:
     case KnowledgeBase::StatementType::CALL: {
         auto lhs_statement_uses = lhs_statement->get_uses();
-        return lhs_statement_uses.find(rhs_variable_name) != lhs_statement_uses.end();
+        return lhs_statement_uses->find(rhs_variable_name) != lhs_statement_uses->end();
     }
     case KnowledgeBase::StatementType::READ:
         return false;
