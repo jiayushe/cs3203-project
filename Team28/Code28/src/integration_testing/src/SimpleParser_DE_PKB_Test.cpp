@@ -489,18 +489,18 @@ std::shared_ptr<SimpleNode> build_ast_for_next_and_affects() {
     source += "            e = a + d;";
     source += "            h = b;";
     source += "        }";
-    source += "        e = b + a;";
+    source += "        a = b + a;";
     source += "        z = 1;";
     source += "        call Second;";
     source += "        f = z * 10;";
-    source += "        c = c + 1;";
+    source += "        c = b + c + 1;";
     source += "        while (d < 10) {";
     source += "            d = a * 2;";
     source += "            k = h + 2;";
     source += "        }";
     source += "    }";
     source += "    e = e + 1;";
-    source += "    if (i == 2) then {";
+    source += "    if (b == 2) then {";
     source += "        read e;";
     source += "        if (j != 1) then {";
     source += "            g = a / 3 + e;";
@@ -535,7 +535,7 @@ std::shared_ptr<SimpleNode> build_ast_for_next_and_affects() {
     return ast;
 }
 
-TEST_CASE("Test for next and affects relationship with multi-nested source program") {
+TEST_CASE("Testing for next and affects relationship with multi-nested source program") {
     auto ast = build_ast_for_next_and_affects();
     auto pkb = std::make_shared<KnowledgeBase::PKB>(ast);
     SimpleExtractor::DesignExtractor::extract_cfg(pkb);
@@ -546,4 +546,351 @@ TEST_CASE("Test for next and affects relationship with multi-nested source progr
     SimpleExtractor::DesignExtractor::extract_modify_relationship(pkb);
     SimpleExtractor::DesignExtractor::extract_use_relationship(pkb);
     SimpleExtractor::DesignExtractor::extract_affect_relationship(pkb);
+
+    SECTION("Testing for next and next*") {
+        SECTION("Testing for direct next") {
+            SECTION("Direct next") {
+                REQUIRE(pkb->get_statement_by_id(3)->get_direct_next()->size() == 2);
+                REQUIRE(pkb->get_statement_by_id(3)->get_direct_next()->count(4) == 1);
+                REQUIRE(pkb->get_statement_by_id(3)->get_direct_next()->count(16) == 1);
+                REQUIRE(pkb->get_statement_by_id(13)->get_direct_next()->size() == 2);
+                REQUIRE(pkb->get_statement_by_id(13)->get_direct_next()->count(3) == 1);
+                REQUIRE(pkb->get_statement_by_id(13)->get_direct_next()->count(14) == 1);
+                REQUIRE(pkb->get_statement_by_id(15)->get_direct_next()->size() == 1);
+                REQUIRE(pkb->get_statement_by_id(15)->get_direct_next()->count(13) == 1);
+                REQUIRE(pkb->get_statement_by_id(17)->get_direct_next()->size() == 2);
+                REQUIRE(pkb->get_statement_by_id(17)->get_direct_next()->count(18) == 1);
+                REQUIRE(pkb->get_statement_by_id(17)->get_direct_next()->count(22) == 1);
+                REQUIRE(pkb->get_statement_by_id(20)->get_direct_next()->size() == 1);
+                REQUIRE(pkb->get_statement_by_id(20)->get_direct_next()->count(26) == 1);
+                REQUIRE(pkb->get_statement_by_id(21)->get_direct_next()->size() == 1);
+                REQUIRE(pkb->get_statement_by_id(21)->get_direct_next()->count(26) == 1);
+                REQUIRE(pkb->get_statement_by_id(23)->get_direct_next()->size() == 2);
+                REQUIRE(pkb->get_statement_by_id(23)->get_direct_next()->count(24) == 1);
+                REQUIRE(pkb->get_statement_by_id(23)->get_direct_next()->count(26) == 1);
+                REQUIRE(pkb->get_statement_by_id(25)->get_direct_next()->size() == 1);
+                REQUIRE(pkb->get_statement_by_id(25)->get_direct_next()->count(23) == 1);
+            }
+
+            SECTION("Direct previous") {
+                REQUIRE(pkb->get_statement_by_id(3)->get_direct_previous()->size() == 2);
+                REQUIRE(pkb->get_statement_by_id(3)->get_direct_previous()->count(2) == 1);
+                REQUIRE(pkb->get_statement_by_id(3)->get_direct_previous()->count(13) == 1);
+                REQUIRE(pkb->get_statement_by_id(8)->get_direct_previous()->size() == 2);
+                REQUIRE(pkb->get_statement_by_id(8)->get_direct_previous()->count(5) == 1);
+                REQUIRE(pkb->get_statement_by_id(8)->get_direct_previous()->count(7) == 1);
+                REQUIRE(pkb->get_statement_by_id(13)->get_direct_previous()->size() == 2);
+                REQUIRE(pkb->get_statement_by_id(13)->get_direct_previous()->count(12) == 1);
+                REQUIRE(pkb->get_statement_by_id(13)->get_direct_previous()->count(15) == 1);
+                REQUIRE(pkb->get_statement_by_id(23)->get_direct_previous()->size() == 2);
+                REQUIRE(pkb->get_statement_by_id(23)->get_direct_previous()->count(22) == 1);
+                REQUIRE(pkb->get_statement_by_id(23)->get_direct_previous()->count(25) == 1);
+                REQUIRE(pkb->get_statement_by_id(26)->get_direct_previous()->size() == 3);
+                REQUIRE(pkb->get_statement_by_id(26)->get_direct_previous()->count(20) == 1);
+                REQUIRE(pkb->get_statement_by_id(26)->get_direct_previous()->count(21) == 1);
+                REQUIRE(pkb->get_statement_by_id(26)->get_direct_previous()->count(23) == 1);
+            }
+        }
+
+        SECTION("Testing for next*") {
+            SECTION("Next* that also satisfies direct next") {
+                REQUIRE(pkb->get_statement_by_id(3)->get_next()->count(4) == 1);
+                REQUIRE(pkb->get_statement_by_id(3)->get_next()->count(16) == 1);
+                REQUIRE(pkb->get_statement_by_id(13)->get_next()->count(3) == 1);
+                REQUIRE(pkb->get_statement_by_id(13)->get_next()->count(14) == 1);
+                REQUIRE(pkb->get_statement_by_id(15)->get_next()->count(13) == 1);
+                REQUIRE(pkb->get_statement_by_id(17)->get_next()->count(18) == 1);
+                REQUIRE(pkb->get_statement_by_id(17)->get_next()->count(22) == 1);
+                REQUIRE(pkb->get_statement_by_id(20)->get_next()->count(26) == 1);
+                REQUIRE(pkb->get_statement_by_id(21)->get_next()->count(26) == 1);
+                REQUIRE(pkb->get_statement_by_id(23)->get_next()->count(24) == 1);
+                REQUIRE(pkb->get_statement_by_id(23)->get_next()->count(26) == 1);
+                REQUIRE(pkb->get_statement_by_id(25)->get_next()->count(23) == 1);
+            }
+
+            SECTION("Cross-level next*") {
+                std::unordered_set<int> next_stmts({3,  4,  5,  6,  7,  8,  9,  10, 11,
+                                                    12, 13, 14, 15, 16, 17, 18, 19, 20,
+                                                    21, 22, 23, 24, 25, 26, 27, 28});
+                REQUIRE(*pkb->get_statement_by_id(2)->get_next() == next_stmts);
+                REQUIRE(pkb->get_statement_by_id(3)->get_next()->count(5) == 1);
+                REQUIRE(pkb->get_statement_by_id(3)->get_next()->count(7) == 1);
+                REQUIRE(pkb->get_statement_by_id(3)->get_next()->count(14) == 1);
+                REQUIRE(pkb->get_statement_by_id(3)->get_next()->count(18) == 1);
+                REQUIRE(pkb->get_statement_by_id(3)->get_next()->count(20) == 1);
+                REQUIRE(pkb->get_statement_by_id(3)->get_next()->count(25) == 1);
+                REQUIRE(pkb->get_statement_by_id(5)->get_next()->count(14) == 1);
+                REQUIRE(pkb->get_statement_by_id(5)->get_next()->count(20) == 1);
+                REQUIRE(pkb->get_statement_by_id(5)->get_next()->count(24) == 1);
+                REQUIRE(pkb->get_statement_by_id(16)->get_next()->count(18) == 1);
+                REQUIRE(pkb->get_statement_by_id(16)->get_next()->count(20) == 1);
+                REQUIRE(pkb->get_statement_by_id(16)->get_next()->count(25) == 1);
+
+                // Negative cases
+                REQUIRE(pkb->get_statement_by_id(18)->get_next()->count(22) == 0);
+                REQUIRE(pkb->get_statement_by_id(20)->get_next()->count(21) == 0);
+                REQUIRE(pkb->get_statement_by_id(20)->get_next()->count(23) == 0);
+                REQUIRE(pkb->get_statement_by_id(24)->get_next()->count(19) == 0);
+                REQUIRE(pkb->get_statement_by_id(24)->get_next()->count(21) == 0);
+            }
+
+            SECTION("Indirect previous") {
+                REQUIRE(pkb->get_statement_by_id(3)->get_previous()->count(2) == 1);
+                REQUIRE(pkb->get_statement_by_id(3)->get_previous()->count(13) == 1);
+                REQUIRE(pkb->get_statement_by_id(8)->get_previous()->count(5) == 1);
+                REQUIRE(pkb->get_statement_by_id(8)->get_previous()->count(7) == 1);
+                REQUIRE(pkb->get_statement_by_id(13)->get_previous()->count(12) == 1);
+                REQUIRE(pkb->get_statement_by_id(13)->get_previous()->count(15) == 1);
+                REQUIRE(pkb->get_statement_by_id(23)->get_previous()->count(22) == 1);
+                REQUIRE(pkb->get_statement_by_id(23)->get_previous()->count(25) == 1);
+                REQUIRE(pkb->get_statement_by_id(26)->get_previous()->count(20) == 1);
+                REQUIRE(pkb->get_statement_by_id(26)->get_previous()->count(21) == 1);
+                REQUIRE(pkb->get_statement_by_id(26)->get_previous()->count(23) == 1);
+            }
+        }
+    }
+
+    SECTION("Testing for direct affects") {
+        SECTION("Direct affects") {
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_affects()->size() == 5);
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_affects()->count(5) == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_affects()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_affects()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_affects()->count(20) == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_affects()->count(28) == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_direct_affects()->size() == 4);
+            REQUIRE(pkb->get_statement_by_id(2)->get_direct_affects()->count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_direct_affects()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_direct_affects()->count(12) == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_direct_affects()->count(28) == 1);
+            REQUIRE(pkb->get_statement_by_id(5)->get_direct_affects()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(5)->get_direct_affects()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_direct_affects()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_direct_affects()->count(16) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affects()->size() == 6);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affects()->count(5) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affects()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affects()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affects()->count(14) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affects()->count(20) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affects()->count(28) == 1);
+            REQUIRE(pkb->get_statement_by_id(14)->get_direct_affects()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(14)->get_direct_affects()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(22)->get_direct_affects()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(22)->get_direct_affects()->count(24) == 1);
+            REQUIRE(pkb->get_statement_by_id(22)->get_direct_affects()->count(28) == 1);
+            REQUIRE(pkb->get_statement_by_id(25)->get_direct_affects()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(25)->get_direct_affects()->count(25) == 1);
+            REQUIRE(pkb->get_statement_by_id(30)->get_direct_affects()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(30)->get_direct_affects()->count(32) == 1);
+
+            // Negative cases
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_affects()->count(14) == 0);
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_affects()->count(22) == 0);
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_affects()->count(24) == 0);
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_affects()->count(27) == 0);
+            REQUIRE(pkb->get_statement_by_id(2)->get_direct_affects()->count(17) == 0);
+            REQUIRE(pkb->get_statement_by_id(2)->get_direct_affects()->count(30) == 0);
+            REQUIRE(pkb->get_statement_by_id(5)->get_direct_affects()->count(13) == 0);
+            REQUIRE(pkb->get_statement_by_id(5)->get_direct_affects()->count(14) == 0);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affects()->count(22) == 0);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affects()->count(24) == 0);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affects()->count(27) == 0);
+            REQUIRE(pkb->get_statement_by_id(9)->get_direct_affects()->count(11) == 0);
+            REQUIRE(pkb->get_statement_by_id(12)->get_direct_affects()->count(3) == 0);
+            REQUIRE(pkb->get_statement_by_id(12)->get_direct_affects()->count(12) == 0);
+            REQUIRE(pkb->get_statement_by_id(16)->get_direct_affects()->count(20) == 0);
+        }
+
+        SECTION("Direct affected by") {
+            REQUIRE(pkb->get_statement_by_id(5)->get_direct_affected_by()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(5)->get_direct_affected_by()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(5)->get_direct_affected_by()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_direct_affected_by()->size() == 4);
+            REQUIRE(pkb->get_statement_by_id(6)->get_direct_affected_by()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_direct_affected_by()->count(5) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_direct_affected_by()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_direct_affected_by()->count(14) == 1);
+            REQUIRE(pkb->get_statement_by_id(7)->get_direct_affected_by()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(7)->get_direct_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affected_by()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affected_by()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_direct_affected_by()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(12)->get_direct_affected_by()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(12)->get_direct_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(20)->get_direct_affected_by()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(20)->get_direct_affected_by()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(20)->get_direct_affected_by()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(24)->get_direct_affected_by()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(24)->get_direct_affected_by()->count(22) == 1);
+            REQUIRE(pkb->get_statement_by_id(25)->get_direct_affected_by()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(25)->get_direct_affected_by()->count(25) == 1);
+            REQUIRE(pkb->get_statement_by_id(28)->get_direct_affected_by()->size() == 4);
+            REQUIRE(pkb->get_statement_by_id(28)->get_direct_affected_by()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(28)->get_direct_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(28)->get_direct_affected_by()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(28)->get_direct_affected_by()->count(22) == 1);
+            REQUIRE(pkb->get_statement_by_id(32)->get_direct_affected_by()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(32)->get_direct_affected_by()->count(30) == 1);
+
+            // Negative cases
+            REQUIRE(pkb->get_statement_by_id(1)->get_direct_affected_by()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(3)->get_direct_affected_by()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(4)->get_direct_affected_by()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(10)->get_direct_affected_by()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(18)->get_direct_affected_by()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(27)->get_direct_affected_by()->size() == 0);
+        }
+    }
+
+    SECTION("Testing for affects*") {
+        SECTION("Affects*") {
+            REQUIRE(pkb->get_statement_by_id(1)->get_affects()->size() == 7);
+            REQUIRE(pkb->get_statement_by_id(1)->get_affects()->count(5) == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_affects()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_affects()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_affects()->count(20) == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_affects()->count(28) == 1);
+            REQUIRE(pkb->get_statement_by_id(1)->get_affects()->count(14) == 1); // 1->8->14
+            REQUIRE(pkb->get_statement_by_id(1)->get_affects()->count(16) == 1); // 1->6->16
+
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->size() == 12);
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->count(12) == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->count(28) == 1);
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->count(5) == 1);  // 2->8->5
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->count(6) == 1);  // 2->8->6
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->count(14) == 1); // 2->8->14
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->count(15) == 1); // 2->7->15
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->count(16) == 1); // 2->8->6->16
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->count(20) == 1); // 2->8->20
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->count(21) == 1); // 2->7->15->21
+            REQUIRE(pkb->get_statement_by_id(2)->get_affects()->count(26) == 1); // 2->7->15->21->26
+
+            REQUIRE(pkb->get_statement_by_id(5)->get_affects()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(5)->get_affects()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(5)->get_affects()->count(16) == 1); // 5->6->16
+
+            REQUIRE(pkb->get_statement_by_id(6)->get_affects()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_affects()->count(16) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(7)->get_affects()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(7)->get_affects()->count(15) == 1);
+            REQUIRE(pkb->get_statement_by_id(7)->get_affects()->count(21) == 1); // 7->15->21
+            REQUIRE(pkb->get_statement_by_id(7)->get_affects()->count(26) == 1); // 7->15->21->26
+
+            REQUIRE(pkb->get_statement_by_id(8)->get_affects()->size() == 7);
+            REQUIRE(pkb->get_statement_by_id(8)->get_affects()->count(5) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_affects()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_affects()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_affects()->count(14) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_affects()->count(20) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_affects()->count(28) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_affects()->count(16) == 1); // 8->6->16
+
+            REQUIRE(pkb->get_statement_by_id(14)->get_affects()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(14)->get_affects()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(14)->get_affects()->count(16) == 1); // 14->6->16
+
+            REQUIRE(pkb->get_statement_by_id(15)->get_affects()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(15)->get_affects()->count(21) == 1);
+            REQUIRE(pkb->get_statement_by_id(15)->get_affects()->count(26) == 1); // 15->21->26
+
+            REQUIRE(pkb->get_statement_by_id(22)->get_affects()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(22)->get_affects()->count(24) == 1);
+            REQUIRE(pkb->get_statement_by_id(22)->get_affects()->count(28) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(25)->get_affects()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(25)->get_affects()->count(25) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(30)->get_affects()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(30)->get_affects()->count(32) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(30)->get_affects()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(30)->get_affects()->count(32) == 1);
+        }
+
+        SECTION("Affected* by") {
+            REQUIRE(pkb->get_statement_by_id(5)->get_affected_by()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(5)->get_affected_by()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(5)->get_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(5)->get_affected_by()->count(8) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(6)->get_affected_by()->size() == 5);
+            REQUIRE(pkb->get_statement_by_id(6)->get_affected_by()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_affected_by()->count(5) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_affected_by()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(6)->get_affected_by()->count(14) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(7)->get_affected_by()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(7)->get_affected_by()->count(2) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(8)->get_affected_by()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(8)->get_affected_by()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(8)->get_affected_by()->count(8) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(12)->get_affected_by()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(12)->get_affected_by()->count(2) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(14)->get_affected_by()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(14)->get_affected_by()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(14)->get_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(14)->get_affected_by()->count(8) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(15)->get_affected_by()->size() == 2);
+            REQUIRE(pkb->get_statement_by_id(15)->get_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(15)->get_affected_by()->count(7) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(16)->get_affected_by()->size() == 6);
+            REQUIRE(pkb->get_statement_by_id(16)->get_affected_by()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(16)->get_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(16)->get_affected_by()->count(5) == 1);
+            REQUIRE(pkb->get_statement_by_id(16)->get_affected_by()->count(6) == 1);
+            REQUIRE(pkb->get_statement_by_id(16)->get_affected_by()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(16)->get_affected_by()->count(14) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(20)->get_affected_by()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(20)->get_affected_by()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(20)->get_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(20)->get_affected_by()->count(8) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(21)->get_affected_by()->size() == 3);
+            REQUIRE(pkb->get_statement_by_id(21)->get_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(21)->get_affected_by()->count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(21)->get_affected_by()->count(15) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(24)->get_affected_by()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(24)->get_affected_by()->count(22) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(25)->get_affected_by()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(25)->get_affected_by()->count(25) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(26)->get_affected_by()->size() == 4);
+            REQUIRE(pkb->get_statement_by_id(26)->get_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(26)->get_affected_by()->count(7) == 1);
+            REQUIRE(pkb->get_statement_by_id(26)->get_affected_by()->count(15) == 1);
+            REQUIRE(pkb->get_statement_by_id(26)->get_affected_by()->count(21) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(28)->get_affected_by()->size() == 4);
+            REQUIRE(pkb->get_statement_by_id(28)->get_affected_by()->count(1) == 1);
+            REQUIRE(pkb->get_statement_by_id(28)->get_affected_by()->count(2) == 1);
+            REQUIRE(pkb->get_statement_by_id(28)->get_affected_by()->count(8) == 1);
+            REQUIRE(pkb->get_statement_by_id(28)->get_affected_by()->count(22) == 1);
+
+            REQUIRE(pkb->get_statement_by_id(32)->get_affected_by()->size() == 1);
+            REQUIRE(pkb->get_statement_by_id(32)->get_affected_by()->count(30) == 1);
+
+            // Negative cases
+            REQUIRE(pkb->get_statement_by_id(1)->get_affected_by()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(3)->get_affected_by()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(4)->get_affected_by()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(10)->get_affected_by()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(18)->get_affected_by()->size() == 0);
+            REQUIRE(pkb->get_statement_by_id(27)->get_affected_by()->size() == 0);
+        }
+    }
 }
