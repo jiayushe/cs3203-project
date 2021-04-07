@@ -10,6 +10,7 @@
 #include "QueryEvaluator/constraints/ConstraintUtils.h"
 #include "QueryEvaluator/domains/DomainUtils.h"
 #include <algorithm>
+#include <functional>
 #include <list>
 #include <memory>
 #include <stdexcept>
@@ -100,18 +101,18 @@ private:
     static std::string get_synonym(const Parser::EntityRef& ref);
     static std::string get_synonym(const Parser::StatementRef& ref);
 
-    // Merge a list of assignment maps together (via a cross-product).
-    static AssignmentMapVector
-    merge_assignment_map_sets(const std::vector<AssignmentMapSet>& assignment_map_sets);
-    static void merge_assignment_map_sets(AssignmentMapVector& results,
-                                          AssignmentMap& assignment_map,
-                                          const std::vector<AssignmentMapSet>& assignment_map_sets,
-                                          int pos);
-    static void merge_assignment_map(AssignmentMap& dest, const AssignmentMap& src);
-
-    // Get the formatted output to a query.
-    static std::list<std::string> get_formatted_output(const Parser::Result& result,
-                                                       const AssignmentMapVector& assignment_maps);
+    // Merge and append answers to the output list.
+    static void merge_and_output(
+        std::list<std::string>& output,
+        const std::function<std::string(const AssignmentMap& assignment_map)>& formatter,
+        const std::vector<AssignmentMapSet>& assignment_map_sets);
+    static void merge_and_output(
+        std::list<std::string>& output, AssignmentMap& assignment_map,
+        const std::function<std::string(const AssignmentMap& assignment_map)>& formatter,
+        const std::vector<AssignmentMapSet>& assignment_map_sets, int pos);
+    static void merge(AssignmentMap& dest, const AssignmentMap& src);
+    static std::function<std::string(const AssignmentMap&)>
+    create_formatter(const std::vector<Parser::Elem>& tuple);
 };
 
 } // namespace QueryEvaluator

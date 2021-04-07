@@ -37,7 +37,7 @@ void Evaluator::evaluate(std::shared_ptr<KnowledgeBase::PKB> pkb,
         }
     }
 
-    std::vector<AssignmentMapSet> assignment_map_sets;
+    std::vector<AssignmentMapSet> all_assignment_maps;
     while (!assignment_groups.empty()) {
         auto assignment_group = choose_assignment_group(assignment_groups);
         auto targets = std::get<0>(assignment_group);
@@ -59,12 +59,22 @@ void Evaluator::evaluate(std::shared_ptr<KnowledgeBase::PKB> pkb,
             }
         }
 
-        assignment_map_sets.push_back(assignment_map_set);
+        all_assignment_maps.push_back(assignment_map_set);
     }
 
-    auto merged_assignment_maps = merge_assignment_map_sets(assignment_map_sets);
-    auto formatted_output = get_formatted_output(query_object.get_result(), merged_assignment_maps);
-    output.insert(output.end(), formatted_output.begin(), formatted_output.end());
+    switch (result.get_type()) {
+    case Parser::ResultType::BOOLEAN:
+        // By this point, there must exist a valid assignment
+        output.emplace_back("TRUE");
+        return;
+    case Parser::ResultType::TUPLE: {
+        auto formatter = create_formatter(result.get_tuple());
+        merge_and_output(output, formatter, all_assignment_maps);
+        return;
+    }
+    default:
+        throw std::runtime_error("Unknown result type");
+    }
 }
 
 std::vector<AssignmentGroup>
@@ -489,105 +499,91 @@ std::string Evaluator::get_synonym(const Parser::StatementRef& statement_ref) {
     return statement_ref.get_synonym();
 }
 
-AssignmentMapVector
-Evaluator::merge_assignment_map_sets(const std::vector<AssignmentMapSet>& all_assignment_maps) {
-    AssignmentMapVector merged;
+void Evaluator::merge_and_output(
+    std::list<std::string>& output,
+    const std::function<std::string(const AssignmentMap& assignment_map)>& formatter,
+    const std::vector<AssignmentMapSet>& all_assignment_maps) {
+
     AssignmentMap empty_assignment_map;
-    merge_assignment_map_sets(merged, empty_assignment_map, all_assignment_maps, 0);
-    return merged;
+    merge_and_output(output, empty_assignment_map, formatter, all_assignment_maps, 0);
 }
 
-void Evaluator::merge_assignment_map_sets(AssignmentMapVector& results,
-                                          AssignmentMap& assignment_map,
-                                          const std::vector<AssignmentMapSet>& all_assignment_maps,
-                                          int pos) {
+void Evaluator::merge_and_output(
+    std::list<std::string>& output, AssignmentMap& assignment_map,
+    const std::function<std::string(const AssignmentMap& assignment_map)>& formatter,
+    const std::vector<AssignmentMapSet>& all_assignment_maps, int pos) {
+
     if (pos == all_assignment_maps.size()) {
-        results.push_back(assignment_map);
+        output.push_back(formatter(assignment_map));
         return;
     }
     for (auto const& new_assignment_map : all_assignment_maps.at(pos)) {
-        merge_assignment_map(assignment_map, new_assignment_map);
-        merge_assignment_map_sets(results, assignment_map, all_assignment_maps, pos + 1);
+        merge(assignment_map, new_assignment_map);
+        merge_and_output(output, assignment_map, formatter, all_assignment_maps, pos + 1);
     }
 }
 
-void Evaluator::merge_assignment_map(AssignmentMap& dest, const AssignmentMap& src) {
+void Evaluator::merge(AssignmentMap& dest, const AssignmentMap& src) {
     for (auto const& entry : src) {
         dest[entry.first] = entry.second;
     }
 }
 
-std::list<std::string> Evaluator::get_formatted_output(const Parser::Result& result,
-                                                       const AssignmentMapVector& assignment_maps) {
+std::function<std::string(const AssignmentMap&)>
+Evaluator::create_formatter(const std::vector<Parser::Elem>& tuple) {
+    std::vector<std::function<std::string(const AssignmentMap& assignment_map)>> partials;
 
-    std::list<std::string> formatted_output;
-
-    switch (result.get_type()) {
-    case Parser::ResultType::TUPLE: {
-        auto tuple = result.get_tuple();
-        for (auto const& assignment_map : assignment_maps) {
-            std::string answer;
-            for (auto const& elem : tuple) {
-                if (!answer.empty()) {
-                    answer += " ";
-                }
-
-                switch (elem.get_type()) {
-                case Parser::ElemType::ATTR_REF: {
-                    auto synonym = elem.get_attr_ref().get_synonym();
+    for (auto const& elem : tuple) {
+        switch (elem.get_type()) {
+        case Parser::ElemType::ATTR_REF: {
+            auto synonym = elem.get_attr_ref().get_synonym();
+            if (elem.get_attr_ref().get_attr_name() == "stmt#" ||
+                elem.get_attr_ref().get_attr_name() == "value") {
+                partials.emplace_back([=](const AssignmentMap& assignment_map) {
                     auto const& assignment = assignment_map.at(synonym);
-
-                    if (elem.get_attr_ref().get_attr_name() == "stmt#" ||
-                        elem.get_attr_ref().get_attr_name() == "value") {
-                        answer += std::to_string(assignment.get_int_value());
-                    } else if (elem.get_attr_ref().get_attr_name() == "procName" ||
-                               elem.get_attr_ref().get_attr_name() == "varName") {
-                        answer += assignment.get_string_value();
-                    } else {
-                        throw std::runtime_error("Unknown attribute name");
-                    }
-
-                    break;
-                }
-                case Parser::ElemType::SYNONYM: {
-                    auto synonym = elem.get_synonym();
+                    return std::to_string(assignment.get_int_value());
+                });
+            } else if (elem.get_attr_ref().get_attr_name() == "procName" ||
+                       elem.get_attr_ref().get_attr_name() == "varName") {
+                partials.emplace_back([=](const AssignmentMap& assignment_map) {
                     auto const& assignment = assignment_map.at(synonym);
-
-                    switch (assignment.get_type()) {
-                    case AssignmentType::INTEGER:
-                        answer += std::to_string(assignment.get_int_value());
-                        break;
-                    case AssignmentType::STRING:
-                        answer += assignment.get_string_value();
-                        break;
-                    case AssignmentType::BOTH:
-                        answer += std::to_string(assignment.get_int_value());
-                        break;
-                    default:
-                        throw std::runtime_error("Unknown assignment type");
-                    }
-
-                    break;
-                }
-                default:
-                    throw std::runtime_error("Unknown elem type");
-                }
+                    return assignment.get_string_value();
+                });
+            } else {
+                throw std::runtime_error("Unknown attribute name");
             }
-
-            formatted_output.push_back(answer);
+            break;
         }
-        break;
-    }
-    case Parser::ResultType::BOOLEAN:
-        if (!assignment_maps.empty()) {
-            formatted_output.emplace_back("TRUE");
-        } else {
-            formatted_output.emplace_back("FALSE");
+        case Parser::ElemType::SYNONYM: {
+            auto synonym = elem.get_synonym();
+            partials.emplace_back([=](const AssignmentMap& assignment_map) {
+                auto const& assignment = assignment_map.at(synonym);
+                switch (assignment.get_type()) {
+                case AssignmentType::INTEGER:
+                    return std::to_string(assignment.get_int_value());
+                case AssignmentType::STRING:
+                    return assignment.get_string_value();
+                case AssignmentType::BOTH:
+                    return std::to_string(assignment.get_int_value());
+                default:
+                    throw std::runtime_error("Unknown assignment type");
+                }
+            });
+            break;
         }
-        break;
-    default:
-        throw std::runtime_error("Unknown result type");
+        default:
+            throw std::runtime_error("Unknown elem type");
+        }
     }
 
-    return formatted_output;
+    return [=](const AssignmentMap& assignment_map) {
+        std::string answer;
+        for (auto const& partial : partials) {
+            if (!answer.empty()) {
+                answer += " ";
+            }
+            answer += partial(assignment_map);
+        }
+        return answer;
+    };
 }
