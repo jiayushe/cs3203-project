@@ -1,5 +1,7 @@
 #pragma once
 
+#include "AffectsBipConstraintLogic.h"
+#include "AffectsBipTConstraintLogic.h"
 #include "AffectsConstraintLogic.h"
 #include "AffectsTConstraintLogic.h"
 #include "BaseConstraintLogic.h"
@@ -12,6 +14,8 @@
 #include "KnowledgeBase/PKB.h"
 #include "ModifiesPConstraintLogic.h"
 #include "ModifiesSConstraintLogic.h"
+#include "NextBipConstraintLogic.h"
+#include "NextBipTConstraintLogic.h"
 #include "NextConstraintLogic.h"
 #include "NextTConstraintLogic.h"
 #include "ParentConstraintLogic.h"

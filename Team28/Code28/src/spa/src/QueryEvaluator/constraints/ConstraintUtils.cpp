@@ -100,6 +100,14 @@ ConstraintUtils::get_constraint_logics(std::shared_ptr<KnowledgeBase::PKB> pkb,
             constraint_logics.push_back(std::make_shared<NextTConstraintLogic>(
                 pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
+        case Parser::SuchThatType::NEXTBIP:
+            constraint_logics.push_back(std::make_shared<NextBipConstraintLogic>(
+                pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
+            break;
+        case Parser::SuchThatType::NEXTBIP_T:
+            constraint_logics.push_back(std::make_shared<NextBipTConstraintLogic>(
+                pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
+            break;
         case Parser::SuchThatType::CALLS:
             constraint_logics.push_back(std::make_shared<CallsConstraintLogic>(
                 pkb, left_ref.get_entity_ref(), right_ref.get_entity_ref()));
@@ -114,6 +122,14 @@ ConstraintUtils::get_constraint_logics(std::shared_ptr<KnowledgeBase::PKB> pkb,
             break;
         case Parser::SuchThatType::AFFECTS_T:
             constraint_logics.push_back(std::make_shared<AffectsTConstraintLogic>(
+                pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
+            break;
+        case Parser::SuchThatType::AFFECTSBIP:
+            constraint_logics.push_back(std::make_shared<AffectsBipConstraintLogic>(
+                pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
+            break;
+        case Parser::SuchThatType::AFFECTSBIP_T:
+            constraint_logics.push_back(std::make_shared<AffectsBipTConstraintLogic>(
                 pkb, left_ref.get_statement_ref(), right_ref.get_statement_ref()));
             break;
         default:

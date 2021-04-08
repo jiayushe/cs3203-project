@@ -28,6 +28,7 @@ def get_statistics(out_path, num_slowest):
         "query_count": 0,
         "passed_count": 0,
         "failed_count": 0,
+        "time_src": 0,
         "time_25": 0,
         "time_50": 0,
         "time_75": 0,
@@ -38,6 +39,8 @@ def get_statistics(out_path, num_slowest):
     time = []
 
     root = ET.parse(out_path).getroot()
+
+    statistics["time_src"] = float(root.findtext("info/parsing_time_taken"))
     for query in root.findall("queries/query"):
         statistics["query_count"] += 1
         if query.find("passed") is not None:
@@ -80,6 +83,7 @@ def autotest(binary_path, name=None, num_slowest=10):
         print(f"# total      = {statistics['query_count']}")
         print(f"# passed     = {statistics['passed_count']}")
         print(f"# failed     = {statistics['failed_count']}")
+        print(f"src time     = {statistics['time_src']:.3f}ms")
         print(f"p25 time     = {statistics['time_25']:.3f}ms")
         print(f"p50 time     = {statistics['time_50']:.3f}ms")
         print(f"p75 time     = {statistics['time_75']:.3f}ms")
@@ -91,9 +95,9 @@ def autotest(binary_path, name=None, num_slowest=10):
         print()
 
     print("Summary")
-    print("----------------------------------------------------------------------------------------------------------------------------")
-    print("| Test case        |    # total |   # passed |   # failed |   p25 time |   p50 time |   p75 time |   avg time | total time |")
-    print("----------------------------------------------------------------------------------------------------------------------------")
+    print("-----------------------------------------------------------------------------------------------------------------------------------------")
+    print("| Test case        |    # total |   # passed |   # failed |   src time |   p25 time |   p50 time |   p75 time |   avg time | total time |")
+    print("-----------------------------------------------------------------------------------------------------------------------------------------")
     for i, _, __, ___ in TEST_SUITE_FILES:
         if name is not None and name != i:
             continue
@@ -102,12 +106,13 @@ def autotest(binary_path, name=None, num_slowest=10):
         print(f" {summary[i]['query_count']:10} |", end="")
         print(f" {summary[i]['passed_count']:10} |", end="")
         print(f" {summary[i]['failed_count']:10} |", end="")
+        print(f" {summary[i]['time_src']:10.3f} |", end="")
         print(f" {summary[i]['time_25']:10.3f} |", end="")
         print(f" {summary[i]['time_50']:10.3f} |", end="")
         print(f" {summary[i]['time_75']:10.3f} |", end="")
         print(f" {summary[i]['time_avg']:10.3f} |", end="")
         print(f" {summary[i]['time_total']:10.3f} |")
-    print("----------------------------------------------------------------------------------------------------------------------------")
+    print("-----------------------------------------------------------------------------------------------------------------------------------------")
     print()
 
     if failed:
@@ -115,4 +120,3 @@ def autotest(binary_path, name=None, num_slowest=10):
 
 if __name__ == "__main__":
     fire.Fire(autotest)
-

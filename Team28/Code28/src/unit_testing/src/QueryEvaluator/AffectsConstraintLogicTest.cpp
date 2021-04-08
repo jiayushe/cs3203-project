@@ -160,6 +160,9 @@ TEST_CASE("AffectsConstraintLogic and AffectsTConstraintLogic") {
         auto affects_constraint = AffectsConstraintLogic(pkb, statement_id, statement_id_dup);
         REQUIRE(affects_constraint.is_valid(assign_mappings));
 
+        auto affectsT_constraint = AffectsTConstraintLogic(pkb, statement_id, statement_id_dup);
+        REQUIRE(affectsT_constraint.is_valid(assign_mappings));
+
         statement_id_dup.set_statement_id(3);
         affects_constraint = AffectsConstraintLogic(pkb, statement_id, statement_id_dup);
         REQUIRE_FALSE(affects_constraint.is_valid(assign_mappings));
@@ -172,7 +175,7 @@ TEST_CASE("AffectsConstraintLogic and AffectsTConstraintLogic") {
         SECTION("indirect affects") {
             statement_id.set_statement_id(1);
             statement_id_dup.set_statement_id(6);
-            auto affectsT_constraint = AffectsTConstraintLogic(pkb, statement_id, statement_id_dup);
+            affectsT_constraint = AffectsTConstraintLogic(pkb, statement_id, statement_id_dup);
             REQUIRE(affectsT_constraint.is_valid(assign_mappings));
 
             affectsT_constraint = AffectsTConstraintLogic(pkb, statement_id_dup, statement_id);
@@ -189,6 +192,10 @@ TEST_CASE("AffectsConstraintLogic and AffectsTConstraintLogic") {
             AffectsConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
         REQUIRE(affects_constraint.is_valid(assign_mappings));
 
+        auto affectsT_constraint =
+            AffectsTConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
+        REQUIRE(affectsT_constraint.is_valid(assign_mappings));
+
         affects_constraint = AffectsConstraintLogic(pkb, statement_synonym_dup, statement_synonym);
         REQUIRE_FALSE(affects_constraint.is_valid(assign_mappings));
 
@@ -199,7 +206,7 @@ TEST_CASE("AffectsConstraintLogic and AffectsTConstraintLogic") {
 
         SECTION("indirect affects") {
             assign_mappings["a2"] = Assignment(6);
-            auto affectsT_constraint =
+            affectsT_constraint =
                 AffectsTConstraintLogic(pkb, statement_synonym, statement_synonym_dup);
             REQUIRE(affectsT_constraint.is_valid(assign_mappings));
 
