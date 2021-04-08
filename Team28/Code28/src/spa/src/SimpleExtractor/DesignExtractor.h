@@ -3,6 +3,7 @@
 #include "KnowledgeBase/PKB.h"
 #include <memory>
 #include <queue>
+#include <stack>
 
 namespace SimpleExtractor {
 
@@ -37,6 +38,12 @@ public:
 
     // Extracts affect relationships from the given PKB.
     static void extract_affect_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb);
+
+    // Extracts next bip relationships from the given PKB.
+    static void extract_next_bip_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb);
+
+    // Extracts affect bip relationships from the given PKB.
+    static void extract_affect_bip_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb);
 
 private:
     /* Modify */

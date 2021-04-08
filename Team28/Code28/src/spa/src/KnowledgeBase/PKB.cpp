@@ -315,3 +315,35 @@ void PKB::add_affect_relationship(int affects_id, int affected_id) {
         }
     }
 }
+
+void PKB::add_direct_next_bip_relationship(int prev_id, int next_id) {
+    auto prev_stmt = this->get_statement_by_id(prev_id);
+    auto next_stmt = this->get_statement_by_id(next_id);
+    prev_stmt->add_direct_next_bip(next_id);
+    next_stmt->add_direct_previous_bip(prev_id);
+    prev_stmt->add_next_bip(next_id);
+    next_stmt->add_previous_bip(prev_id);
+}
+
+void PKB::add_indirect_next_bip_relationship(int prev_id, int next_id) {
+    auto prev_stmt = this->get_statement_by_id(prev_id);
+    auto next_stmt = this->get_statement_by_id(next_id);
+    prev_stmt->add_next_bip(next_id);
+    next_stmt->add_previous_bip(prev_id);
+}
+
+void PKB::add_direct_affect_bip_relationship(int affects_id, int affected_id) {
+    auto affects_stmt = this->get_statement_by_id(affects_id);
+    auto affected_stmt = this->get_statement_by_id(affected_id);
+    affects_stmt->add_direct_affects_bip(affected_id);
+    affected_stmt->add_direct_affected_bip_by(affects_id);
+    affects_stmt->add_affects_bip(affected_id);
+    affected_stmt->add_affected_bip_by(affects_id);
+}
+
+void PKB::add_indirect_affect_bip_relationship(int affects_id, int affected_id) {
+    auto affects_stmt = this->get_statement_by_id(affects_id);
+    auto affected_stmt = this->get_statement_by_id(affected_id);
+    affects_stmt->add_affects_bip(affected_id);
+    affected_stmt->add_affected_bip_by(affects_id);
+}

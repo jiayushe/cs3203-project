@@ -82,17 +82,23 @@ public:
     // Adds a next relationship between two prog line ids.
     void add_next_relationship(int prev_id, int next_id);
 
-    // Adds a next bip relationship between two prog line ids.
-    void add_next_bip_relationship(int prev_id, int next_id);
-
     // Adds a call relationship between two procedure names.
     void add_call_relationship(std::string caller_name, std::string callee_name);
 
     // Adds an affect relationship between two assignment statement ids.
     void add_affect_relationship(int affects_id, int affected_id);
 
-    // Adds an affect bip relationship between two assignment statement ids.
-    void add_affect_bip_relationship(int affects_id, int affected_id);
+    // Adds a direct next bip relationship between two prog line ids.
+    void add_direct_next_bip_relationship(int prev_id, int next_id);
+
+    // Adds an indirect next bip relationship between two prog line ids.
+    void add_indirect_next_bip_relationship(int prev_id, int next_id);
+
+    // Adds a direct affect bip relationship between two assignment statement ids.
+    void add_direct_affect_bip_relationship(int affects_id, int affected_id);
+
+    // Adds an indirect affect bip relationship between two assignment statement ids.
+    void add_indirect_affect_bip_relationship(int affects_id, int affected_id);
 
 private:
     // Base AST

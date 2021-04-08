@@ -512,6 +512,211 @@ void DesignExtractor::extract_affect_relationship(std::shared_ptr<KnowledgeBase:
     }
 }
 
+void DesignExtractor::extract_next_bip_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
+    // Assume all entities and all other abstractions have been extracted and stored
+    auto statements = pkb->get_statements();
+    std::queue<std::tuple<int, std::stack<int>, std::unordered_map<int, int>, std::vector<int>>>
+        bfs;
+    std::unordered_map<std::string, int> first_stmts;
+    for (auto stmt : statements) {
+        if (stmt->get_followings()->size()) {
+            continue;
+        }
+        int curr_stmt_id = stmt->get_id();
+        std::string curr_proc_name = stmt->get_procedure_name();
+        if (first_stmts.count(curr_proc_name) == 0 || first_stmts[curr_proc_name] > curr_stmt_id) {
+            first_stmts[curr_proc_name] = curr_stmt_id;
+        }
+    }
+    for (auto kv : first_stmts) {
+        std::string curr_proc_name = kv.first;
+        if (pkb->get_procedure_by_name(curr_proc_name)->get_callers()->size()) {
+            continue;
+        }
+        int curr_stmt_id = kv.second;
+        std::vector<int> path;
+        std::stack<int> trace;
+        std::unordered_map<int, int> visited;
+        bfs.push(std::make_tuple(curr_stmt_id, trace, visited, path));
+    }
+    while (bfs.size()) {
+        auto curr = bfs.front();
+        bfs.pop();
+        int curr_stmt_id = std::get<0>(curr);
+        std::stack<int> curr_trace = std::get<1>(curr);
+        std::unordered_map<int, int> curr_visited = std::get<2>(curr);
+        std::vector<int> curr_path = std::get<3>(curr);
+        auto curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
+        auto curr_stmt_type = curr_stmt->get_type();
+        // Populate PKB
+        for (auto prev_stmt_id : curr_path) {
+            pkb->add_indirect_next_bip_relationship(prev_stmt_id, curr_stmt_id);
+        }
+        if (curr_path.size()) {
+            pkb->add_direct_next_bip_relationship(curr_path.back(), curr_stmt_id);
+        }
+        // Update states
+        curr_path.push_back(curr_stmt_id);
+        if (curr_visited.count(curr_stmt_id) == 0) {
+            curr_visited[curr_stmt_id] = 0;
+        }
+        curr_visited[curr_stmt_id] += 1;
+        // Traverse in CFG BIP
+        if (curr_stmt_type == KnowledgeBase::StatementType::CALL) {
+            // BIP
+            curr_trace.push(curr_stmt_id);
+            std::string proc_called_name = curr_stmt->get_procedure_called();
+            int next_stmt_id = first_stmts[proc_called_name];
+            bfs.push(std::make_tuple(next_stmt_id, curr_trace, curr_visited, curr_path));
+        } else {
+            while (true) {
+                auto next_stmt_ids = curr_stmt->get_direct_next();
+                if (next_stmt_ids->size()) {
+                    for (auto next_stmt_id : *next_stmt_ids) {
+                        if (curr_visited.count(next_stmt_id) && curr_visited[next_stmt_id] > 2) {
+                            continue;
+                        }
+                        bfs.push(
+                            std::make_tuple(next_stmt_id, curr_trace, curr_visited, curr_path));
+                    }
+                    // Special check for WHILE
+                    // Attempt to backtrack if no follower statements
+                    if (curr_stmt_type != KnowledgeBase::StatementType::WHILE ||
+                        curr_stmt->get_direct_follower() != -1) {
+                        break;
+                    }
+                }
+                if (curr_trace.size()) {
+                    // BIP
+                    int curr_stmt_id = curr_trace.top();
+                    curr_trace.pop();
+                    curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
+                    curr_stmt_type = curr_stmt->get_type();
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void DesignExtractor::extract_affect_bip_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
+    // Assume all entities and all other abstractions have been extracted and stored
+    auto statements = pkb->get_statements();
+    std::queue<std::tuple<int, std::stack<int>, std::unordered_map<int, int>,
+                          std::unordered_map<int, std::unordered_set<int>>,
+                          std::unordered_map<std::string, int>>>
+        bfs;
+    std::unordered_map<std::string, int> first_stmts;
+    for (auto stmt : statements) {
+        if (stmt->get_followings()->size()) {
+            continue;
+        }
+        int curr_stmt_id = stmt->get_id();
+        std::string curr_proc_name = stmt->get_procedure_name();
+        if (first_stmts.count(curr_proc_name) == 0 || first_stmts[curr_proc_name] > curr_stmt_id) {
+            first_stmts[curr_proc_name] = curr_stmt_id;
+        }
+    }
+    for (auto kv : first_stmts) {
+        std::string curr_proc_name = kv.first;
+        if (pkb->get_procedure_by_name(curr_proc_name)->get_callers()->size()) {
+            continue;
+        }
+        int curr_stmt_id = kv.second;
+        std::unordered_map<int, std::unordered_set<int>> affected_by;
+        std::unordered_map<std::string, int> modified_by;
+        std::stack<int> trace;
+        std::unordered_map<int, int> visited;
+        bfs.push(std::make_tuple(curr_stmt_id, trace, visited, affected_by, modified_by));
+    }
+    while (bfs.size()) {
+        auto curr = bfs.front();
+        bfs.pop();
+        int curr_stmt_id = std::get<0>(curr);
+        std::stack<int> curr_trace = std::get<1>(curr);
+        std::unordered_map<int, int> curr_visited = std::get<2>(curr);
+        std::unordered_map<int, std::unordered_set<int>> curr_affected_by = std::get<3>(curr);
+        std::unordered_map<std::string, int> curr_modified_by = std::get<4>(curr);
+        auto curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
+        auto curr_stmt_type = curr_stmt->get_type();
+        // Populate PKB and update states
+        if (curr_stmt_type == KnowledgeBase::StatementType::ASSIGN) {
+            auto uses = curr_stmt->get_direct_uses();
+            for (auto var : *uses) {
+                if (curr_modified_by.count(var)) {
+                    int affects_id = curr_modified_by[var];
+                    if (affects_id == -1) {
+                        continue;
+                    }
+                    if (curr_affected_by.count(curr_stmt_id) == 0) {
+                        curr_affected_by[curr_stmt_id] = std::unordered_set<int>();
+                    }
+                    pkb->add_direct_affect_bip_relationship(affects_id, curr_stmt_id);
+                    curr_affected_by[curr_stmt_id].insert(affects_id);
+                    if (curr_affected_by.count(affects_id)) {
+                        for (auto indirect_affects_id : curr_affected_by[affects_id]) {
+                            pkb->add_indirect_affect_bip_relationship(indirect_affects_id,
+                                                                      curr_stmt_id);
+                            curr_affected_by[curr_stmt_id].insert(indirect_affects_id);
+                        }
+                    }
+                }
+            }
+            auto modifies = curr_stmt->get_direct_modifies();
+            for (auto var : *modifies) {
+                curr_modified_by[var] = curr_stmt_id;
+            }
+        } else if (curr_stmt_type == KnowledgeBase::StatementType::READ) {
+            auto modifies = curr_stmt->get_direct_modifies();
+            for (auto var : *modifies) {
+                curr_modified_by[var] = -1;
+            }
+        }
+        if (curr_visited.count(curr_stmt_id) == 0) {
+            curr_visited[curr_stmt_id] = 0;
+        }
+        curr_visited[curr_stmt_id] += 1;
+        // Traverse in CFG BIP
+        if (curr_stmt_type == KnowledgeBase::StatementType::CALL) {
+            // BIP
+            curr_trace.push(curr_stmt_id);
+            std::string proc_called_name = curr_stmt->get_procedure_called();
+            int next_stmt_id = first_stmts[proc_called_name];
+            bfs.push(std::make_tuple(next_stmt_id, curr_trace, curr_visited, curr_affected_by,
+                                     curr_modified_by));
+        } else {
+            while (true) {
+                auto next_stmt_ids = curr_stmt->get_direct_next();
+                if (next_stmt_ids->size()) {
+                    for (auto next_stmt_id : *next_stmt_ids) {
+                        if (curr_visited.count(next_stmt_id) && curr_visited[next_stmt_id] > 2) {
+                            continue;
+                        }
+                        bfs.push(std::make_tuple(next_stmt_id, curr_trace, curr_visited,
+                                                 curr_affected_by, curr_modified_by));
+                    }
+                    // Special check for WHILE
+                    // Attempt to backtrack if no follower statements
+                    if (curr_stmt_type != KnowledgeBase::StatementType::WHILE ||
+                        curr_stmt->get_direct_follower() != -1) {
+                        break;
+                    }
+                }
+                if (curr_trace.size()) {
+                    // BIP
+                    int curr_stmt_id = curr_trace.top();
+                    curr_trace.pop();
+                    curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
+                    curr_stmt_type = curr_stmt->get_type();
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+}
+
 std::shared_ptr<KnowledgeBase::Procedure>
 DesignExtractor::extract_procedure(std::shared_ptr<KnowledgeBase::PKB> pkb,
                                    std::shared_ptr<Parser::SimpleNode> proc_node) {
