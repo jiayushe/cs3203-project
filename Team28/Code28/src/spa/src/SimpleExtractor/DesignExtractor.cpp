@@ -580,9 +580,9 @@ void DesignExtractor::extract_next_bip_relationship(std::shared_ptr<KnowledgeBas
                             std::make_tuple(next_stmt_id, curr_trace, curr_visited, curr_path));
                     }
                     // Special check for WHILE
-                    // Attempt to backtrack if no follower statements
+                    // Attempt to backtrack if last statement in procedure
                     if (curr_stmt_type != KnowledgeBase::StatementType::WHILE ||
-                        curr_stmt->get_direct_follower() != -1) {
+                        curr_stmt->get_direct_next()->size() == 2) {
                         break;
                     }
                 }
@@ -697,9 +697,9 @@ void DesignExtractor::extract_affect_bip_relationship(std::shared_ptr<KnowledgeB
                                                  curr_affected_by, curr_modified_by));
                     }
                     // Special check for WHILE
-                    // Attempt to backtrack if no follower statements
+                    // Attempt to backtrack if last statement in procedure
                     if (curr_stmt_type != KnowledgeBase::StatementType::WHILE ||
-                        curr_stmt->get_direct_follower() != -1) {
+                        curr_stmt->get_direct_next()->size() == 2) {
                         break;
                     }
                 }
