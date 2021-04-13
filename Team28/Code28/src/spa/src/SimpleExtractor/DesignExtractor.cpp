@@ -514,38 +514,23 @@ void DesignExtractor::extract_affect_relationship(std::shared_ptr<KnowledgeBase:
 
 void DesignExtractor::extract_next_bip_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
     // Assume all entities and all other abstractions have been extracted and stored
-    auto statements = pkb->get_statements();
-    std::queue<std::tuple<int, std::stack<int>, std::unordered_map<int, int>, std::vector<int>>>
-        bfs;
-    std::unordered_map<std::string, int> first_stmts;
-    for (auto stmt : statements) {
-        if (stmt->get_followings()->size()) {
+    std::queue<std::tuple<int, std::stack<int>, std::vector<int>>> bfs;
+    auto procedures = pkb->get_procedures();
+    for (auto proc : procedures) {
+        if (proc->get_callers()->size()) {
             continue;
         }
-        int curr_stmt_id = stmt->get_id();
-        std::string curr_proc_name = stmt->get_procedure_name();
-        if (first_stmts.count(curr_proc_name) == 0 || first_stmts[curr_proc_name] > curr_stmt_id) {
-            first_stmts[curr_proc_name] = curr_stmt_id;
-        }
-    }
-    for (auto kv : first_stmts) {
-        std::string curr_proc_name = kv.first;
-        if (pkb->get_procedure_by_name(curr_proc_name)->get_callers()->size()) {
-            continue;
-        }
-        int curr_stmt_id = kv.second;
-        std::vector<int> path;
+        int curr_stmt_id = proc->get_first_statement();
         std::stack<int> trace;
-        std::unordered_map<int, int> visited;
-        bfs.push(std::make_tuple(curr_stmt_id, trace, visited, path));
+        std::vector<int> path;
+        bfs.push(std::make_tuple(curr_stmt_id, trace, path));
     }
     while (bfs.size()) {
         auto curr = bfs.front();
         bfs.pop();
         int curr_stmt_id = std::get<0>(curr);
         std::stack<int> curr_trace = std::get<1>(curr);
-        std::unordered_map<int, int> curr_visited = std::get<2>(curr);
-        std::vector<int> curr_path = std::get<3>(curr);
+        std::vector<int> curr_path = std::get<2>(curr);
         auto curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
         auto curr_stmt_type = curr_stmt->get_type();
         // Populate PKB
@@ -557,77 +542,189 @@ void DesignExtractor::extract_next_bip_relationship(std::shared_ptr<KnowledgeBas
         }
         // Update states
         curr_path.push_back(curr_stmt_id);
-        if (curr_visited.count(curr_stmt_id) == 0) {
-            curr_visited[curr_stmt_id] = 0;
-        }
-        curr_visited[curr_stmt_id] += 1;
-        // Traverse in CFG BIP
+        // BIP
         if (curr_stmt_type == KnowledgeBase::StatementType::CALL) {
-            // BIP
             curr_trace.push(curr_stmt_id);
             std::string proc_called_name = curr_stmt->get_procedure_called();
-            int next_stmt_id = first_stmts[proc_called_name];
-            bfs.push(std::make_tuple(next_stmt_id, curr_trace, curr_visited, curr_path));
-        } else {
-            while (true) {
-                auto next_stmt_ids = curr_stmt->get_direct_next();
-                if (next_stmt_ids->size()) {
+            int next_stmt_id = pkb->get_procedure_by_name(proc_called_name)->get_first_statement();
+            bfs.push(std::make_tuple(next_stmt_id, curr_trace, curr_path));
+            continue;
+        }
+        if (curr_stmt_type == KnowledgeBase::StatementType::WHILE) {
+            // Transitive extraction
+            std::shared_ptr<const std::unordered_set<int>> loop_stmt_ids =
+                extract_next_bip_relationship_from_while_loop(pkb, curr_stmt_id);
+            // Populate PKB
+            for (auto prev_stmt_id : curr_path) {
+                for (auto next_stmt_id : *loop_stmt_ids) {
+                    pkb->add_indirect_next_bip_relationship(prev_stmt_id, next_stmt_id);
+                }
+            }
+            // Update states
+            for (auto next_stmt_id : *loop_stmt_ids) {
+                curr_path.push_back(next_stmt_id);
+            }
+            curr_path.push_back(curr_stmt_id);
+        }
+        while (true) {
+            auto next_stmt_ids = curr_stmt->get_direct_next();
+            if (next_stmt_ids->size()) {
+                if (curr_stmt_type == KnowledgeBase::StatementType::WHILE) {
+                    auto children_ids = curr_stmt->get_children();
                     for (auto next_stmt_id : *next_stmt_ids) {
-                        if (curr_visited.count(next_stmt_id) && curr_visited[next_stmt_id] > 2) {
-                            continue;
+                        // Ignore stmts inside WHILE loop
+                        if (children_ids->count(next_stmt_id) == 0) {
+                            bfs.push(std::make_tuple(next_stmt_id, curr_trace, curr_path));
                         }
-                        bfs.push(
-                            std::make_tuple(next_stmt_id, curr_trace, curr_visited, curr_path));
                     }
-                    // Special check for WHILE
-                    // Attempt to backtrack if last statement in procedure
-                    if (curr_stmt_type != KnowledgeBase::StatementType::WHILE ||
-                        curr_stmt->get_direct_next()->size() == 2) {
-                        break;
+                } else {
+                    for (auto next_stmt_id : *next_stmt_ids) {
+                        bfs.push(std::make_tuple(next_stmt_id, curr_trace, curr_path));
                     }
                 }
-                if (curr_trace.size()) {
-                    // BIP
-                    int curr_stmt_id = curr_trace.top();
-                    curr_trace.pop();
-                    curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
-                    curr_stmt_type = curr_stmt->get_type();
-                } else {
+                // Special check for WHILE
+                // Attempt to backtrack if last statement in procedure
+                if (curr_stmt_type != KnowledgeBase::StatementType::WHILE ||
+                    next_stmt_ids->size() == 2) {
                     break;
                 }
+            }
+            // Last statement in procedure
+            if (curr_trace.size()) {
+                // BIP
+                curr_stmt_id = curr_trace.top();
+                curr_trace.pop();
+                curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
+                curr_stmt_type = curr_stmt->get_type();
+            } else {
+                break;
             }
         }
     }
 }
 
+// Inspired by boost's hash_combine
+// https://github.com/boostorg/container_hash/blob/171c012d4723c5e93cc7cffe42919afdf8b27dfa/include/boost/container_hash/hash.hpp#L310-L314
+struct int_list_hash {
+    std::size_t operator()(std::list<int> const& int_list) const {
+        std::hash<int> int_hash;
+        std::size_t result = 0;
+        for (auto const& item : int_list) {
+            result ^= int_hash(item) + 0x9e3779b9 + (result << 6) + (result >> 2);
+        }
+        return result;
+    }
+};
+
+std::shared_ptr<std::unordered_set<int>>
+DesignExtractor::extract_next_bip_relationship_from_while_loop(
+    std::shared_ptr<KnowledgeBase::PKB> pkb, int while_stmt_id) {
+    auto loop_stmt_ids = pkb->get_while_loop_stmt_ids(while_stmt_id);
+    if (loop_stmt_ids->size()) {
+        return loop_stmt_ids;
+    }
+    std::unordered_map<int, std::unordered_set<int>> next_map, prev_map;
+    auto add_transitive_direct_next_bip_relationship = [&](int prev_stmt_id, int next_stmt_id) {
+        pkb->add_direct_next_bip_relationship(prev_stmt_id, next_stmt_id);
+        auto prev_set = prev_map[prev_stmt_id];
+        prev_set.insert(prev_stmt_id);
+        auto next_set = next_map[next_stmt_id];
+        next_set.insert(next_stmt_id);
+        for (auto curr_prev_id : prev_set) {
+            for (auto curr_next_id : next_set) {
+                next_map[curr_prev_id].insert(curr_next_id);
+                prev_map[curr_next_id].insert(curr_prev_id);
+            }
+        }
+    };
+    std::unordered_map<std::list<int>, std::unordered_set<int>, int_list_hash> visited;
+    std::queue<std::tuple<int, std::list<int>>> bfs;
+    auto while_stmt = pkb->get_statement_by_id(while_stmt_id);
+    auto next_stmt_ids = while_stmt->get_direct_next();
+    auto children_ids = while_stmt->get_children();
+    for (auto next_stmt_id : *next_stmt_ids) {
+        // Ignore stmts outside WHILE loop
+        if (children_ids->count(next_stmt_id)) {
+            std::list<int> trace;
+            visited[trace].insert(while_stmt_id);
+            bfs.push(std::make_tuple(next_stmt_id, trace));
+            add_transitive_direct_next_bip_relationship(while_stmt_id, next_stmt_id);
+        }
+    }
+    while (bfs.size()) {
+        auto curr = bfs.front();
+        bfs.pop();
+        int curr_stmt_id = std::get<0>(curr);
+        std::list<int> curr_trace = std::get<1>(curr);
+        if (visited[curr_trace].count(curr_stmt_id)) {
+            continue;
+        }
+        visited[curr_trace].insert(curr_stmt_id);
+        loop_stmt_ids->insert(curr_stmt_id);
+        auto curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
+        auto curr_stmt_type = curr_stmt->get_type();
+        if (curr_stmt_type == KnowledgeBase::StatementType::CALL) {
+            // BIP
+            curr_trace.push_back(curr_stmt_id);
+            std::string proc_called_name = curr_stmt->get_procedure_called();
+            int next_stmt_id = pkb->get_procedure_by_name(proc_called_name)->get_first_statement();
+            bfs.push(std::make_tuple(next_stmt_id, curr_trace));
+            add_transitive_direct_next_bip_relationship(curr_stmt_id, next_stmt_id);
+            continue;
+        }
+        int prev_stmt_id = curr_stmt_id;
+        while (true) {
+            auto next_stmt_ids = curr_stmt->get_direct_next();
+            if (next_stmt_ids->size()) {
+                for (auto next_stmt_id : *next_stmt_ids) {
+                    bfs.push(std::make_tuple(next_stmt_id, curr_trace));
+                    add_transitive_direct_next_bip_relationship(prev_stmt_id, next_stmt_id);
+                }
+                // Special check for WHILE
+                // Attempt to backtrack if last statement in procedure
+                if (curr_stmt_type != KnowledgeBase::StatementType::WHILE ||
+                    next_stmt_ids->size() == 2) {
+                    break;
+                }
+            }
+            // Last statement in procedure
+            if (curr_trace.size()) {
+                // BIP
+                curr_stmt_id = curr_trace.back();
+                curr_trace.pop_back();
+                curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
+                curr_stmt_type = curr_stmt->get_type();
+            } else {
+                break;
+            }
+        }
+    }
+    // Populate PKB
+    for (auto kv : next_map) {
+        int prev_stmt_id = kv.first;
+        for (auto next_stmt_id : kv.second) {
+            pkb->add_indirect_next_bip_relationship(prev_stmt_id, next_stmt_id);
+        }
+    }
+    return loop_stmt_ids;
+}
+
 void DesignExtractor::extract_affect_bip_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
     // Assume all entities and all other abstractions have been extracted and stored
-    auto statements = pkb->get_statements();
     std::queue<std::tuple<int, std::stack<int>, std::unordered_map<int, int>,
                           std::unordered_map<int, std::unordered_set<int>>,
                           std::unordered_map<std::string, int>>>
         bfs;
-    std::unordered_map<std::string, int> first_stmts;
-    for (auto stmt : statements) {
-        if (stmt->get_followings()->size()) {
+    auto procedures = pkb->get_procedures();
+    for (auto proc : procedures) {
+        if (proc->get_callers()->size()) {
             continue;
         }
-        int curr_stmt_id = stmt->get_id();
-        std::string curr_proc_name = stmt->get_procedure_name();
-        if (first_stmts.count(curr_proc_name) == 0 || first_stmts[curr_proc_name] > curr_stmt_id) {
-            first_stmts[curr_proc_name] = curr_stmt_id;
-        }
-    }
-    for (auto kv : first_stmts) {
-        std::string curr_proc_name = kv.first;
-        if (pkb->get_procedure_by_name(curr_proc_name)->get_callers()->size()) {
-            continue;
-        }
-        int curr_stmt_id = kv.second;
-        std::unordered_map<int, std::unordered_set<int>> affected_by;
-        std::unordered_map<std::string, int> modified_by;
+        int curr_stmt_id = proc->get_first_statement();
         std::stack<int> trace;
         std::unordered_map<int, int> visited;
+        std::unordered_map<int, std::unordered_set<int>> affected_by;
+        std::unordered_map<std::string, int> modified_by;
         bfs.push(std::make_tuple(curr_stmt_id, trace, visited, affected_by, modified_by));
     }
     while (bfs.size()) {
@@ -682,7 +779,7 @@ void DesignExtractor::extract_affect_bip_relationship(std::shared_ptr<KnowledgeB
             // BIP
             curr_trace.push(curr_stmt_id);
             std::string proc_called_name = curr_stmt->get_procedure_called();
-            int next_stmt_id = first_stmts[proc_called_name];
+            int next_stmt_id = pkb->get_procedure_by_name(proc_called_name)->get_first_statement();
             bfs.push(std::make_tuple(next_stmt_id, curr_trace, curr_visited, curr_affected_by,
                                      curr_modified_by));
         } else {
@@ -691,7 +788,11 @@ void DesignExtractor::extract_affect_bip_relationship(std::shared_ptr<KnowledgeB
                 if (next_stmt_ids->size()) {
                     for (auto next_stmt_id : *next_stmt_ids) {
                         if (curr_visited.count(next_stmt_id) && curr_visited[next_stmt_id] > 2) {
-                            continue;
+                            auto next_stmt = pkb->get_statement_by_id(next_stmt_id);
+                            auto next_stmt_type = next_stmt->get_type();
+                            if (next_stmt_type == KnowledgeBase::StatementType::WHILE) {
+                                continue;
+                            }
                         }
                         bfs.push(std::make_tuple(next_stmt_id, curr_trace, curr_visited,
                                                  curr_affected_by, curr_modified_by));
@@ -699,13 +800,14 @@ void DesignExtractor::extract_affect_bip_relationship(std::shared_ptr<KnowledgeB
                     // Special check for WHILE
                     // Attempt to backtrack if last statement in procedure
                     if (curr_stmt_type != KnowledgeBase::StatementType::WHILE ||
-                        curr_stmt->get_direct_next()->size() == 2) {
+                        next_stmt_ids->size() == 2) {
                         break;
                     }
                 }
+                // Last statement in procedure
                 if (curr_trace.size()) {
                     // BIP
-                    int curr_stmt_id = curr_trace.top();
+                    curr_stmt_id = curr_trace.top();
                     curr_trace.pop();
                     curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
                     curr_stmt_type = curr_stmt->get_type();

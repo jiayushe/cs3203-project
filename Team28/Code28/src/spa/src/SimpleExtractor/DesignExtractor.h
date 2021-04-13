@@ -1,6 +1,7 @@
 #pragma once
 
 #include "KnowledgeBase/PKB.h"
+#include <list>
 #include <memory>
 #include <queue>
 #include <stack>
@@ -127,6 +128,11 @@ private:
                                          std::unordered_map<int, std::unordered_set<int>>& cfg,
                                          std::shared_ptr<Parser::SimpleNode> if_stmt,
                                          int next_block_stmt_id);
+
+    /* NextBip */
+    static std::shared_ptr<std::unordered_set<int>>
+    extract_next_bip_relationship_from_while_loop(std::shared_ptr<KnowledgeBase::PKB> pkb,
+                                                  int while_stmt_id);
 
     /* Util */
     static std::shared_ptr<KnowledgeBase::Procedure>

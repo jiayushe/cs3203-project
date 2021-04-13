@@ -26,6 +26,9 @@ public:
     // Sets the control flow graph.
     void set_cfg(std::unordered_map<int, std::unordered_set<int>> cfg);
 
+    // Gets the loop stmt ids for a given root while loop
+    std::shared_ptr<std::unordered_set<int>> get_while_loop_stmt_ids(int while_stmt_id);
+
     // Gets the list of all procedures.
     std::vector<std::shared_ptr<Procedure>> get_procedures();
 
@@ -114,6 +117,9 @@ private:
     // Control Flow Graph, stored as an adjacency list (map) from prog_line/stmt_id to a set of
     // prog_lines/stmt_ids
     std::unordered_map<int, std::unordered_set<int>> cfg;
+    // Memoized loop stmt ids in each root while loop
+    // Needed for nextbip
+    std::unordered_map<int, std::shared_ptr<std::unordered_set<int>>> while_loop_stmt_ids_map;
 };
 
 } // namespace KnowledgeBase

@@ -17,6 +17,9 @@ public:
     // Gets the name of the procedure.
     std::string get_name();
 
+    // Gets the first statement of the procedure.
+    int get_first_statement();
+
     // Gets the list of ids for statements in the procedure.
     std::shared_ptr<std::unordered_set<int>> get_statements();
 
@@ -67,6 +70,7 @@ public:
 
 private:
     std::string name;
+    int first_statement;
     std::shared_ptr<std::unordered_set<int>> statements;
     std::shared_ptr<std::unordered_set<int>> called_by_statements;
     std::shared_ptr<std::unordered_set<std::string>> modifies;

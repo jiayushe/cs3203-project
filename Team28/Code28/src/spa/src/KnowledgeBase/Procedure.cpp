@@ -2,7 +2,7 @@
 
 using namespace KnowledgeBase;
 
-Procedure::Procedure(std::string name) : name(name) {
+Procedure::Procedure(std::string name) : name(name), first_statement(-1) {
     statements = std::make_shared<std::unordered_set<int>>();
     called_by_statements = std::make_shared<std::unordered_set<int>>();
     modifies = std::make_shared<std::unordered_set<std::string>>();
@@ -13,7 +13,7 @@ Procedure::Procedure(std::string name) : name(name) {
     callees = std::make_shared<std::unordered_set<std::string>>();
 }
 
-Procedure::Procedure() : name("") {
+Procedure::Procedure() : name(""), first_statement(-1) {
     statements = std::make_shared<std::unordered_set<int>>();
     called_by_statements = std::make_shared<std::unordered_set<int>>();
     modifies = std::make_shared<std::unordered_set<std::string>>();
@@ -28,9 +28,16 @@ Procedure::~Procedure() {}
 
 std::string Procedure::get_name() { return name; }
 
+int Procedure::get_first_statement() { return first_statement; }
+
 std::shared_ptr<std::unordered_set<int>> Procedure::get_statements() { return statements; }
 
-void Procedure::add_statement(int stmt_id) { statements->insert(stmt_id); }
+void Procedure::add_statement(int stmt_id) {
+    statements->insert(stmt_id);
+    if (first_statement == -1 || first_statement > stmt_id) {
+        first_statement = stmt_id;
+    }
+}
 
 std::shared_ptr<std::unordered_set<int>> Procedure::get_called_by_statements() {
     return called_by_statements;

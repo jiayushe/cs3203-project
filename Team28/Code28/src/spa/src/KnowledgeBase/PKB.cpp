@@ -11,6 +11,15 @@ std::shared_ptr<Parser::SimpleNode> PKB::get_ast() { return ast; }
 
 std::unordered_map<int, std::unordered_set<int>> PKB::get_cfg() { return cfg; }
 
+void PKB::set_cfg(std::unordered_map<int, std::unordered_set<int>> input_cfg) { cfg = input_cfg; }
+
+std::shared_ptr<std::unordered_set<int>> PKB::get_while_loop_stmt_ids(int while_stmt_id) {
+    if (!while_loop_stmt_ids_map[while_stmt_id]) {
+        while_loop_stmt_ids_map[while_stmt_id] = std::make_shared<std::unordered_set<int>>();
+    }
+    return while_loop_stmt_ids_map[while_stmt_id];
+}
+
 std::vector<std::shared_ptr<Procedure>> PKB::get_procedures() {
     std::vector<std::shared_ptr<Procedure>> res;
     for (auto kv : procedures) {
@@ -121,8 +130,6 @@ std::shared_ptr<Constant> PKB::get_constant_by_value(int value) {
     }
     return constants.at(value);
 }
-
-void PKB::set_cfg(std::unordered_map<int, std::unordered_set<int>> input_cfg) { cfg = input_cfg; }
 
 std::shared_ptr<Constant> PKB::add_constant(int value) {
     auto it = constants.find(value);
