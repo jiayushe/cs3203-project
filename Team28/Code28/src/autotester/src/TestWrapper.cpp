@@ -17,21 +17,26 @@ TestWrapper::TestWrapper() {}
 
 // method for parsing the SIMPLE source
 void TestWrapper::parse(std::string filename) {
-    auto source = std::make_shared<Parser::Source>(filename, true);
-    Parser::SimpleParser parser(source);
-    auto root_node = parser.parse_program();
+    try {
+        auto source = std::make_shared<Parser::Source>(filename, true);
+        Parser::SimpleParser parser(source);
+        auto root_node = parser.parse_program();
 
-    pkb = std::make_shared<KnowledgeBase::PKB>(root_node);
-    SimpleExtractor::DesignExtractor::extract_cfg(pkb);
-    SimpleExtractor::DesignExtractor::extract_next_relationship(pkb);
-    SimpleExtractor::DesignExtractor::extract_follow_relationship(pkb);
-    SimpleExtractor::DesignExtractor::extract_parent_relationship(pkb);
-    SimpleExtractor::DesignExtractor::extract_call_relationship(pkb);
-    SimpleExtractor::DesignExtractor::extract_modify_relationship(pkb);
-    SimpleExtractor::DesignExtractor::extract_use_relationship(pkb);
-    SimpleExtractor::DesignExtractor::extract_affect_relationship(pkb);
-    // SimpleExtractor::DesignExtractor::extract_next_bip_relationship(pkb);
-    // SimpleExtractor::DesignExtractor::extract_affect_bip_relationship(pkb);
+        pkb = std::make_shared<KnowledgeBase::PKB>(root_node);
+        SimpleExtractor::DesignExtractor::extract_cfg(pkb);
+        SimpleExtractor::DesignExtractor::extract_next_relationship(pkb);
+        SimpleExtractor::DesignExtractor::extract_follow_relationship(pkb);
+        SimpleExtractor::DesignExtractor::extract_parent_relationship(pkb);
+        SimpleExtractor::DesignExtractor::extract_call_relationship(pkb);
+        SimpleExtractor::DesignExtractor::extract_modify_relationship(pkb);
+        SimpleExtractor::DesignExtractor::extract_use_relationship(pkb);
+        SimpleExtractor::DesignExtractor::extract_affect_relationship(pkb);
+        SimpleExtractor::DesignExtractor::extract_next_bip_relationship(pkb);
+        SimpleExtractor::DesignExtractor::extract_affect_bip_relationship(pkb);
+    } catch (std::runtime_error& error) {
+        std::cout << "Error: " << error.what() << std::endl;
+        exit(1);
+    }
 }
 
 // method to evaluating a query

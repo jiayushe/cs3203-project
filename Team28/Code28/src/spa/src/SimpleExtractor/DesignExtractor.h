@@ -1,6 +1,7 @@
 #pragma once
 
 #include "KnowledgeBase/PKB.h"
+#include <chrono>
 #include <list>
 #include <memory>
 #include <queue>
@@ -130,9 +131,18 @@ private:
                                          int next_block_stmt_id);
 
     /* NextBip */
+    static void extract_next_bip_relationship_with_timeout(
+        std::shared_ptr<KnowledgeBase::PKB> pkb,
+        const std::chrono::time_point<std::chrono::steady_clock>& deadline);
     static std::shared_ptr<std::unordered_set<int>>
-    extract_next_bip_relationship_from_while_loop(std::shared_ptr<KnowledgeBase::PKB> pkb,
-                                                  int while_stmt_id);
+    extract_next_bip_relationship_from_while_loop_with_timeout(
+        std::shared_ptr<KnowledgeBase::PKB> pkb, int while_stmt_id,
+        const std::chrono::time_point<std::chrono::steady_clock>& deadline);
+
+    /* AffectsBip */
+    static void extract_affect_bip_relationship_with_timeout(
+        std::shared_ptr<KnowledgeBase::PKB> pkb,
+        const std::chrono::time_point<std::chrono::steady_clock>& deadline);
 
     /* Util */
     static std::shared_ptr<KnowledgeBase::Procedure>

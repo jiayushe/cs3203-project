@@ -513,6 +513,14 @@ void DesignExtractor::extract_affect_relationship(std::shared_ptr<KnowledgeBase:
 }
 
 void DesignExtractor::extract_next_bip_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
+    // Timeout after 1 minute
+    auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(60000);
+    extract_next_bip_relationship_with_timeout(pkb, deadline);
+}
+
+void DesignExtractor::extract_next_bip_relationship_with_timeout(
+    std::shared_ptr<KnowledgeBase::PKB> pkb,
+    const std::chrono::time_point<std::chrono::steady_clock>& deadline) {
     // Assume all entities and all other abstractions have been extracted and stored
     std::queue<std::tuple<int, std::stack<int>, std::vector<int>>> bfs;
     auto procedures = pkb->get_procedures();
@@ -526,6 +534,9 @@ void DesignExtractor::extract_next_bip_relationship(std::shared_ptr<KnowledgeBas
         bfs.push(std::make_tuple(curr_stmt_id, trace, path));
     }
     while (bfs.size()) {
+        if (std::chrono::steady_clock::now() > deadline) {
+            break;
+        }
         auto curr = bfs.front();
         bfs.pop();
         int curr_stmt_id = std::get<0>(curr);
@@ -553,7 +564,8 @@ void DesignExtractor::extract_next_bip_relationship(std::shared_ptr<KnowledgeBas
         if (curr_stmt_type == KnowledgeBase::StatementType::WHILE) {
             // Transitive extraction
             std::shared_ptr<const std::unordered_set<int>> loop_stmt_ids =
-                extract_next_bip_relationship_from_while_loop(pkb, curr_stmt_id);
+                extract_next_bip_relationship_from_while_loop_with_timeout(pkb, curr_stmt_id,
+                                                                           deadline);
             // Populate PKB
             for (auto prev_stmt_id : curr_path) {
                 for (auto next_stmt_id : *loop_stmt_ids) {
@@ -617,8 +629,9 @@ struct int_list_hash {
 };
 
 std::shared_ptr<std::unordered_set<int>>
-DesignExtractor::extract_next_bip_relationship_from_while_loop(
-    std::shared_ptr<KnowledgeBase::PKB> pkb, int while_stmt_id) {
+DesignExtractor::extract_next_bip_relationship_from_while_loop_with_timeout(
+    std::shared_ptr<KnowledgeBase::PKB> pkb, int while_stmt_id,
+    const std::chrono::time_point<std::chrono::steady_clock>& deadline) {
     auto loop_stmt_ids = pkb->get_while_loop_stmt_ids(while_stmt_id);
     if (loop_stmt_ids->size()) {
         return loop_stmt_ids;
@@ -652,6 +665,9 @@ DesignExtractor::extract_next_bip_relationship_from_while_loop(
         }
     }
     while (bfs.size()) {
+        if (std::chrono::steady_clock::now() > deadline) {
+            break;
+        }
         auto curr = bfs.front();
         bfs.pop();
         int curr_stmt_id = std::get<0>(curr);
@@ -710,6 +726,14 @@ DesignExtractor::extract_next_bip_relationship_from_while_loop(
 }
 
 void DesignExtractor::extract_affect_bip_relationship(std::shared_ptr<KnowledgeBase::PKB> pkb) {
+    // Timeout after 1 minute
+    auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(60000);
+    extract_affect_bip_relationship_with_timeout(pkb, deadline);
+}
+
+void DesignExtractor::extract_affect_bip_relationship_with_timeout(
+    std::shared_ptr<KnowledgeBase::PKB> pkb,
+    const std::chrono::time_point<std::chrono::steady_clock>& deadline) {
     // Assume all entities and all other abstractions have been extracted and stored
     std::queue<std::tuple<int, std::stack<int>, std::unordered_map<int, int>,
                           std::unordered_map<int, std::unordered_set<int>>,
@@ -728,6 +752,9 @@ void DesignExtractor::extract_affect_bip_relationship(std::shared_ptr<KnowledgeB
         bfs.push(std::make_tuple(curr_stmt_id, trace, visited, affected_by, modified_by));
     }
     while (bfs.size()) {
+        if (std::chrono::steady_clock::now() > deadline) {
+            break;
+        }
         auto curr = bfs.front();
         bfs.pop();
         int curr_stmt_id = std::get<0>(curr);
@@ -782,38 +809,38 @@ void DesignExtractor::extract_affect_bip_relationship(std::shared_ptr<KnowledgeB
             int next_stmt_id = pkb->get_procedure_by_name(proc_called_name)->get_first_statement();
             bfs.push(std::make_tuple(next_stmt_id, curr_trace, curr_visited, curr_affected_by,
                                      curr_modified_by));
-        } else {
-            while (true) {
-                auto next_stmt_ids = curr_stmt->get_direct_next();
-                if (next_stmt_ids->size()) {
-                    for (auto next_stmt_id : *next_stmt_ids) {
-                        if (curr_visited.count(next_stmt_id) && curr_visited[next_stmt_id] > 2) {
-                            auto next_stmt = pkb->get_statement_by_id(next_stmt_id);
-                            auto next_stmt_type = next_stmt->get_type();
-                            if (next_stmt_type == KnowledgeBase::StatementType::WHILE) {
-                                continue;
-                            }
+            continue;
+        }
+        while (true) {
+            auto next_stmt_ids = curr_stmt->get_direct_next();
+            if (next_stmt_ids->size()) {
+                for (auto next_stmt_id : *next_stmt_ids) {
+                    if (curr_visited.count(next_stmt_id) && curr_visited[next_stmt_id] > 2) {
+                        auto next_stmt = pkb->get_statement_by_id(next_stmt_id);
+                        auto next_stmt_type = next_stmt->get_type();
+                        if (next_stmt_type == KnowledgeBase::StatementType::WHILE) {
+                            continue;
                         }
-                        bfs.push(std::make_tuple(next_stmt_id, curr_trace, curr_visited,
-                                                 curr_affected_by, curr_modified_by));
                     }
-                    // Special check for WHILE
-                    // Attempt to backtrack if last statement in procedure
-                    if (curr_stmt_type != KnowledgeBase::StatementType::WHILE ||
-                        next_stmt_ids->size() == 2) {
-                        break;
-                    }
+                    bfs.push(std::make_tuple(next_stmt_id, curr_trace, curr_visited,
+                                             curr_affected_by, curr_modified_by));
                 }
-                // Last statement in procedure
-                if (curr_trace.size()) {
-                    // BIP
-                    curr_stmt_id = curr_trace.top();
-                    curr_trace.pop();
-                    curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
-                    curr_stmt_type = curr_stmt->get_type();
-                } else {
+                // Special check for WHILE
+                // Attempt to backtrack if last statement in procedure
+                if (curr_stmt_type != KnowledgeBase::StatementType::WHILE ||
+                    next_stmt_ids->size() == 2) {
                     break;
                 }
+            }
+            // Last statement in procedure
+            if (curr_trace.size()) {
+                // BIP
+                curr_stmt_id = curr_trace.top();
+                curr_trace.pop();
+                curr_stmt = pkb->get_statement_by_id(curr_stmt_id);
+                curr_stmt_type = curr_stmt->get_type();
+            } else {
+                break;
             }
         }
     }
