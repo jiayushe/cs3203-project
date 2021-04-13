@@ -8,7 +8,7 @@ using namespace Parser;
 
 TEST_CASE("Parser::PQLLexer") {
     SECTION("Parent*/Follows*") {
-        std::string op = GENERATE("Follows*", "Parent*");
+        std::string op = GENERATE("Follows*", "Parent*", "Calls*", "Next*", "Affects*", "NextBip*", "AffectsBip*");
         auto source = std::make_shared<Parser::Source>(op);
         PQLLexer lexer(source);
 
@@ -21,7 +21,7 @@ TEST_CASE("Parser::PQLLexer") {
     }
 
     SECTION("Parent */Follows *") {
-        std::string op = GENERATE("Follows", "Parent");
+        std::string op = GENERATE("Follows", "Parent", "Calls", "Next", "Affects", "NextBip", "AffectsBip");
         std::string query = op + " *";
         auto source = std::make_shared<Parser::Source>(query);
         PQLLexer lexer(source);

@@ -177,11 +177,15 @@ TEST_CASE("Parser::PQLParser") {
             {"Next*", SuchThatType::NEXT_T},
             {"Affects", SuchThatType::AFFECTS},
             {"Affects*", SuchThatType::AFFECTS_T},
+            {"NextBip", SuchThatType::NEXTBIP},
+            {"NextBip*", SuchThatType::NEXTBIP_T},
+            {"AffectsBip", SuchThatType::AFFECTSBIP},
+            {"AffectsBip*", SuchThatType::AFFECTSBIP_T},
         };
 
         SECTION("Parent/Parent*/Follows/Follows*/Next/Next*/Affects/Affects* type") {
             std::string op = GENERATE("Parent", "Parent*", "Follows", "Follows*", "Next", "Next*",
-                                      "Affects", "Affects*");
+                                      "Affects", "Affects*", "NextBip", "NextBip*", "AffectsBip", "AffectsBip*");
 
             std::string query = "prog_line pg; Select pg such that " + op + "(pg, 7)";
             auto source = std::make_shared<Parser::Source>(query);
