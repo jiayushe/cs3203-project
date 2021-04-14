@@ -1,0 +1,21 @@
+1 - [15: 2 Uses 3 Modifies 2 Parent 2 Follows 3 Pattern 2 Next 1 Call with stmt# and varName] 
+stmt s1, s2, s3, s4, s5; variable v1, v2; prog_line n1, n2; procedure p, q; assign a1, a2;
+Select s1 such that Uses(s1, v1) and Uses(s1, v2) and Modifies(a1, v1) and Modifies(s3, _) and Modifies(1,"v1") and Parent(s5, s4) and Parent(s5, s1) and Follows(s2, s1) and Follows(s3, s5) pattern a2(_, _"v2"_) with s5.stmt# = 8 and v2.varName = "v3"
+11
+5000
+2 - [17: 1 Uses 3 Modifies 1 Parent 1 Follows 1 Parent* 1 Follows* 3 Pattern 2 Next 2 Calls, 1 Affects with varName] 
+stmt s1, s2, s3, s4, s5; variable v1, v2, v3; prog_line n1, n2, n3, n4; procedure p, q, r; assign a1, a2, a3;
+Select <s5, v1, v3, p, a2> such that Uses(s1, v1) and Modifies(a1, v1) and Modifies(n2, _) and Modifies(s3, v2) and Parent(s5, s4) and Parent*(s5, s1) and Follows(s2, s1) and Follows*(s2, s4) pattern a1(_, _"v2"_) pattern a2(_, _"1"_) pattern a3(v3, "x + 1") such that Next(n1, n2) and Next(n3, n4) and Calls(p, q) and Calls(p, "proc13") and Affects(a1, a2)
+6 v13 x proc11 56, 8 v13 x proc11 56, 44 v13 x proc11 56, 47 v13 x proc11 56, 85 v13 x proc11 56, 90 v13 x proc11 56, 144 v13 x proc11 56, 174 v13 x proc11 56, 252 v13 x proc11 56, 223 v13 x proc11 56
+5000
+3 - [16: 3 Uses 1 Parent 1 Follows 2 Parent* 2 Follows* 1 Pattern 2 Next* 2 Calls* 1 Calls, 1 Affects] 
+stmt s1, s2, s3, s4, s5; variable v1; prog_line n1, n2, n3, n4; procedure p, q, r; assign a1, a2;
+Select <s1, n1, n3, a1> such that Uses(s1, "v25") and Uses(s2, v1) and Parent*(s5, s4) and Parent*(s1, s5) and Parent(s4, s3) and Follows(s2, n2) and Follows(n2, n1) and Follows*(270, n3) pattern a1(_, _"b"_) such that Next*(n2, 229) and Next*(n4, n3) and Calls(p, q) and Calls*(p, q) and Calls*(q, r) and Affects(a1, a2) and Next(n3, 275) and Next(n3, n4) and Calls(p, q) and Calls(p, r)
+174 223 274 112,174 223 274 267,174 227 274 112, 174 227 274 267, 174 228 274 112, 174 228 274 267, 174 229 274 112, 174 229 274 267, 174 259 274 112, 174 259 274 267, 223 223 274 112, 223 223 274 267, 223 227 274 112, 223 227 274 267, 223 228 274 112, 223 228 274 267, 223 229 274 112, 223 229 274 267, 223 259 274 112, 223 259 274 267, 6 223 274 112,6 223 274 267,6 227 274 112,6 227 274 267,6 228 274 112,6 228 274 267,6 229 274 112,6 229 274 267,6 259 274 112,6 259 274 267,85 223 274 112,85 223 274 267,85 227 274 112,85 227 274 267, 85 228 274 112, 85 228 274 267, 85 229 274 112, 85 229 274 267, 85 259 274 112, 85 259 274 267
+5000
+4 - [20: 3 Uses 2 Parent 2 Modifies 2 Follows* 2 Pattern 1 Next 2 Calls* 2 Affects 2 Affects* 2 Next*] 
+stmt s1, s2; variable v1, v2; prog_line n1, n2; procedure p, q, r; assign a1, a2, a3, a4;
+Select <s1, v1, v2, a1> such that Uses(q, v1) and Uses(p, v2) and Uses(s1, v1) and Modifies(a1, v1) and Modifies(s2, v2) and Parent(s1, s2) and Parent(176, s1) and Affects(a1, a2) and Affects(a2, a3) and Affects*(a2, a4) and Affects*(a2, 182) and Next*(n1, n2) and Next*(s2, s1) and Next(n1, s1) and Calls(p, q) and Calls(p, r) and Follows*(179, s1) and Follows*(n1, n2) pattern a1(_, _"ee"_) pattern a2("kk", _)
+181 jj bb 196,181 jj cc 196,181 jj dd 196,181 jj ff 196,181 jj gg 196,181 jj jj 196,181 jj kk 196,181 jj mm 196,181 jj nn 196
+5000
+
