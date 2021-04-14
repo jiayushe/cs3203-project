@@ -1,0 +1,51 @@
+procedure P1 {
+  V1 = V0;
+  call P2;
+  call P3;
+  V10 = V8;
+  if (V6 > 0) then {
+    V8 = 5;
+    V11 = V8;
+  } else {
+    read V8;
+    V12 = V8;
+  }
+}
+
+procedure P2 {
+  while (V2 > 0) {
+    if (V3 > 0) then {
+      if (V4 > 0) then {
+        V2 = V1;
+      } else {
+        V13 = V1;
+      }
+    } else {
+      if (V5 > 0) then {
+        V3 = V2;
+      } else {
+        V14 = V13;
+      }
+    }
+  }
+}
+
+procedure P3 {
+  call P4;
+  call P5;
+  call P4;
+}
+
+procedure P4 {
+  call P5;
+  call P5;
+}
+
+procedure P5 {
+  V9 = V8;
+  V8 = V7;
+  V7 = V6;
+  V6 = V5;
+  V5 = V4;
+  V4 = V3;
+}

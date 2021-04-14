@@ -1,0 +1,23 @@
+procedure P1 {
+  V2 = V1 + 2;
+  if (V2 > 5) then {
+    call P2;
+  } else {
+    call P3;
+    call P3;
+  }
+  V6 = V5 + 5;
+}
+
+procedure P2 {
+  while (1 > 0) {
+    call P3;
+    read V5;
+  }
+}
+
+procedure P3 {
+  V5 = V4;
+  V4 = V3;
+  V3 = V2;
+}
