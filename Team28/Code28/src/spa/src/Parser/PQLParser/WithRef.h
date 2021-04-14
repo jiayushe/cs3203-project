@@ -23,6 +23,8 @@ public:
     void set_synonym(const std::string& synonym);
     void set_attr_ref(const AttrRef& attr_ref);
 
+    bool operator==(const WithRef& other) const;
+
 private:
     WithRefType type;
 
@@ -30,6 +32,11 @@ private:
     int statement_id;
     std::string synonym;
     AttrRef attr_ref;
+};
+
+class WithRefHash {
+public:
+    std::size_t operator()(const WithRef& with_ref) const;
 };
 
 } // namespace Parser

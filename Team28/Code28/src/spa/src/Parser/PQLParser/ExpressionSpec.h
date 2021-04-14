@@ -18,10 +18,17 @@ public:
     void set_pattern(std::shared_ptr<Parser::SimpleNode> pattern);
     void set_exact_pattern(std::shared_ptr<Parser::SimpleNode> exact_pattern);
 
+    bool operator==(const ExpressionSpec& other) const;
+
 private:
     ExpressionSpecType type;
     std::shared_ptr<Parser::SimpleNode> pattern;
     std::shared_ptr<Parser::SimpleNode> exact_pattern;
+};
+
+class ExpressionSpecHash {
+public:
+    std::size_t operator()(const ExpressionSpec& expression_spec) const;
 };
 
 } // namespace Parser

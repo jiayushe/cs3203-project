@@ -3,70 +3,115 @@
 using namespace QueryEvaluator;
 
 AssignmentMapSet ForwardCheckingSolver::solve(const std::unordered_set<std::string>& targets,
-                                              DomainMap domain_map,
-                                              const std::vector<BinaryConstraint>& constraints) {
+                                              DomainMap& domain_map,
+                                              ConstraintMap& constraint_map) {
 
     AssignmentMapSet results;
     AssignmentMap empty_assignment_map;
-    search(results, empty_assignment_map, targets, domain_map, constraints);
+    std::unordered_set<std::string> unassigned_synonyms;
+    for (const auto& entry : domain_map) {
+        unassigned_synonyms.insert(entry.first);
+    }
+    search(results, empty_assignment_map, unassigned_synonyms, targets, domain_map, constraint_map);
     return results;
 }
 
 bool ForwardCheckingSolver::search(AssignmentMapSet& results, AssignmentMap& assignment_map,
+                                   std::unordered_set<std::string>& unassigned_synonyms,
                                    const std::unordered_set<std::string>& targets,
-                                   DomainMap& domain_map,
-                                   const std::vector<BinaryConstraint>& constraints) {
+                                   DomainMap& domain_map, ConstraintMap& constraint_map) {
 
-    auto synonym = choose_unassigned_synonym(targets, assignment_map, domain_map);
+    auto synonym =
+        choose_unassigned_synonym(unassigned_synonyms, targets, domain_map, constraint_map);
+    unassigned_synonyms.erase(synonym);
+
     auto can_short = targets.find(synonym) == targets.end();
 
     auto domain = domain_map[synonym];
     for (auto const& assignment : domain) {
         assignment_map[synonym] = assignment;
 
-        if (assignment_map.size() == domain_map.size()) {
+        if (unassigned_synonyms.empty()) {
             results.insert(pick(assignment_map, targets));
-            assignment_map.erase(synonym);
             if (can_short) {
+                unassigned_synonyms.insert(synonym);
                 return true;
             }
             continue;
         }
 
-        auto invalidated_domain_map =
-            invalidate_domain_map(synonym, assignment_map, constraints, domain_map);
+        auto invalidated_domain_map = invalidate_domain_map(
+            synonym, assignment, unassigned_synonyms, domain_map, constraint_map);
 
-        auto is_shorted = search(results, assignment_map, targets, domain_map, constraints);
+        auto is_shorted = search(results, assignment_map, unassigned_synonyms, targets, domain_map,
+                                 constraint_map);
 
-        assignment_map.erase(synonym);
         restore_domain_map(domain_map, invalidated_domain_map);
 
         if (is_shorted && can_short) {
+            unassigned_synonyms.insert(synonym);
             return true;
         }
     }
 
+    unassigned_synonyms.insert(synonym);
+
     return false;
 }
 
-std::string
-ForwardCheckingSolver::choose_unassigned_synonym(const std::unordered_set<std::string>& targets,
-                                                 const AssignmentMap& assignment_map,
-                                                 const DomainMap& domain_map) {
+// Create a global random uniform distribution to be used in choose_unassigned_synonym. Ideally, we
+// shouldn't be using a global instance yet this is done as such for optimisation purposes.
+auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+std::default_random_engine generator(seed);
+std::uniform_int_distribution<int> distribution(0, 9);
+
+std::string ForwardCheckingSolver::choose_unassigned_synonym(
+    const std::unordered_set<std::string>& unassigned_synonyms,
+    const std::unordered_set<std::string>& targets, DomainMap& domain_map,
+    ConstraintMap& constraint_map) {
 
     std::string min_synonym;
-    auto min_domain_size = (int)1e9;
+    double min_score = 1e9;
 
-    for (auto const& entry : domain_map) {
-        auto is_unassigned = assignment_map.find(entry.first) == assignment_map.end();
-        auto is_domain_smaller = entry.second.size() < min_domain_size;
-        if (is_unassigned && is_domain_smaller) {
-            min_synonym = entry.first;
-            min_domain_size = entry.second.size();
+    for (const auto& synonym : unassigned_synonyms) {
+        auto score =
+            score_synonym(synonym, unassigned_synonyms, targets, domain_map, constraint_map);
+        if (score < min_score) {
+            min_synonym = synonym;
+            min_score = score;
+        } else if (score == min_score && distribution(generator) >= 5) {
+            min_synonym = synonym;
+            min_score = score;
         }
     }
 
     return min_synonym;
+}
+
+double
+ForwardCheckingSolver::score_synonym(const std::string& synonym,
+                                     const std::unordered_set<std::string>& unassigned_synonyms,
+                                     const std::unordered_set<std::string>& targets,
+                                     DomainMap& domain_map, ConstraintMap& constraint_map) {
+
+    double score = domain_map[synonym].size();
+
+    int num_remaining_constraints = 0;
+    for (auto const& constraint : constraint_map[synonym]) {
+        auto constraint_synonyms = constraint.get_synonyms();
+        constraint_synonyms.erase(synonym);
+        auto other_synonym = *(constraint_synonyms.begin());
+        if (unassigned_synonyms.find(other_synonym) != unassigned_synonyms.end()) {
+            num_remaining_constraints += 1;
+        }
+    }
+    score /= (0.5 * num_remaining_constraints) + 1;
+
+    if (targets.find(synonym) == targets.end()) {
+        score *= 10;
+    }
+
+    return score;
 }
 
 // Create a global AssignmentMap instance that is frequently used in invalidate_domain_map.
@@ -75,21 +120,17 @@ ForwardCheckingSolver::choose_unassigned_synonym(const std::unordered_set<std::s
 AssignmentMap binary_assignment_map;
 
 DomainMap ForwardCheckingSolver::invalidate_domain_map(
-    const std::string& synonym, AssignmentMap& assignment_map,
-    const std::vector<BinaryConstraint>& constraints, DomainMap& domain_map) {
+    const std::string& synonym, const Assignment& assignment,
+    const std::unordered_set<std::string>& unassigned_synonyms, DomainMap& domain_map,
+    ConstraintMap& constraint_map) {
 
     DomainMap invalidated_domain_map;
 
-    auto assignment = assignment_map[synonym];
-    for (auto const& constraint : constraints) {
+    for (auto const& constraint : constraint_map[synonym]) {
         auto constraint_synonyms = constraint.get_synonyms();
-        if (constraint_synonyms.find(synonym) == constraint_synonyms.end()) {
-            continue;
-        }
-
         constraint_synonyms.erase(synonym);
         auto other_synonym = *(constraint_synonyms.begin());
-        if (assignment_map.find(other_synonym) != assignment_map.end()) {
+        if (unassigned_synonyms.find(other_synonym) == unassigned_synonyms.end()) {
             continue;
         }
 

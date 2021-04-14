@@ -102,7 +102,14 @@ Evaluator::get_assignment_groups(std::shared_ptr<KnowledgeBase::PKB> pkb,
         auto unary_constraints = constraints.first;
         auto binary_constraints = constraints.second;
 
-        DomainMap domains;
+        std::unordered_set<std::string> targets;
+        for (auto const& synonym : connected_synonyms) {
+            if (result_synonyms.find(synonym) != result_synonyms.end()) {
+                targets.insert(synonym);
+            }
+        }
+
+        DomainMap domain_map;
         for (const auto& synonym : connected_synonyms) {
             auto design_entity = design_entity_map[synonym];
 
@@ -113,18 +120,18 @@ Evaluator::get_assignment_groups(std::shared_ptr<KnowledgeBase::PKB> pkb,
                 }
             }
 
-            domains[synonym] =
+            domain_map[synonym] =
                 DomainUtils::get_domain(pkb, design_entity.get_type(), domain_constraints);
         }
 
-        std::unordered_set<std::string> targets;
-        for (auto const& synonym : connected_synonyms) {
-            if (result_synonyms.find(synonym) != result_synonyms.end()) {
-                targets.insert(synonym);
+        ConstraintMap constraint_map;
+        for (const auto& binary_constraint : binary_constraints) {
+            for (const auto& synonym : binary_constraint.get_synonyms()) {
+                constraint_map[synonym].push_back(binary_constraint);
             }
         }
 
-        assignment_groups.emplace_back(targets, domains, binary_constraints);
+        assignment_groups.emplace_back(targets, domain_map, constraint_map);
     }
 
     return assignment_groups;

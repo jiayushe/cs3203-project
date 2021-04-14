@@ -22,10 +22,17 @@ public:
     void set_synonym(const std::string& synonym);
     void set_name(const std::string& name);
 
+    bool operator==(const EntityRef& other) const;
+
 private:
     EntityRefType type;
     std::string synonym;
     std::string name;
+};
+
+class EntityRefHash {
+public:
+    std::size_t operator()(const EntityRef& entity_ref) const;
 };
 
 } // namespace Parser

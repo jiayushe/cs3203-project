@@ -23,10 +23,17 @@ public:
     void set_synonym(const std::string& synonym);
     void set_statement_id(int statement_id);
 
+    bool operator==(const StatementRef& other) const;
+
 private:
     StatementRefType type;
     std::string synonym;
     int statement_id;
+};
+
+class StatementRefHash {
+public:
+    std::size_t operator()(const StatementRef& statement_ref) const;
 };
 
 } // namespace Parser

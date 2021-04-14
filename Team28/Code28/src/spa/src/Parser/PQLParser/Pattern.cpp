@@ -39,3 +39,27 @@ PatternIf Pattern::get_pattern_if() const {
     }
     return pattern_if;
 }
+
+bool Pattern::operator==(const Pattern& other) const {
+    return type == other.type && pattern_assign == other.pattern_assign &&
+           pattern_while == other.pattern_while && pattern_if == other.pattern_if;
+}
+
+std::size_t PatternHash::operator()(const Pattern& pattern) const {
+    std::hash<int> int_hash;
+    PatternAssignHash pattern_assign_hash;
+    PatternWhileHash pattern_while_hash;
+    PatternIfHash pattern_if_hash;
+    switch (pattern.get_type()) {
+    case PatternType::INVALID:
+        return int_hash(1);
+    case PatternType::ASSIGN:
+        return int_hash(2) ^ pattern_assign_hash(pattern.get_pattern_assign());
+    case PatternType::WHILE:
+        return int_hash(3) ^ pattern_while_hash(pattern.get_pattern_while());
+    case PatternType::IF:
+        return int_hash(4) ^ pattern_if_hash(pattern.get_pattern_if());
+    default:
+        throw std::runtime_error("Unknown pattern type");
+    }
+}

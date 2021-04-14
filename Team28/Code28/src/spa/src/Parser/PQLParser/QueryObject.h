@@ -7,7 +7,7 @@
 #include "SuchThat.h"
 #include "With.h"
 #include <string>
-#include <vector>
+#include <unordered_set>
 
 namespace Parser {
 
@@ -18,9 +18,9 @@ public:
     // getters
     DeclarationMap get_declarations() const;
     Result get_result() const;
-    std::vector<SuchThat> get_all_such_that() const;
-    std::vector<Pattern> get_all_pattern() const;
-    std::vector<With> get_all_with() const;
+    std::unordered_set<SuchThat, SuchThatHash> get_all_such_that() const;
+    std::unordered_set<Pattern, PatternHash> get_all_pattern() const;
+    std::unordered_set<With, WithHash> get_all_with() const;
 
     // setters
     void add_declaration(const std::string& synonym, const DesignEntity& design_entity);
@@ -36,9 +36,9 @@ private:
     DeclarationMap declarations;
     Result result;
 
-    std::vector<SuchThat> all_such_that;
-    std::vector<Pattern> all_pattern;
-    std::vector<With> all_with;
+    std::unordered_set<SuchThat, SuchThatHash> all_such_that;
+    std::unordered_set<Pattern, PatternHash> all_pattern;
+    std::unordered_set<With, WithHash> all_with;
 };
 
 } // namespace Parser

@@ -15,9 +15,8 @@ class BinaryConstraint;
 
 typedef std::unordered_set<Assignment, AssignmentHash> Domain;
 typedef std::unordered_map<std::string, Domain> DomainMap;
+typedef std::unordered_map<std::string, std::vector<BinaryConstraint>> ConstraintMap;
 typedef std::unordered_set<AssignmentMap, AssignmentMapHash> AssignmentMapSet;
-typedef std::vector<AssignmentMap> AssignmentMapVector;
-typedef std::tuple<std::unordered_set<std::string>, DomainMap, std::vector<BinaryConstraint>>
-    AssignmentGroup;
+typedef std::tuple<std::unordered_set<std::string>, DomainMap, ConstraintMap> AssignmentGroup;
 
 } // namespace QueryEvaluator

@@ -27,3 +27,24 @@ int StatementRef::get_statement_id() const {
     }
     return statement_id;
 }
+
+bool StatementRef::operator==(const StatementRef& other) const {
+    return type == other.type && synonym == other.synonym && statement_id == other.statement_id;
+}
+
+std::size_t StatementRefHash::operator()(const StatementRef& statement_ref) const {
+    std::hash<int> int_hash;
+    std::hash<std::string> string_hash;
+    switch (statement_ref.get_type()) {
+    case StatementRefType::INVALID:
+        return int_hash(1);
+    case StatementRefType::ANY:
+        return int_hash(2);
+    case StatementRefType::STATEMENT_ID:
+        return int_hash(3) ^ int_hash(statement_ref.get_statement_id());
+    case StatementRefType::SYNONYM:
+        return int_hash(4) ^ string_hash(statement_ref.get_synonym());
+    default:
+        throw std::runtime_error("Unknown statement ref type");
+    }
+}

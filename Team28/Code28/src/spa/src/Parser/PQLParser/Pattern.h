@@ -27,11 +27,18 @@ public:
     void set_pattern_while(const PatternWhile& pattern_while);
     void set_pattern_if(const PatternIf& pattern_if);
 
+    bool operator==(const Pattern& other) const;
+
 private:
     PatternType type;
     PatternAssign pattern_assign;
     PatternWhile pattern_while;
     PatternIf pattern_if;
+};
+
+class PatternHash {
+public:
+    std::size_t operator()(const Pattern& pattern) const;
 };
 
 } // namespace Parser

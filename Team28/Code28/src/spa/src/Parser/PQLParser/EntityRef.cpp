@@ -27,3 +27,24 @@ std::string EntityRef::get_name() const {
     }
     return name;
 }
+
+bool EntityRef::operator==(const EntityRef& other) const {
+    return type == other.type && synonym == other.synonym && name == other.name;
+}
+
+std::size_t EntityRefHash::operator()(const EntityRef& entity_ref) const {
+    std::hash<int> int_hash;
+    std::hash<std::string> string_hash;
+    switch (entity_ref.get_type()) {
+    case EntityRefType::INVALID:
+        return int_hash(1);
+    case EntityRefType::ANY:
+        return int_hash(2);
+    case EntityRefType::NAME:
+        return int_hash(3) ^ string_hash(entity_ref.get_name());
+    case EntityRefType::SYNONYM:
+        return int_hash(4) ^ string_hash(entity_ref.get_synonym());
+    default:
+        throw std::runtime_error("Unknown entity ref type");
+    }
+}

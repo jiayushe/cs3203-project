@@ -32,3 +32,23 @@ std::shared_ptr<Parser::SimpleNode> ExpressionSpec::get_exact_pattern() const {
     }
     return exact_pattern;
 }
+
+bool ExpressionSpec::operator==(const ExpressionSpec& other) const {
+    switch (type) {
+    case ExpressionSpecType::INVALID:
+        return other.type == ExpressionSpecType::INVALID;
+    case ExpressionSpecType::ANY:
+        return other.type == ExpressionSpecType::ANY;
+    case ExpressionSpecType::PATTERN:
+        return other.type == ExpressionSpecType::PATTERN && pattern->is_equal(other.pattern);
+    case ExpressionSpecType::EXACT_PATTERN:
+        return other.type == ExpressionSpecType::EXACT_PATTERN &&
+               exact_pattern->is_equal(other.exact_pattern);
+    default:
+        throw std::runtime_error("Unknown expression spec type");
+    }
+}
+
+std::size_t ExpressionSpecHash::operator()(const ExpressionSpec& expression_spec) const {
+    return static_cast<std::size_t>(expression_spec.get_type());
+}

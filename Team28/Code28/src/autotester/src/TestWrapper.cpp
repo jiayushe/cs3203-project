@@ -31,8 +31,8 @@ void TestWrapper::parse(std::string filename) {
         SimpleExtractor::DesignExtractor::extract_modify_relationship(pkb);
         SimpleExtractor::DesignExtractor::extract_use_relationship(pkb);
         SimpleExtractor::DesignExtractor::extract_affect_relationship(pkb);
-        SimpleExtractor::DesignExtractor::extract_next_bip_relationship(pkb);
-        SimpleExtractor::DesignExtractor::extract_affect_bip_relationship(pkb);
+        // SimpleExtractor::DesignExtractor::extract_next_bip_relationship(pkb);
+        // SimpleExtractor::DesignExtractor::extract_affect_bip_relationship(pkb);
     } catch (std::runtime_error& error) {
         std::cout << "Error: " << error.what() << std::endl;
         exit(1);

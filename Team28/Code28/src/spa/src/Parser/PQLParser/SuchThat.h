@@ -38,10 +38,17 @@ public:
     void set_left_ref(const SuchThatRef& left_ref);
     void set_right_ref(const SuchThatRef& right_ref);
 
+    bool operator==(const SuchThat& other) const;
+
 private:
     SuchThatType type;
     SuchThatRef left_ref;
     SuchThatRef right_ref;
+};
+
+class SuchThatHash {
+public:
+    std::size_t operator()(const SuchThat& such_that) const;
 };
 
 } // namespace Parser

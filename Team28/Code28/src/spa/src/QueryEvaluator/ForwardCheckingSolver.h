@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "Profiler.h"
 #include "constraints/BinaryConstraint.h"
+#include <chrono>
+#include <random>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -31,28 +33,33 @@ public:
     //
     // Then, we expect the output to be {{"a": 1, "b": 2}}.
     static AssignmentMapSet solve(const std::unordered_set<std::string>& targets,
-                                  DomainMap domain_map,
-                                  const std::vector<BinaryConstraint>& constraints);
+                                  DomainMap& domain_map, ConstraintMap& constraint_map);
 
 private:
     // Similar to `solve`, `search` is the main constraint solving routine (in fact `solve` simply
     // wraps around `search`). The algorithm implemented is forward-checking backtracking search.
     static bool search(AssignmentMapSet& results, AssignmentMap& assignment_map,
+                       std::unordered_set<std::string>& unassigned_synonyms,
                        const std::unordered_set<std::string>& targets, DomainMap& domain_map,
-                       const std::vector<BinaryConstraint>& constraints);
+                       ConstraintMap& constraint_map);
 
     // Choose a synonym to evaluate next during the search process. A good choice heuristic will
     // speed up the constraint solving process significantly.
-    static std::string choose_unassigned_synonym(const std::unordered_set<std::string>& targets,
-                                                 const AssignmentMap& assignment_map,
-                                                 const DomainMap& domain_map);
+    static std::string
+    choose_unassigned_synonym(const std::unordered_set<std::string>& unassigned_synonyms,
+                              const std::unordered_set<std::string>& targets, DomainMap& domain_map,
+                              ConstraintMap& constraint_map);
+    static double score_synonym(const std::string& synonym,
+                                const std::unordered_set<std::string>& unassigned_synonyms,
+                                const std::unordered_set<std::string>& targets,
+                                DomainMap& domain_map, ConstraintMap& constraint_map);
 
     // Execute the forward-checking step, i.e. invalidate all values in the domain which are
     // inconsistent with the current assignment.
-    static DomainMap invalidate_domain_map(const std::string& synonym,
-                                           AssignmentMap& assignment_map,
-                                           const std::vector<BinaryConstraint>& constraints,
-                                           DomainMap& domain_map);
+    static DomainMap
+    invalidate_domain_map(const std::string& synonym, const Assignment& assignment,
+                          const std::unordered_set<std::string>& unassigned_synonyms,
+                          DomainMap& domain_map, ConstraintMap& constraint_map);
 
     // Part of the backtracking step, i.e. used to restore all domains that were invalidated when
     // `invalidate_domain_map` is called.
