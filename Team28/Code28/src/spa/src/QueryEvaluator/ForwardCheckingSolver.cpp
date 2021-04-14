@@ -105,10 +105,10 @@ ForwardCheckingSolver::score_synonym(const std::string& synonym,
             num_remaining_constraints += 1;
         }
     }
-    score /= (0.5 * num_remaining_constraints) + 1;
+    score /= (3.5 * num_remaining_constraints) + 1;
 
     if (targets.find(synonym) == targets.end()) {
-        score *= 10;
+        score *= 2;
     }
 
     return score;
