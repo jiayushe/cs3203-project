@@ -138,6 +138,54 @@ TEST_CASE("KnowledgeBase::Statement") {
             REQUIRE_THROWS(stmt.set_pattern(node));
             REQUIRE_THROWS(stmt.get_pattern());
         }
+
+        SECTION("add_get_direct_next") {
+            REQUIRE(stmt.get_direct_next()->size() == 0);
+            int first_next_id = 11;
+            int second_next_id = 12;
+            stmt.add_direct_next(first_next_id);
+            stmt.add_direct_next(second_next_id);
+            REQUIRE(stmt.get_direct_next()->size() == 2);
+            REQUIRE(stmt.get_direct_next()->count(first_next_id) == 1);
+            REQUIRE(stmt.get_direct_next()->count(second_next_id) == 1);
+            REQUIRE(stmt.get_direct_next()->count(100) == 0);
+        }
+
+        SECTION("add_get_next") {
+            REQUIRE(stmt.get_next()->size() == 0);
+            int first_next_id = 11;
+            int second_next_id = 12;
+            stmt.add_next(first_next_id);
+            stmt.add_next(second_next_id);
+            REQUIRE(stmt.get_next()->size() == 2);
+            REQUIRE(stmt.get_next()->count(first_next_id) == 1);
+            REQUIRE(stmt.get_next()->count(second_next_id) == 1);
+            REQUIRE(stmt.get_next()->count(100) == 0);
+        }
+
+        SECTION("add_get_direct_previous") {
+            REQUIRE(stmt.get_direct_previous()->size() == 0);
+            int first_previous_id = 8;
+            int second_previous_id = 9;
+            stmt.add_direct_previous(first_previous_id);
+            stmt.add_direct_previous(second_previous_id);
+            REQUIRE(stmt.get_direct_previous()->size() == 2);
+            REQUIRE(stmt.get_direct_previous()->count(first_previous_id) == 1);
+            REQUIRE(stmt.get_direct_previous()->count(second_previous_id) == 1);
+            REQUIRE(stmt.get_direct_previous()->count(100) == 0);
+        }
+
+        SECTION("add_get_previous") {
+            REQUIRE(stmt.get_previous()->size() == 0);
+            int first_previous_id = 8;
+            int second_previous_id = 9;
+            stmt.add_previous(first_previous_id);
+            stmt.add_previous(second_previous_id);
+            REQUIRE(stmt.get_previous()->size() == 2);
+            REQUIRE(stmt.get_previous()->count(first_previous_id) == 1);
+            REQUIRE(stmt.get_previous()->count(second_previous_id) == 1);
+            REQUIRE(stmt.get_previous()->count(100) == 0);
+        }
     }
 
     SECTION("assign") {
@@ -150,6 +198,54 @@ TEST_CASE("KnowledgeBase::Statement") {
             auto node = build_node();
             stmt.set_pattern(node);
             REQUIRE(stmt.get_pattern()->is_equal(node));
+        }
+
+        SECTION("add_get_direct_affects") {
+            REQUIRE(stmt.get_direct_affects()->size() == 0);
+            int first_id = 8;
+            int second_id = 9;
+            stmt.add_direct_affects(first_id);
+            stmt.add_direct_affects(second_id);
+            REQUIRE(stmt.get_direct_affects()->size() == 2);
+            REQUIRE(stmt.get_direct_affects()->count(first_id) == 1);
+            REQUIRE(stmt.get_direct_affects()->count(second_id) == 1);
+            REQUIRE(stmt.get_direct_affects()->count(100) == 0);
+        }
+
+        SECTION("add_get_affects") {
+            REQUIRE(stmt.get_affects()->size() == 0);
+            int first_id = 8;
+            int second_id = 9;
+            stmt.add_affects(first_id);
+            stmt.add_affects(second_id);
+            REQUIRE(stmt.get_affects()->size() == 2);
+            REQUIRE(stmt.get_affects()->count(first_id) == 1);
+            REQUIRE(stmt.get_affects()->count(second_id) == 1);
+            REQUIRE(stmt.get_affects()->count(100) == 0);
+        }
+
+        SECTION("add_get_direct_affected_by") {
+            REQUIRE(stmt.get_direct_affected_by()->size() == 0);
+            int first_id = 8;
+            int second_id = 9;
+            stmt.add_direct_affected_by(first_id);
+            stmt.add_direct_affected_by(second_id);
+            REQUIRE(stmt.get_direct_affected_by()->size() == 2);
+            REQUIRE(stmt.get_direct_affected_by()->count(first_id) == 1);
+            REQUIRE(stmt.get_direct_affected_by()->count(second_id) == 1);
+            REQUIRE(stmt.get_direct_affected_by()->count(100) == 0);
+        }
+
+        SECTION("add_get_affected_by") {
+            REQUIRE(stmt.get_affected_by()->size() == 0);
+            int first_id = 8;
+            int second_id = 9;
+            stmt.add_affected_by(first_id);
+            stmt.add_affected_by(second_id);
+            REQUIRE(stmt.get_affected_by()->size() == 2);
+            REQUIRE(stmt.get_affected_by()->count(first_id) == 1);
+            REQUIRE(stmt.get_affected_by()->count(second_id) == 1);
+            REQUIRE(stmt.get_affected_by()->count(100) == 0);
         }
     }
 
@@ -189,6 +285,109 @@ TEST_CASE("KnowledgeBase::Statement") {
             REQUIRE(descendant_set->size() == 1);
             REQUIRE(descendant_set->count(descendant_id) == 1);
             REQUIRE(descendant_set->count(100) == 0);
+        }
+    }
+
+    SECTION("bip") {
+        StatementType stmt_type = StatementType::ASSIGN;
+        int stmt_id = 10;
+        std::string proc_name = "main";
+        Statement stmt(stmt_type, stmt_id, proc_name);
+
+        SECTION("add_get_direct_next_bip") {
+            REQUIRE(stmt.get_direct_next_bip()->size() == 0);
+            int first_next_id = 11;
+            int second_next_id = 12;
+            stmt.add_direct_next_bip(first_next_id);
+            stmt.add_direct_next_bip(second_next_id);
+            REQUIRE(stmt.get_direct_next_bip()->size() == 2);
+            REQUIRE(stmt.get_direct_next_bip()->count(first_next_id) == 1);
+            REQUIRE(stmt.get_direct_next_bip()->count(second_next_id) == 1);
+            REQUIRE(stmt.get_direct_next_bip()->count(100) == 0);
+        }
+
+        SECTION("add_get_next_bip") {
+            REQUIRE(stmt.get_next_bip()->size() == 0);
+            int first_next_id = 11;
+            int second_next_id = 12;
+            stmt.add_next_bip(first_next_id);
+            stmt.add_next_bip(second_next_id);
+            REQUIRE(stmt.get_next_bip()->size() == 2);
+            REQUIRE(stmt.get_next_bip()->count(first_next_id) == 1);
+            REQUIRE(stmt.get_next_bip()->count(second_next_id) == 1);
+            REQUIRE(stmt.get_next_bip()->count(100) == 0);
+        }
+
+        SECTION("add_get_direct_previous_bip") {
+            REQUIRE(stmt.get_direct_previous_bip()->size() == 0);
+            int first_previous_id = 8;
+            int second_previous_id = 9;
+            stmt.add_direct_previous_bip(first_previous_id);
+            stmt.add_direct_previous_bip(second_previous_id);
+            REQUIRE(stmt.get_direct_previous_bip()->size() == 2);
+            REQUIRE(stmt.get_direct_previous_bip()->count(first_previous_id) == 1);
+            REQUIRE(stmt.get_direct_previous_bip()->count(second_previous_id) == 1);
+            REQUIRE(stmt.get_direct_previous_bip()->count(100) == 0);
+        }
+
+        SECTION("add_get_previous_bip") {
+            REQUIRE(stmt.get_previous_bip()->size() == 0);
+            int first_previous_id = 8;
+            int second_previous_id = 9;
+            stmt.add_previous_bip(first_previous_id);
+            stmt.add_previous_bip(second_previous_id);
+            REQUIRE(stmt.get_previous_bip()->size() == 2);
+            REQUIRE(stmt.get_previous_bip()->count(first_previous_id) == 1);
+            REQUIRE(stmt.get_previous_bip()->count(second_previous_id) == 1);
+            REQUIRE(stmt.get_previous_bip()->count(100) == 0);
+        }
+
+        SECTION("add_get_direct_affects_bip") {
+            REQUIRE(stmt.get_direct_affects_bip()->size() == 0);
+            int first_id = 8;
+            int second_id = 9;
+            stmt.add_direct_affects_bip(first_id);
+            stmt.add_direct_affects_bip(second_id);
+            REQUIRE(stmt.get_direct_affects_bip()->size() == 2);
+            REQUIRE(stmt.get_direct_affects_bip()->count(first_id) == 1);
+            REQUIRE(stmt.get_direct_affects_bip()->count(second_id) == 1);
+            REQUIRE(stmt.get_direct_affects_bip()->count(100) == 0);
+        }
+
+        SECTION("add_get_affects_bip") {
+            REQUIRE(stmt.get_affects_bip()->size() == 0);
+            int first_id = 8;
+            int second_id = 9;
+            stmt.add_affects_bip(first_id);
+            stmt.add_affects_bip(second_id);
+            REQUIRE(stmt.get_affects_bip()->size() == 2);
+            REQUIRE(stmt.get_affects_bip()->count(first_id) == 1);
+            REQUIRE(stmt.get_affects_bip()->count(second_id) == 1);
+            REQUIRE(stmt.get_affects_bip()->count(100) == 0);
+        }
+
+        SECTION("add_get_direct_affected_bip_by") {
+            REQUIRE(stmt.get_direct_affected_bip_by()->size() == 0);
+            int first_id = 8;
+            int second_id = 9;
+            stmt.add_direct_affected_bip_by(first_id);
+            stmt.add_direct_affected_bip_by(second_id);
+            REQUIRE(stmt.get_direct_affected_bip_by()->size() == 2);
+            REQUIRE(stmt.get_direct_affected_bip_by()->count(first_id) == 1);
+            REQUIRE(stmt.get_direct_affected_bip_by()->count(second_id) == 1);
+            REQUIRE(stmt.get_direct_affected_bip_by()->count(100) == 0);
+        }
+
+        SECTION("add_get_direct_affected_bip_by") {
+            REQUIRE(stmt.get_direct_affected_bip_by()->size() == 0);
+            int first_id = 8;
+            int second_id = 9;
+            stmt.add_affected_bip_by(first_id);
+            stmt.add_affected_bip_by(second_id);
+            REQUIRE(stmt.get_affected_bip_by()->size() == 2);
+            REQUIRE(stmt.get_affected_bip_by()->count(first_id) == 1);
+            REQUIRE(stmt.get_affected_bip_by()->count(second_id) == 1);
+            REQUIRE(stmt.get_affected_bip_by()->count(100) == 0);
         }
     }
 }

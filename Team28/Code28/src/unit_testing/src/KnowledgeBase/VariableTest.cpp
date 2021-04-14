@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
 #include "KnowledgeBase/Variable.h"
+#include <KnowledgeBase/Procedure.h>
 #include <string>
 
 using namespace KnowledgeBase;
@@ -45,5 +46,33 @@ TEST_CASE("KnowledgeBase::Variable") {
         REQUIRE(used_by_set->size() == 1);
         REQUIRE(used_by_set->count(stmt_id) == 1);
         REQUIRE(used_by_set->count(100) == 0);
+    }
+
+    SECTION("add_get_modified_by_procedures") {
+        std::string first_proc_name = "main";
+        std::string second_proc_name = "compute";
+        Procedure first_proc(first_proc_name);
+        Procedure second_proc(second_proc_name);
+        var.add_modified_by_procedure(first_proc_name);
+        var.add_modified_by_procedure(second_proc_name);
+        auto modified_by_set = var.get_modified_by_procedures();
+        REQUIRE(modified_by_set->size() == 2);
+        REQUIRE(modified_by_set->count(first_proc_name) == 1);
+        REQUIRE(modified_by_set->count(second_proc_name) == 1);
+        REQUIRE(modified_by_set->count("hello") == 0);
+    }
+
+    SECTION("add_get_used_by_procedures") {
+        std::string first_proc_name = "main";
+        std::string second_proc_name = "compute";
+        Procedure first_proc(first_proc_name);
+        Procedure second_proc(second_proc_name);
+        var.add_used_by_procedure(first_proc_name);
+        var.add_used_by_procedure(second_proc_name);
+        auto used_by_set = var.get_used_by_procedures();
+        REQUIRE(used_by_set->size() == 2);
+        REQUIRE(used_by_set->count(first_proc_name) == 1);
+        REQUIRE(used_by_set->count(second_proc_name) == 1);
+        REQUIRE(used_by_set->count("hello") == 0);
     }
 }

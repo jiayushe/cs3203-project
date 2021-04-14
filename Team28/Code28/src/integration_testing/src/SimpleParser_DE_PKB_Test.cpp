@@ -13,6 +13,9 @@ using namespace Parser;
 
 std::shared_ptr<SimpleNode> build_multi_proc_ast() {
     std::string source;
+    // This SIMPLE source code is adapted from CS3203 project wiki page, Code 6.
+    // See
+    // https://github.com/nus-cs3203/project-wiki/wiki/Full-(Basic-and-Advanced)-SPA-requirements#code-6-simple-program-used-to-explain-basic-relationships-and-basic-pql-queries
     source += "procedure main {";
     source += "    flag = 0;";
     source += "    call computeCentroid;";
