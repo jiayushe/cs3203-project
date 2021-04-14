@@ -209,8 +209,8 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE(query_object.get_all_pattern().empty());
             REQUIRE(query_object.get_all_with().empty());
 
-            std::vector<SuchThat> such_that_vector = query_object.get_all_such_that();
-            SuchThat such_that_obj = such_that_vector.front();
+            auto all_such_that = query_object.get_all_such_that();
+            SuchThat such_that_obj = *all_such_that.begin();
             REQUIRE(such_that_obj.get_type() == such_that_map[op]);
 
             SuchThatRef left_ref = such_that_obj.get_left_ref();
@@ -251,8 +251,8 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE(query_object.get_all_pattern().empty());
             REQUIRE(query_object.get_all_with().empty());
 
-            std::vector<SuchThat> such_that_vector = query_object.get_all_such_that();
-            SuchThat such_that_obj = such_that_vector.front();
+            auto all_such_that = query_object.get_all_such_that();
+            SuchThat such_that_obj = *all_such_that.begin();
             REQUIRE(such_that_obj.get_type() == such_that_map[op]);
 
             SuchThatRef left_ref = such_that_obj.get_left_ref();
@@ -292,8 +292,8 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE(query_object.get_all_pattern().empty());
             REQUIRE(query_object.get_all_with().empty());
 
-            std::vector<SuchThat> such_that_vector = query_object.get_all_such_that();
-            SuchThat such_that_obj = such_that_vector.front();
+            auto all_such_that = query_object.get_all_such_that();
+            SuchThat such_that_obj = *all_such_that.begin();
             REQUIRE(such_that_obj.get_type() == such_that_map[op]);
 
             SuchThatRef left_ref = such_that_obj.get_left_ref();
@@ -328,8 +328,8 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE(query_object.get_all_pattern().empty());
             REQUIRE(query_object.get_all_with().empty());
 
-            std::vector<SuchThat> such_that_vector = query_object.get_all_such_that();
-            SuchThat such_that_obj = such_that_vector.front();
+            auto all_such_that = query_object.get_all_such_that();
+            SuchThat such_that_obj = *all_such_that.begin();
             REQUIRE(such_that_obj.get_type() == such_that_map[op + "P"]);
 
             SuchThatRef left_ref = such_that_obj.get_left_ref();
@@ -366,8 +366,8 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE(query_object.get_all_pattern().empty());
             REQUIRE(query_object.get_all_with().empty());
 
-            std::vector<SuchThat> such_that_vector = query_object.get_all_such_that();
-            SuchThat such_that_obj = such_that_vector.front();
+            auto all_such_that = query_object.get_all_such_that();
+            SuchThat such_that_obj = *all_such_that.begin();
             REQUIRE(such_that_obj.get_type() == such_that_map["Modifies"]);
 
             SuchThatRef left_ref = such_that_obj.get_left_ref();
@@ -397,12 +397,12 @@ TEST_CASE("Parser::PQLParser") {
             auto query_object_2 = parser_2.parse_query();
             auto query_object_3 = parser_3.parse_query();
 
-            std::vector<SuchThat> such_that_vector_1 = query_object_1.get_all_such_that();
-            SuchThat such_that_obj_1 = such_that_vector_1.front();
-            std::vector<SuchThat> such_that_vector_2 = query_object_2.get_all_such_that();
-            SuchThat such_that_obj_2 = such_that_vector_2.front();
-            std::vector<SuchThat> such_that_vector_3 = query_object_3.get_all_such_that();
-            SuchThat such_that_obj_3 = such_that_vector_3.front();
+            auto all_such_that_1 = query_object_1.get_all_such_that();
+            SuchThat such_that_obj_1 = *all_such_that_1.begin();
+            auto all_such_that_2 = query_object_2.get_all_such_that();
+            SuchThat such_that_obj_2 = *all_such_that_2.begin();
+            auto all_such_that_3 = query_object_3.get_all_such_that();
+            SuchThat such_that_obj_3 = *all_such_that_3.begin();
             SuchThatRef left_ref_1 = such_that_obj_1.get_left_ref();
             SuchThatRef right_ref_1 = such_that_obj_1.get_right_ref();
             SuchThatRef left_ref_2 = such_that_obj_2.get_left_ref();
@@ -452,33 +452,31 @@ TEST_CASE("Parser::PQLParser") {
         REQUIRE(query_object.get_all_pattern().empty());
         REQUIRE(query_object.get_all_with().empty());
 
-        std::vector<SuchThat> such_that_vector = query_object.get_all_such_that();
-        SuchThat such_that_0 = such_that_vector[0];
-        SuchThat such_that_1 = such_that_vector[1];
-        REQUIRE(such_that_0.get_type() == SuchThatType::MODIFIES_P);
-        REQUIRE(such_that_1.get_type() == SuchThatType::USES_P);
+        EntityRef expected_any_entref;
+        expected_any_entref.set_type(EntityRefType::ANY);
+        SuchThatRef expected_any_ref(expected_any_entref);
 
-        SuchThatRef left_ref_0 = such_that_0.get_left_ref();
-        SuchThatRef right_ref_0 = such_that_0.get_right_ref();
-        REQUIRE(left_ref_0.get_type() == SuchThatRefType::ENTITY);
-        REQUIRE(right_ref_0.get_type() == SuchThatRefType::ENTITY);
+        SuchThat expected_first_such_that;
+        EntityRef expected_first_left_entref;
+        expected_first_left_entref.set_type(EntityRefType::SYNONYM);
+        expected_first_left_entref.set_synonym("p");
+        SuchThatRef expected_first_left_ref(expected_first_left_entref);
+        expected_first_such_that.set_type(SuchThatType::MODIFIES_P);
+        expected_first_such_that.set_left_ref(expected_first_left_ref);
+        expected_first_such_that.set_right_ref(expected_any_ref);
 
-        EntityRef left_entity_ref = left_ref_0.get_entity_ref();
-        EntityRef right_entity_ref = right_ref_0.get_entity_ref();
-        REQUIRE(left_entity_ref.get_type() == EntityRefType::SYNONYM);
-        REQUIRE(left_entity_ref.get_synonym() == "p");
-        REQUIRE(right_entity_ref.get_type() == EntityRefType::ANY);
+        SuchThat expected_second_such_that;
+        EntityRef expected_second_left_entref;
+        expected_second_left_entref.set_type(EntityRefType::SYNONYM);
+        expected_second_left_entref.set_synonym("p1");
+        SuchThatRef expected_second_left_ref(expected_second_left_entref);
+        expected_second_such_that.set_type(SuchThatType::USES_P);
+        expected_second_such_that.set_left_ref(expected_second_left_ref);
+        expected_second_such_that.set_right_ref(expected_any_ref);
 
-        SuchThatRef left_ref_1 = such_that_1.get_left_ref();
-        SuchThatRef right_ref_1 = such_that_1.get_right_ref();
-        REQUIRE(left_ref_1.get_type() == SuchThatRefType::ENTITY);
-        REQUIRE(right_ref_1.get_type() == SuchThatRefType::ENTITY);
-
-        left_entity_ref = left_ref_1.get_entity_ref();
-        right_entity_ref = right_ref_1.get_entity_ref();
-        REQUIRE(left_entity_ref.get_type() == EntityRefType::SYNONYM);
-        REQUIRE(left_entity_ref.get_synonym() == "p1");
-        REQUIRE(right_entity_ref.get_type() == EntityRefType::ANY);
+        auto all_such_that = query_object.get_all_such_that();
+        REQUIRE(all_such_that == std::unordered_set<SuchThat, SuchThatHash>{
+                                     expected_first_such_that, expected_second_such_that});
     }
 
     SECTION("One Pattern clause") {
@@ -507,10 +505,10 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE(query_object.get_all_pattern().size() == 1);
             REQUIRE(query_object.get_all_with().empty());
 
-            std::vector<Pattern> pattern = query_object.get_all_pattern();
-            REQUIRE(pattern.size() == 1);
-            REQUIRE(pattern.front().get_type() == PatternType::ASSIGN);
-            PatternAssign pattern_obj = pattern.front().get_pattern_assign();
+            auto all_pattern = query_object.get_all_pattern();
+            REQUIRE(all_pattern.size() == 1);
+            REQUIRE(all_pattern.begin()->get_type() == PatternType::ASSIGN);
+            PatternAssign pattern_obj = all_pattern.begin()->get_pattern_assign();
             std::string assigned_synonym = pattern_obj.get_assign_synonym();
             REQUIRE(assigned_synonym == "a");
 
@@ -543,10 +541,10 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE(query_object.get_all_pattern().size() == 1);
             REQUIRE(query_object.get_all_with().empty());
 
-            std::vector<Pattern> pattern = query_object.get_all_pattern();
-            REQUIRE(pattern.size() == 1);
-            REQUIRE(pattern.front().get_type() == PatternType::IF);
-            PatternIf pattern_obj = pattern.front().get_pattern_if();
+            auto all_pattern = query_object.get_all_pattern();
+            REQUIRE(all_pattern.size() == 1);
+            REQUIRE(all_pattern.begin()->get_type() == PatternType::IF);
+            PatternIf pattern_obj = all_pattern.begin()->get_pattern_if();
             std::string assigned_synonym = pattern_obj.get_if_synonym();
             REQUIRE(assigned_synonym == "ifs");
 
@@ -577,10 +575,10 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE(query_object.get_all_pattern().size() == 1);
             REQUIRE(query_object.get_all_with().empty());
 
-            std::vector<Pattern> pattern = query_object.get_all_pattern();
-            REQUIRE(pattern.size() == 1);
-            REQUIRE(pattern.front().get_type() == PatternType::WHILE);
-            PatternWhile pattern_obj = pattern.front().get_pattern_while();
+            auto all_pattern = query_object.get_all_pattern();
+            REQUIRE(all_pattern.size() == 1);
+            REQUIRE(all_pattern.begin()->get_type() == PatternType::WHILE);
+            PatternWhile pattern_obj = all_pattern.begin()->get_pattern_while();
             std::string assigned_synonym = pattern_obj.get_while_synonym();
             REQUIRE(assigned_synonym == "while");
 
@@ -615,10 +613,10 @@ TEST_CASE("Parser::PQLParser") {
             REQUIRE(query_object.get_all_pattern().size() == 1);
             REQUIRE(query_object.get_all_with().empty());
 
-            std::vector<Pattern> pattern = query_object.get_all_pattern();
-            REQUIRE(pattern.size() == 1);
-            REQUIRE(pattern.front().get_type() == PatternType::ASSIGN);
-            PatternAssign pattern_obj = pattern.front().get_pattern_assign();
+            auto all_pattern = query_object.get_all_pattern();
+            REQUIRE(all_pattern.size() == 1);
+            REQUIRE(all_pattern.begin()->get_type() == PatternType::ASSIGN);
+            PatternAssign pattern_obj = all_pattern.begin()->get_pattern_assign();
             std::string assigned_synonym = pattern_obj.get_assign_synonym();
             REQUIRE(assigned_synonym == "pattern");
 
@@ -635,10 +633,10 @@ TEST_CASE("Parser::PQLParser") {
             auto source = std::make_shared<Parser::Source>(query);
             Parser::PQLParser parser(source);
             auto query_object = parser.parse_query();
-            std::vector<Pattern> pattern = query_object.get_all_pattern();
-            REQUIRE(pattern.size() == 1);
-            REQUIRE(pattern.front().get_type() == PatternType::ASSIGN);
-            PatternAssign pattern_obj = pattern.front().get_pattern_assign();
+            auto all_pattern = query_object.get_all_pattern();
+            REQUIRE(all_pattern.size() == 1);
+            REQUIRE(all_pattern.begin()->get_type() == PatternType::ASSIGN);
+            PatternAssign pattern_obj = all_pattern.begin()->get_pattern_assign();
             ExpressionSpec expression_spec = pattern_obj.get_expression_spec();
             REQUIRE(expression_spec.get_type() == ExpressionSpecType::ANY);
         }
@@ -666,23 +664,37 @@ TEST_CASE("Parser::PQLParser") {
         REQUIRE(query_object.get_all_pattern().size() == 3);
         REQUIRE(query_object.get_all_with().empty());
 
-        std::vector<Pattern> pattern = query_object.get_all_pattern();
-        REQUIRE(pattern[0].get_type() == PatternType::ASSIGN);
-        PatternAssign pattern_assign = pattern[0].get_pattern_assign();
-        REQUIRE(pattern[1].get_type() == PatternType::IF);
-        PatternIf pattern_if = pattern[1].get_pattern_if();
-        REQUIRE(pattern[2].get_type() == PatternType::WHILE);
-        PatternWhile pattern_while = pattern[2].get_pattern_while();
+        EntityRef expected_any_entity_ref;
+        expected_any_entity_ref.set_type(EntityRefType::ANY);
 
-        REQUIRE(pattern_assign.get_assign_synonym() == "a");
-        REQUIRE(pattern_assign.get_entity_ref().get_type() == EntityRefType::ANY);
-        REQUIRE(pattern_assign.get_expression_spec().get_type() == ExpressionSpecType::ANY);
+        Pattern expected_first_pattern;
+        PatternAssign expected_first_pattern_assign;
+        ExpressionSpec expected_first_pattern_assign_exprspec;
+        expected_first_pattern_assign_exprspec.set_type(ExpressionSpecType::ANY);
+        expected_first_pattern_assign.set_assign_synonym("a");
+        expected_first_pattern_assign.set_entity_ref(expected_any_entity_ref);
+        expected_first_pattern_assign.set_expression_spec(expected_first_pattern_assign_exprspec);
+        expected_first_pattern.set_type(PatternType::ASSIGN);
+        expected_first_pattern.set_pattern_assign(expected_first_pattern_assign);
 
-        REQUIRE(pattern_if.get_if_synonym() == "ifs");
-        REQUIRE(pattern_if.get_entity_ref().get_type() == EntityRefType::ANY);
+        Pattern expected_second_pattern;
+        PatternIf expected_second_pattern_if;
+        expected_second_pattern_if.set_if_synonym("ifs");
+        expected_second_pattern_if.set_entity_ref(expected_any_entity_ref);
+        expected_second_pattern.set_type(PatternType::IF);
+        expected_second_pattern.set_pattern_if(expected_second_pattern_if);
 
-        REQUIRE(pattern_while.get_while_synonym() == "w");
-        REQUIRE(pattern_while.get_entity_ref().get_type() == EntityRefType::ANY);
+        Pattern expected_third_pattern;
+        PatternWhile expected_third_pattern_while;
+        expected_third_pattern_while.set_while_synonym("w");
+        expected_third_pattern_while.set_entity_ref(expected_any_entity_ref);
+        expected_third_pattern.set_type(PatternType::WHILE);
+        expected_third_pattern.set_pattern_while(expected_third_pattern_while);
+
+        auto all_pattern = query_object.get_all_pattern();
+        REQUIRE(all_pattern == std::unordered_set<Pattern, PatternHash>{expected_first_pattern,
+                                                                        expected_second_pattern,
+                                                                        expected_third_pattern});
     }
 
     SECTION("One With clause") {
@@ -711,10 +723,10 @@ TEST_CASE("Parser::PQLParser") {
                 REQUIRE(query_object.get_all_pattern().empty());
                 REQUIRE(query_object.get_all_with().size() == 1);
 
-                std::vector<With> with = query_object.get_all_with();
-                REQUIRE(with.size() == 1);
-                WithRef left_with_ref = with.front().get_left_ref();
-                WithRef right_with_ref = with.front().get_right_ref();
+                auto all_with = query_object.get_all_with();
+                REQUIRE(all_with.size() == 1);
+                WithRef left_with_ref = all_with.begin()->get_left_ref();
+                WithRef right_with_ref = all_with.begin()->get_right_ref();
 
                 if (op == "NAME2") {
                     REQUIRE(left_with_ref.get_type() == WithRefType::NAME);
@@ -755,10 +767,10 @@ TEST_CASE("Parser::PQLParser") {
                 REQUIRE(query_object.get_all_pattern().empty());
                 REQUIRE(query_object.get_all_with().size() == 1);
 
-                std::vector<With> with = query_object.get_all_with();
-                REQUIRE(with.size() == 1);
-                WithRef left_with_ref = with.front().get_left_ref();
-                WithRef right_with_ref = with.front().get_right_ref();
+                auto all_with = query_object.get_all_with();
+                REQUIRE(all_with.size() == 1);
+                WithRef left_with_ref = all_with.begin()->get_left_ref();
+                WithRef right_with_ref = all_with.begin()->get_right_ref();
 
                 if (op == "20") {
                     REQUIRE(left_with_ref.get_type() == WithRefType::STATEMENT_ID);
@@ -807,15 +819,29 @@ TEST_CASE("Parser::PQLParser") {
         REQUIRE(query_object.get_all_pattern().empty());
         REQUIRE(query_object.get_all_with().size() == 2);
 
-        std::vector<With> with = query_object.get_all_with();
-        REQUIRE(with[0].get_left_ref().get_type() == WithRefType::STATEMENT_ID);
-        REQUIRE(with[0].get_left_ref().get_statement_id() == 10);
-        REQUIRE(with[0].get_right_ref().get_type() == WithRefType::STATEMENT_ID);
-        REQUIRE(with[0].get_right_ref().get_statement_id() == 20);
-        REQUIRE(with[1].get_left_ref().get_type() == WithRefType::STATEMENT_ID);
-        REQUIRE(with[1].get_left_ref().get_statement_id() == 30);
-        REQUIRE(with[1].get_right_ref().get_type() == WithRefType::STATEMENT_ID);
-        REQUIRE(with[1].get_right_ref().get_statement_id() == 40);
+        With expected_first_with;
+        WithRef expected_first_left_ref;
+        WithRef expected_first_right_ref;
+        expected_first_left_ref.set_type(WithRefType::STATEMENT_ID);
+        expected_first_left_ref.set_statement_id(10);
+        expected_first_right_ref.set_type(WithRefType::STATEMENT_ID);
+        expected_first_right_ref.set_statement_id(20);
+        expected_first_with.set_left_ref(expected_first_left_ref);
+        expected_first_with.set_right_ref(expected_first_right_ref);
+
+        With expected_second_with;
+        WithRef expected_second_left_ref;
+        WithRef expected_second_right_ref;
+        expected_second_left_ref.set_type(WithRefType::STATEMENT_ID);
+        expected_second_left_ref.set_statement_id(30);
+        expected_second_right_ref.set_type(WithRefType::STATEMENT_ID);
+        expected_second_right_ref.set_statement_id(40);
+        expected_second_with.set_left_ref(expected_second_left_ref);
+        expected_second_with.set_right_ref(expected_second_right_ref);
+
+        auto all_with = query_object.get_all_with();
+        REQUIRE(all_with ==
+                std::unordered_set<With, WithHash>{expected_first_with, expected_second_with});
     }
 
     SECTION("Multiple Such That clause, Multiple Pattern clause, Multiple With clause") {
@@ -852,27 +878,6 @@ TEST_CASE("Parser::PQLParser") {
         REQUIRE(query_object.get_all_such_that().size() == 3);
         REQUIRE(query_object.get_all_pattern().size() == 3);
         REQUIRE(query_object.get_all_with().size() == 3);
-
-        std::vector<SuchThat> such_that_vector = query_object.get_all_such_that();
-        REQUIRE(such_that_vector[0].get_type() == SuchThatType::USES_S);
-        REQUIRE(such_that_vector[1].get_type() == SuchThatType::CALLS_T);
-        REQUIRE(such_that_vector[2].get_type() == SuchThatType::MODIFIES_P);
-
-        std::vector<Pattern> pattern_vector = query_object.get_all_pattern();
-        REQUIRE(pattern_vector[0].get_type() == PatternType::ASSIGN);
-        REQUIRE(
-            pattern_vector[0].get_pattern_assign().get_expression_spec().get_pattern()->is_equal(
-                pattern_node));
-        REQUIRE(pattern_vector[1].get_type() == PatternType::ASSIGN);
-        REQUIRE(pattern_vector[2].get_type() == PatternType::ASSIGN);
-
-        std::vector<With> with_vector = query_object.get_all_with();
-        REQUIRE(with_vector[0].get_left_ref().get_statement_id() == 10);
-        REQUIRE(with_vector[0].get_right_ref().get_statement_id() == 10);
-        REQUIRE(with_vector[1].get_left_ref().get_statement_id() == 20);
-        REQUIRE(with_vector[1].get_right_ref().get_statement_id() == 20);
-        REQUIRE(with_vector[2].get_left_ref().get_statement_id() == 30);
-        REQUIRE(with_vector[2].get_right_ref().get_statement_id() == 30);
     }
 
     SECTION("Syntactic validation") {
