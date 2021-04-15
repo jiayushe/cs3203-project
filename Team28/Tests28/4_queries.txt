@@ -1138,3 +1138,268 @@ If ifs;
 Select ifs pattern if(_, _, _"v1"_)
 none
 5000
+229 - [Modifies] procedure as 1st argument
+procedure p;
+Select p such that Modifies(p, "a")
+proc1, proc4, proc5
+5000
+230 - [Modifies] procedure as 1st argument
+procedure p, q, r; variable v; assign a;
+Select v such that Modifies(p, v) and Modifies(q, v) and Modifies(r, v) and Modifies(a, v)
+v1, v2, a, v10, v12, v3, v4, v5, v6, v7, v9, x, y, z
+5000
+231 - [Next] 2 synonyms
+prog_line n1, n2;
+Select n2 such that Next(n1, n2) and Next(n2, n1)
+54, 55
+5000
+232 - [with read print call]
+stmt s; call c; read r; print pr;
+Select <s, c, r, pr> such that Parent(s, c) with r.varName = "v1" and pr.varName = "v1" and c.procName = "PROC2"
+16 20 1 14, 16 20 1 17, 16 20 1 49
+5000
+233 - [Affects] TRUE is affects relationship is present
+
+Select BOOLEAN such that Affects(_, _) 
+TRUE
+5000
+234 - [Affects] TRUE if any assignment affects given assignment
+
+Select BOOLEAN such that Affects(_, 19)
+TRUE
+5000
+235 - [Affects] TRUE if given assignment affects any assignment
+
+Select BOOLEAN such that Affects(36, _)
+FALSE
+5000
+236 - [Affects] FALSE if given synonym is not assignment
+
+Select BOOLEAN such that Affects(37, _)
+FALSE
+5000
+237 - [Affects] FALSE if given synonyms are not from the same procedure
+
+Select BOOLEAN such that Affects(47, 50)
+FALSE
+5000
+238 - [Affects] TRUE if given assignment affects another given assignment
+
+Select BOOLEAN such that Affects(28, 27)
+TRUE
+5000
+239 - [Affects] All assignment affected by the given assignment
+assign a;
+Select a such that Affects(18,a) 
+19
+5000
+240 - [Affects] All assignment affecting the given assignment
+prog_line n;
+Select n such that Affects(n, 33)
+30
+5000
+241 - [Affects] All assignment affected by the given assignment
+assign a;
+Select a such that Affects(32,a) 
+none
+5000
+242 - [Affects] All assignment affecting the some statement
+assign a1, a2;
+Select <a1, a2> such that Affects(a1, a2)
+18 19, 27 28, 28 27, 30 33, 21 35, 22 35, 23 35, 30 30, 40 42, 40 44 
+5000
+243 - [Affects] All assignment affected by some statement
+assign a1,  a2;
+Select <a1, a2> such that Affects(a1 ,a2) and Affects(a2, a1) 
+28 27, 27 28, 30 30
+5000
+244 - [Affects*] TRUE is affects relationship is present
+
+Select BOOLEAN such that Affects*(_, _) 
+TRUE
+5000
+245 - [Affects*] TRUE if any assignment affects given assignment
+
+Select BOOLEAN such that Affects*(_, 19)
+TRUE
+5000
+246 - [Affects*] TRUE if given assignment affects any assignment
+
+Select BOOLEAN such that Affects*(36, _)
+FALSE
+5000
+247 - [Affects*] FALSE if given synonym is not assignment
+
+Select BOOLEAN such that Affects*(37, _)
+FALSE
+5000
+248 - [Affects*] FALSE if given synonyms are not from the same procedure
+
+Select BOOLEAN such that Affects*(47, 50)
+FALSE
+5000
+249 - [Affects*] TRUE if given assignment affects directly or indirectly another given assignment
+
+Select BOOLEAN such that Affects*(27, 27)
+TRUE
+5000
+250 - [Affects*] All assignment affected directly or indirectly by the given assignment
+assign a;
+Select a such that Affects*(18,a) 
+19
+5000
+251 - [Affects*] All assignment affecting directly or indirectly the given assignment
+assign a;
+Select a such that Affects*(a, 35)
+21, 22, 23
+5000
+252 - [Affects*] All assignment affected directly or indirectly by the given assignment
+prog_line n;
+Select n such that Affects*(32, n) 
+none
+5000
+253 - [Affects*] All assignment affected directly or indirectly by some statement
+assign a1,  a2;
+Select <a1, a2> such that Affects*(a1 ,a2) and Affects*(a2, a1) 
+28 27, 27 28, 30 30, 28 28, 27 27
+5000
+254 - [Modifies] LHS is call
+call c;
+Select c such that Modifies(c, "a")
+37, 57
+5000
+255 - [Modifies] LHS is prog_line
+prog_line n;
+Select n such that Modifies(n, "v1")
+1, 18, 20, 47, 50, 16, 34, 48
+5000
+256 - [Uses] LHS is call
+call c;
+Select c such that Uses(c, "x")
+20
+5000
+257 - [Uses] LHS is prog_line
+prog_line n; 
+Select n such that Uses(n, "v7")
+28, 16, 24
+5000
+258 - [Uses] LHS is a procedure
+procedure p;
+Select p such that Uses(p, "unmodified")
+proc1, proc4
+5000
+259 - [Follows] LHS is if
+if ifs; assign a;
+Select a such that Follows(ifs, a)
+32
+5000
+260 - [Follows] LHS is while
+while w; print p;
+Select w such that Follows(w, p)
+54
+5000
+261 - [Follows] LHS is assign
+assign a;
+Select a such that Follows(a, 59)
+none
+5000
+262 - [Follows] LHS is call
+call c;
+Select c such that Follows(c, 35)
+34
+5000
+263 - [Follows] LHS is prog_line
+prog_line n1, n2;
+Select n1 such that Follows(n1, 43)
+42
+5000
+264 - [Follows*] LHS is read
+read r1, r2;
+Select BOOLEAN such that Follows*(r1, r2)
+TRUE
+5000
+265 - [Follows*] LHS is print
+print p; while w;
+Select p such that Follows*(p, w)
+53
+5000
+266 - [Follows*] LHS is call
+call c;
+Select c such that Follows*(c, 49)
+48
+5000
+267 - [Follows*] LHS is prog_line
+prog_line n; if ifs;
+Select n such that Follows*(n, ifs) with ifs.stmt# = 41
+40
+5000
+268 - [Pattern] Pattern while with LHS is a variable
+variable v; while w;
+Select v pattern w(v, _)
+v3, v8, x, v9, z, v10
+5000
+269 - [Pattern] Pattern if with LHS is a variable
+variable v; if ifs;
+Select v pattern ifs(v, _, _)
+v1, v2, v3, v4, x, unmodified
+5000
+270 - [Next] LHS is read
+read r;
+Select r such that Next(r, 3)
+2
+5000
+271 - [Next] LHS is assign
+assign a;
+Select a such that Next(a, 14)
+none
+5000
+272 - [Next] LHS is print
+print p; read r;
+Select p such that Next(p, r)
+25, 45
+5000
+273 - [Next] LHS is if
+if ifs;
+Select ifs such that Next(ifs, _)
+41, 16, 29
+5000
+274 - [Next] LHS is while
+while w; prog_line n;
+Select w such that Next(w, n) and Next(n, w)
+54
+5000
+275 - [Next] LHS is call
+call c;
+Select BOOLEAN such that Next(c, c)
+FALSE
+5000
+276 - [Next*] LHS is read
+read r;
+Select r such that Next*(r, 4)
+1, 2, 3
+5000
+277 - [Next*] LHS is assign
+assign a; print p;
+Select a such that Next*(a, 24)
+21, 22, 23, 27, 28, 30
+5000
+278 - [Next*] LHS is print
+print p;
+Select p such that Next*(p, 16)
+14, 15
+5000
+279 - [Next*] LHS is if
+if ifs1, ifs2;
+Select ifs1 such that Next*(ifs1, ifs2)
+16, 29
+5000
+280 - [Next*] LHS is while
+while w; call c;
+Select w such that Next*(w, c)
+24, 54
+5000
+281 - [Next*] LHS is call
+call c1, c2;
+Select c1 such that Next*(c1, c2)
+34, 20
+5000
