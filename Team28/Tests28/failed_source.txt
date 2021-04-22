@@ -1,0 +1,15 @@
+procedure P1 {
+  call P2;
+  a = 1;
+  call P3;
+  c = a + b;
+}
+
+procedure P2 {
+  a = 1;
+  call P3;
+}
+
+procedure P3 {
+  b = a;
+}

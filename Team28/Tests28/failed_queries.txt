@@ -1,0 +1,5 @@
+1 - No clause
+stmt s;
+Select s such that AffectsBip*(s, 4)
+2,7
+5000
